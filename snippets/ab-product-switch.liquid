@@ -15,6 +15,26 @@ the time. Everyone sees the same version at the same time.
   html[data-ab-version] and published as the "ab_product_page_view" customer event for custom pixels.
 {%- endcomment -%}
 
+{%- comment -%}
+  Safety net: if the redirect to template A lands on a 404 (template A missing or not yet synced on the store), go
+  straight back to the product without ?view= and switch the test off for the rest of the visit.
+{%- endcomment -%}
+{%- if settings.ab_enabled and request.page_type == '404' -%}
+  <script>
+    (function () {
+      var templateA = {{ settings.ab_template_a | default: 'version-a' | strip | json }};
+      var url = new URL(window.location.href);
+
+      if (url.searchParams.get('view') === templateA && url.pathname.indexOf('/products/') !== -1) {
+        try { sessionStorage.setItem('ab-template-a-missing', '1'); } catch (error) {}
+        url.searchParams.delete('view');
+        url.searchParams.delete('ab_preview');
+        window.location.replace(url.toString());
+      }
+    })();
+  </script>
+{%- endif -%}
+
 {%- if settings.ab_enabled and request.page_type == 'product' and product != blank -%}
   {%- liquid
     assign ab_a = settings.ab_template_a | default: 'version-a' | strip
@@ -79,6 +99,11 @@ the time. Everyone sees the same version at the same time.
         var url = new URL(window.location.href);
         var preview = (url.searchParams.get('ab_preview') || '').toLowerCase();
         var wantA = preview === 'a' ? true : (preview === 'b' ? false : inWindow);
+
+        // Template A answered with a 404 earlier in this visit (see the 404 guard below): stay on B.
+        try {
+          if (preview !== 'a' && sessionStorage.getItem('ab-template-a-missing')) wantA = false;
+        } catch (error) {}
         var isA = config.current === config.a;
 
         if (!config.designMode) {
