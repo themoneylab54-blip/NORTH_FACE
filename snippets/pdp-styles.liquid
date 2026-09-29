@@ -249,4 +249,75 @@ Supported variables:
     color: var(--pdp-text);
     white-space: nowrap;
   }
+
+  /* ------------------------------------------------------------------
+     Color chips (outdoor brand style): small 46 x 32 rectangles in one
+     row, thin frame, black outline around the selected color
+     ------------------------------------------------------------------ */
+  {{ pdp_scope }} .pdp-size-selector__values--color,
+  {{ pdp_scope }} .variant-picker__option-values:has(.thumbnail-swatch) {
+    gap: 6px;
+  }
+
+  {{ pdp_scope }} .pdp-size-selector__values--color :is(.thumbnail-swatch, .color-swatch),
+  {{ pdp_scope }} .variant-picker__option-values .thumbnail-swatch {
+    --swatch-size: 46px;
+    width: 46px;
+    height: 32px;
+    margin: 0;
+    border-radius: var(--pdp-radius);
+    outline: 1px solid var(--pdp-border);
+    outline-offset: -1px;
+    cursor: pointer;
+  }
+
+  {{ pdp_scope }} :is(.pdp-size-selector__values--color, .variant-picker__option-values) .thumbnail-swatch > img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: var(--pdp-radius);
+  }
+
+  {{ pdp_scope }} .pdp-size-selector__values--color :is(.thumbnail-swatch, .color-swatch)::before,
+  {{ pdp_scope }} .variant-picker__option-values .thumbnail-swatch::before {
+    inset: -4px;
+    width: auto;
+    border-radius: 3px;
+    box-shadow: 0 0 0 1px var(--pdp-text);
+    transform: none;
+  }
+
+  {{ pdp_scope }} :checked + :is(.thumbnail-swatch, .color-swatch) {
+    outline-color: transparent;
+  }
+
+  /* ------------------------------------------------------------------
+     Mobile gallery arrows: two small squares over the bottom-left corner
+     ------------------------------------------------------------------ */
+  {{ pdp_scope }} .product-gallery__arrows {
+    position: absolute;
+    inset-inline-start: 12px;
+    bottom: 12px;
+    z-index: 2;
+    display: flex;
+    gap: 6px;
+  }
+
+  {{ pdp_scope }} .product-gallery__arrow {
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border: 1px solid var(--pdp-input-border);
+    border-radius: var(--pdp-radius);
+    background: rgba(255, 255, 255, .92);
+    color: var(--pdp-text);
+    cursor: pointer;
+  }
+
+  {{ pdp_scope }} .product-gallery__arrow svg {
+    width: 10px;
+    height: auto;
+  }
 </style>

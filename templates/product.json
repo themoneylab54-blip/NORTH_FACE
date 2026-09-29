@@ -511,7 +511,9 @@
         "background_gradient": "",
         "text_color": "",
         "input_background": "",
-        "input_text_color": ""
+        "input_text_color": "",
+        "mobile_gallery_arrows": true,
+        "color_image_sets": true
       }
     },
     "complete_look": {

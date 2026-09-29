@@ -26,10 +26,12 @@ only way to do it on Shopify right now.
 
 {%- liquid
   assign filtered_indexes = null | sort
+  assign uses_alt_image_sets = false
 
   if product.variants.size > 1
     for media in product.media
       if media.alt contains '#' and media.alt != product.title
+        assign uses_alt_image_sets = true
         assign alt_parts = media.alt | split: '#'
 
         assign media_group_parts = alt_parts.last | split: '_'
@@ -44,6 +46,82 @@ only way to do it on Shopify right now.
         endif
       endif
     endfor
+  endif
+
+  comment
+    ------------------------------------------------------------------------------------------------------------------
+    AUTOMATIC IMAGE SETS PER COLOR (no alt text needed)
+
+    When the alt text method above is not used, images are grouped by their order: each color's variant image
+    (the image assigned to the variants of that color in Shopify admin) starts that color's set, and every following
+    image belongs to it until the next color's variant image. Images placed before the first variant image are shared
+    by every color. Only the selected color's set is shown, like on outdoor brand sites.
+
+    Example order: [Black front] [Black back] [Black detail] [Taupe front] [Taupe back] ... with "Black front"
+    assigned to the Black variants and "Taupe front" to the Taupe variants.
+    ------------------------------------------------------------------------------------------------------------------
+  endcomment
+
+  assign color_sets_enabled = true
+  if section.settings.color_image_sets == false
+    assign color_sets_enabled = false
+  endif
+
+  if color_sets_enabled and uses_alt_image_sets == false and product.variants.size > 1
+    assign color_option_names = 'color,colour,couleur,couleurs,coloris,colors,colours,farbe,colore,kleur' | split: ','
+    assign color_index = -1
+    assign selected_color = ''
+
+    for option in product.options_with_values
+      assign option_downcase = option.name | downcase | strip
+      if color_option_names contains option_downcase
+        assign color_index = forloop.index0
+        assign selected_color = option.selected_value | downcase | strip
+        break
+      endif
+    endfor
+
+    if color_index >= 0
+      comment
+        Map each variant image position to its color: "§3=black§7=timeless taupe§"
+      endcomment
+      assign set_starts = '§'
+      assign set_colors = ''
+      for variant in product.variants
+        if variant.featured_media != blank
+          assign variant_color = variant.options[color_index] | downcase | strip
+          assign start_key = '§' | append: variant.featured_media.position | append: '='
+          unless set_starts contains start_key
+            assign set_starts = set_starts | append: variant.featured_media.position | append: '=' | append: variant_color | append: '§'
+          endunless
+          assign color_key = '§' | append: variant_color | append: '§'
+          unless set_colors contains color_key
+            assign set_colors = set_colors | append: color_key
+          endunless
+        endif
+      endfor
+
+      comment
+        At least two colors with their own image, and the selected color has one: otherwise keep every image.
+      endcomment
+      assign color_count = set_colors | split: '§§' | size
+      assign selected_key = '§' | append: selected_color | append: '§'
+
+      if color_count >= 2 and set_colors contains selected_key
+        assign current_set_color = ''
+        for media in product.media
+          assign start_key = '§' | append: media.position | append: '='
+          if set_starts contains start_key
+            assign current_set_color = set_starts | split: start_key | last | split: '§' | first
+          endif
+
+          if current_set_color != '' and current_set_color != selected_color and media != default_media
+            assign media_position = media.position | sort
+            assign filtered_indexes = filtered_indexes | concat: media_position
+          endif
+        endfor
+      endif
+    endif
   endif
 -%}
 
@@ -114,6 +192,20 @@ only way to do it on Shopify right now.
           </div>
         {%- endfor -%}
       </media-carousel>
+
+      {%- comment -%}Mobile: small square previous / next buttons over the bottom-left corner of the image.{%- endcomment -%}
+      {%- if product.media.size > 1 and section.settings.mobile_gallery_arrows -%}
+        <div class="product-gallery__arrows md:hidden">
+          <button type="button" is="prev-button" class="product-gallery__arrow" aria-controls="{{ product_gallery_id }}">
+            <span class="sr-only">{{ 'general.accessibility.previous' | t }}</span>
+            {%- render 'icon' with 'chevron-left-small', direction_aware: true -%}
+          </button>
+          <button type="button" is="next-button" class="product-gallery__arrow" aria-controls="{{ product_gallery_id }}">
+            <span class="sr-only">{{ 'general.accessibility.next' | t }}</span>
+            {%- render 'icon' with 'chevron-right-small', direction_aware: true -%}
+          </button>
+        </div>
+      {%- endif -%}
 
       {%- if section.settings.enable_image_zoom -%}
         <div class="product-gallery__zoom {% if section.settings.desktop_media_layout contains 'grid' %}md:hidden{% endif %}">

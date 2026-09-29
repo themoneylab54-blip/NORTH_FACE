@@ -63,7 +63,8 @@
     "ab_start": "23:30",
     "ab_end": "01:00",
     "ab_timezone": "",
-    "ab_tag_orders": true
+    "ab_tag_orders": true,
+    "color_swatch_style": "rectangle"
   },
   "presets": {
     "Sound": {
