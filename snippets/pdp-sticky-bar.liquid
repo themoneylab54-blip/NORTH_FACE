@@ -1,0 +1,492 @@
+{%- comment -%}
+----------------------------------------------------------------------------------------------------------------------
+PDP STICKY BAR (block type "pdp_sticky_bar")
+----------------------------------------------------------------------------------------------------------------------
+
+Fixed bottom purchase bar (77px, white, 1px top border, z-index 30) that slides in once the main add-to-cart button has
+scrolled out of view. Left to right: 44px thumbnail, title + price / struck compare-at price / delivery window, a size
+<select> mirroring the size option of the main variant picker, and a yellow pill "Add to cart" submit button bound to
+the product form.
+
+How it stays in sync
+* Every value is Liquid-driven. The main <product-rerender allow-partial-rerender> only swaps a fixed list of theme
+  block types on variant change, so this element listens to the form's "product:rerender" event itself and swaps its
+  inner markup from the fragment the theme already fetched (same approach as pdp-size-selector).
+* The <select> is a proxy: it never submits. On change it checks the real option radio of the product form
+  (input[data-option-position][form=...], matched by option value ID, then by label) and dispatches "change" so the
+  theme's <variant-picker> reacts exactly as if the size button had been clicked.
+
+********************************************
+Supported variables
+********************************************
+
+* block: the block (settings: button_text, min_days, max_days, show_delivery, mobile_only)
+* product: the product
+* product_form_id: the ID of the product form
+* section: the section the block belongs to
+{%- endcomment -%}
+
+{%- liquid
+  assign psb_class = 'pdp-sticky-bar-' | append: block.id
+  assign psb_key = section.id | append: '-' | append: block.id
+  assign psb_variant = product.selected_or_first_available_variant
+
+  assign psb_button_text = block.settings.button_text | default: 'Add to cart'
+  assign psb_min_days = block.settings.min_days | default: 5
+  assign psb_max_days = block.settings.max_days | default: 12
+  assign psb_mobile_only = block.settings.mobile_only | default: false
+
+  assign psb_show_delivery = block.settings.show_delivery
+  if psb_show_delivery == nil
+    assign psb_show_delivery = true
+  endif
+
+  # Delivery window, computed like the theme's "delivery_estimate" block, compacted to "9–16/10" (day–day/month) when
+  # both dates fall in the same month, otherwise "28/9–5/10".
+  assign psb_now_seconds = 'now' | date: '%s'
+  assign psb_min_seconds = psb_min_days | times: 86400 | plus: psb_now_seconds
+  assign psb_max_seconds = psb_max_days | times: 86400 | plus: psb_now_seconds
+  assign psb_min_month = psb_min_seconds | date: '%-m'
+  assign psb_max_month = psb_max_seconds | date: '%-m'
+  if psb_min_month == psb_max_month
+    assign psb_date_min = psb_min_seconds | date: '%-d'
+  else
+    assign psb_date_min = psb_min_seconds | date: '%-d/%-m'
+  endif
+  assign psb_date_max = psb_max_seconds | date: '%-d/%-m'
+
+  # Which option is the size: "Size" first, then the theme's translated size labels, then the first option.
+  assign psb_size_position = 0
+  assign psb_size_label_list = 'general.label.size' | t | replace: ', ', ',' | downcase | split: ','
+  for option in product.options_with_values
+    assign psb_option_downcase = option.name | downcase | strip
+    if psb_option_downcase == 'size'
+      assign psb_size_position = option.position
+      break
+    endif
+  endfor
+
+  if psb_size_position == 0
+    for option in product.options_with_values
+      assign psb_option_downcase = option.name | downcase | strip
+      if psb_size_label_list contains psb_option_downcase
+        assign psb_size_position = option.position
+        break
+      endif
+    endfor
+  endif
+
+  if psb_size_position == 0 and product.has_only_default_variant == false
+    assign psb_size_position = product.options_with_values.first.position
+  endif
+
+  assign psb_image = psb_variant.featured_media | default: product.featured_media
+  assign psb_select_id = 'pdp-sticky-size-' | append: psb_key
+-%}
+
+<style>
+  .{{ psb_class }} {
+    position: fixed;
+    inset-inline: 0;
+    bottom: 0;
+    z-index: 30;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    height: calc(77px + env(safe-area-inset-bottom, 0px));
+    padding: 0 16px env(safe-area-inset-bottom, 0px);
+    background: #FFFFFF;
+    color: #121212;
+    border-top: 1px solid rgba(240, 240, 240, .7);
+    font-family: Inter, var(--text-font-family), -apple-system, "Segoe UI", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    transform: translateY(110%);
+    transition: transform .25s ease;
+  }
+
+  .{{ psb_class }}.is-visible {
+    transform: none;
+  }
+
+  .{{ psb_class }} .pdp-sticky-bar__inner {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+    max-width: 1280px;
+    margin: 0 auto;
+  }
+
+  .{{ psb_class }} .pdp-sticky-bar__thumb {
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    object-fit: cover;
+    border-radius: 6px;
+    background: #F5F5F5;
+  }
+
+  .{{ psb_class }} .pdp-sticky-bar__info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .{{ psb_class }} .pdp-sticky-bar__title {
+    display: block;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 600;
+    color: #121212;
+  }
+
+  .{{ psb_class }} .pdp-sticky-bar__meta {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  .{{ psb_class }} .pdp-sticky-bar__price {
+    font-size: 14px;
+    line-height: 18px;
+    font-weight: 700;
+    color: #121212;
+  }
+
+  .{{ psb_class }} .pdp-sticky-bar__compare {
+    font-size: 12px;
+    line-height: 16px;
+    font-weight: 500;
+    color: #737373;
+    text-decoration: line-through;
+  }
+
+  .{{ psb_class }} .pdp-sticky-bar__delivery {
+    margin-inline-start: 4px;
+    font-size: 11px;
+    line-height: 16px;
+    font-weight: 400;
+    color: #737373;
+  }
+
+  .{{ psb_class }} .pdp-sticky-bar__select {
+    flex-shrink: 0;
+    box-sizing: border-box;
+    height: 40px;
+    min-width: 96px;
+    margin: 0;
+    padding: 0 34px 0 12px;
+    border: 1px solid #F0F0F0;
+    border-radius: 6px;
+    background-color: #FFFFFF;
+    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16' fill='none'%3E%3Cpath d='M4 6l4 4 4-4' stroke='%23121212' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    color: #121212;
+    font-family: inherit;
+    font-size: 14px;
+    line-height: 1;
+    font-weight: 500;
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
+  .{{ psb_class }} .pdp-sticky-bar__select:focus-visible {
+    outline: 2px solid #121212;
+    outline-offset: 2px;
+  }
+
+  .{{ psb_class }} .pdp-sticky-bar__button {
+    flex-shrink: 0;
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 44px;
+    margin: 0;
+    padding: 0 22px;
+    border: 0;
+    border-radius: 9999px;
+    background: #FFD014;
+    color: #000000;
+    font-family: inherit;
+    font-size: 14px;
+    line-height: 1;
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background-color .15s ease;
+  }
+
+  @media (hover: hover) {
+    .{{ psb_class }} .pdp-sticky-bar__button:hover:not(:disabled) {
+      background: #F5C700;
+    }
+  }
+
+  .{{ psb_class }} .pdp-sticky-bar__button:focus-visible {
+    outline: 2px solid #121212;
+    outline-offset: 2px;
+  }
+
+  .{{ psb_class }} .pdp-sticky-bar__button:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+  }
+
+  @media screen and (min-width: 1000px) {
+    .{{ psb_class }} {
+      padding-inline: 40px;
+    }
+  }
+
+  @media screen and (max-width: 699px) {
+    .{{ psb_class }} {
+      padding-inline: 12px;
+    }
+
+    .{{ psb_class }} .pdp-sticky-bar__inner {
+      gap: 10px;
+    }
+
+    .{{ psb_class }} .pdp-sticky-bar__thumb,
+    .{{ psb_class }} .pdp-sticky-bar__delivery {
+      display: none;
+    }
+
+    .{{ psb_class }} .pdp-sticky-bar__select {
+      min-width: 76px;
+      padding-inline: 10px 30px;
+      background-position: right 10px center;
+    }
+
+    .{{ psb_class }} .pdp-sticky-bar__button {
+      padding-inline: 16px;
+    }
+  }
+
+  {%- if psb_mobile_only %}
+  @media screen and (min-width: 700px) {
+    .{{ psb_class }} {
+      display: none;
+    }
+  }
+  {%- endif %}
+
+  @media (prefers-reduced-motion: reduce) {
+    .{{ psb_class }},
+    .{{ psb_class }} .pdp-sticky-bar__button {
+      transition: none;
+    }
+  }
+</style>
+
+<pdp-sticky-bar class="pdp-sticky-bar {{ psb_class }}" form-id="{{ product_form_id }}" data-pdp-sticky-bar="{{ psb_key }}" {{ block.shopify_attributes }}>
+  {%- comment -%} Everything inside [data-pdp-sticky-content] is swapped for fresh Liquid HTML on every variant change. {%- endcomment -%}
+  <div class="pdp-sticky-bar__inner" data-pdp-sticky-content="{{ psb_key }}">
+    {%- if psb_image != blank -%}
+      {{- psb_image | image_url: width: 132 | image_tag: loading: 'lazy', sizes: '44px', widths: '44,88,132', class: 'pdp-sticky-bar__thumb' -}}
+    {%- endif -%}
+
+    <div class="pdp-sticky-bar__info">
+      <span class="pdp-sticky-bar__title">{{ product.title | escape }}</span>
+
+      <div class="pdp-sticky-bar__meta">
+        <span class="pdp-sticky-bar__price">{{ psb_variant.price | money }}</span>
+
+        {%- if psb_variant.compare_at_price > psb_variant.price -%}
+          <s class="pdp-sticky-bar__compare">{{ psb_variant.compare_at_price | money }}</s>
+        {%- endif -%}
+
+        {%- if psb_show_delivery -%}
+          <span class="pdp-sticky-bar__delivery">Delivery {{ psb_date_min }}&ndash;{{ psb_date_max }}</span>
+        {%- endif -%}
+      </div>
+    </div>
+
+    {%- if product.has_only_default_variant == false and psb_size_position > 0 -%}
+      {%- for option in product.options_with_values -%}
+        {%- if option.position == psb_size_position -%}
+          <label class="sr-only" for="{{ psb_select_id }}">Choose your size:</label>
+          <select id="{{ psb_select_id }}" class="pdp-sticky-bar__select" data-pdp-sticky-size="{{ option.position }}" aria-label="Choose your size">
+            {%- for option_value in option.values -%}
+              <option value="{{ option_value.id }}" data-label="{{ option_value.name | escape }}" {% if option_value.selected %}selected{% endif %}>{{ option_value.name | escape }}</option>
+            {%- endfor -%}
+          </select>
+        {%- endif -%}
+      {%- endfor -%}
+    {%- endif -%}
+
+    <button type="submit" form="{{ product_form_id }}" name="add" class="pdp-sticky-bar__button" {% unless psb_variant.available %}disabled{% endunless %}>
+      {%- if psb_variant.available -%}
+        {{- psb_button_text | escape -}}
+      {%- else -%}
+        {{- 'product.general.sold_out_button' | t -}}
+      {%- endif -%}
+    </button>
+  </div>
+</pdp-sticky-bar>
+
+<script>
+  if (!window.customElements.get('pdp-sticky-bar')) {
+    window.customElements.define('pdp-sticky-bar', class extends HTMLElement {
+      /* Pure helper: the bar shows once the observed add-to-cart area has scrolled ABOVE the viewport. */
+      static shouldShow(entry) {
+        return !entry.isIntersecting && entry.boundingClientRect.top < 0;
+      }
+
+      /* Pure helper: pick the real option radio for the chosen <option>: by option value ID first, then by label. */
+      static findOptionInput(candidates, value, label) {
+        const wantedValue = String(value || '').trim();
+        const wantedLabel = String(label || '').trim().toUpperCase();
+
+        const byValue = wantedValue
+          ? candidates.find((candidate) => String(candidate.value || '').trim() === wantedValue)
+          : null;
+
+        if (byValue) {
+          return byValue;
+        }
+
+        if (!wantedLabel) {
+          return null;
+        }
+
+        return candidates.find((candidate) => String(candidate.label || '').trim().toUpperCase() === wantedLabel) || null;
+      }
+
+      connectedCallback() {
+        this._formId = this.getAttribute('form-id');
+        this._key = this.getAttribute('data-pdp-sticky-bar');
+        this._abortController = new AbortController();
+
+        const signal = this._abortController.signal;
+
+        /* The product form and the buy buttons sit below this block: bind once the document is parsed. */
+        const bind = () => {
+          if (signal.aborted) {
+            return;
+          }
+
+          const form = document.forms[this._formId];
+
+          if (form) {
+            form.addEventListener('product:rerender', (event) => this._onRerender(event), { signal });
+          }
+
+          this._observe();
+        };
+
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', bind, { once: true, signal });
+        } else {
+          bind();
+        }
+
+        this.addEventListener('change', (event) => {
+          if (event.target.matches('[data-pdp-sticky-size]')) {
+            this._applySize(event.target);
+          }
+        }, { signal });
+
+        /* Theme editor: keep the bar on screen while the merchant edits this block. */
+        document.addEventListener('shopify:block:select', (event) => {
+          if (event.target === this) {
+            this._editorForced = true;
+            this.classList.add('is-visible');
+          }
+        }, { signal });
+
+        document.addEventListener('shopify:block:deselect', (event) => {
+          if (event.target === this) {
+            this._editorForced = false;
+          }
+        }, { signal });
+      }
+
+      disconnectedCallback() {
+        this._abortController?.abort();
+        this._observer?.disconnect();
+        this._observer = null;
+      }
+
+      _observe() {
+        this._observer?.disconnect();
+
+        const productInfo = this.closest('.product-info') || document;
+        const target = productInfo.querySelector('.product-info__buy-buttons')
+          || productInfo.querySelector('buy-buttons')
+          || this.parentElement;
+
+        if (!target || typeof IntersectionObserver === 'undefined') {
+          return;
+        }
+
+        this._observer = new IntersectionObserver((entries) => {
+          const entry = entries[0];
+          this.classList.toggle('is-visible', this._editorForced || this.constructor.shouldShow(entry));
+        });
+
+        this._observer.observe(target);
+      }
+
+      _onRerender(event) {
+        if (event.detail?.productChange || !this.isConnected) {
+          return;
+        }
+
+        const current = this.querySelector('[data-pdp-sticky-content="' + this._key + '"]');
+        const fresh = event.detail?.htmlFragment?.querySelector?.('[data-pdp-sticky-content="' + this._key + '"]');
+
+        if (!current || !fresh) {
+          return;
+        }
+
+        const focusedId = document.activeElement?.id;
+        current.replaceWith(fresh);
+
+        if (focusedId) {
+          const element = document.getElementById(focusedId);
+
+          if (element && this.contains(element)) {
+            element.focus({ preventScroll: true });
+          }
+        }
+      }
+
+      _applySize(select) {
+        const position = select.getAttribute('data-pdp-sticky-size');
+        const chosen = select.options[select.selectedIndex];
+
+        if (!chosen) {
+          return;
+        }
+
+        const inputs = Array.from(document.querySelectorAll('input[data-option-position="' + position + '"][form="' + this._formId + '"]'));
+        const candidates = inputs.map((input) => ({
+          input,
+          value: input.value,
+          label: input.nextElementSibling?.textContent || ''
+        }));
+
+        const match = this.constructor.findOptionInput(candidates, chosen.value, chosen.getAttribute('data-label') || chosen.text);
+
+        if (!match || match.input.disabled || match.input.checked) {
+          return;
+        }
+
+        match.input.checked = true;
+        match.input.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+    });
+  }
+</script>

@@ -1,0 +1,22 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-page",
+      "disabled": true,
+      "settings": {}
+    },
+    "size_guide": {
+      "type": "size-guide-page",
+      "settings": {
+        "subheading": "Get it right first time",
+        "title": "Size guide",
+        "content": "<p>Find your jersey size in seconds from your chest measurement or the size you usually wear.</p>",
+        "reassurance_text": "Between two sizes? Size down for a fitted look, up for the classic oversized look."
+      }
+    }
+  },
+  "order": [
+    "main",
+    "size_guide"
+  ]
+}

@@ -1,0 +1,251 @@
+{%- comment -%}
+----------------------------------------------------------------------------------------------------------------------
+PDP STYLES (internal, not a merchant-facing block)
+----------------------------------------------------------------------------------------------------------------------
+
+CSS bundle rendered ONCE inside the product-info column. It restyles the theme-native pieces of the product page
+(title, add-to-cart button, collapsible_text accordions, block spacing) to the reference measurements, and exposes two
+small utilities (.pdp-label, .pdp-chip) that the other pdp-* snippets reuse.
+
+Everything is scoped under #shopify-section-{{ section.id }} so it cannot leak into other sections.
+
+Supported variables:
+* section: the current section (required, used for scoping)
+{%- endcomment -%}
+
+{%- assign pdp_scope = '#shopify-section-' | append: section.id -%}
+
+<style>
+  {{ pdp_scope }} {
+    /* Reference design tokens (measured on the reference product page) */
+    --pdp-bg: #FFFFFF;
+    --pdp-text: #121212;
+    --pdp-muted-bg: #F5F5F5;
+    --pdp-muted-text: #737373;
+    --pdp-border: #F0F0F0;
+    --pdp-input-border: #E6E6E6;
+    --pdp-cta: #FFD014;
+    --pdp-cta-text: #000000;
+    --pdp-sale: #F04242;
+    --pdp-sale-text: #FFFFFF;
+    --pdp-tier: #DC2626;
+    --pdp-verified: #00B67A;
+    --pdp-radius: 6px;
+    --pdp-radius-card: 12px;
+    --pdp-radius-badge: 3px;
+    --pdp-shadow-card: 0 1px 6px rgba(0, 0, 0, .08);
+    --pdp-font: "Inter", var(--text-font-family), -apple-system, "Segoe UI", sans-serif;
+  }
+
+  /* ------------------------------------------------------------------
+     Column: Inter everywhere, 14px gap between blocks
+     ------------------------------------------------------------------ */
+  {{ pdp_scope }} .product-info {
+    --product-info-block-spacing: 14px;
+    font-family: var(--pdp-font);
+    color: var(--pdp-text);
+  }
+
+  {{ pdp_scope }} .product-info__block-item:where([data-block-type="vendor"], [data-block-type="title"], [data-block-type="sku"], [data-block-type="price"], [data-block-type="rating"], [data-block-type="payment-terms"]) {
+    --product-info-block-spacing: 8px;
+  }
+
+  {{ pdp_scope }} .product-info__block-item:where([data-block-type="badges"]),
+  {{ pdp_scope }} .product-info__block-item:where([data-block-type="buy-buttons"]) {
+    --product-info-block-spacing: 14px;
+  }
+
+  @media screen and (min-width: 700px) {
+    {{ pdp_scope }} .product-info__block-item:where([data-block-type="vendor"], [data-block-type="title"], [data-block-type="sku"], [data-block-type="price"], [data-block-type="rating"], [data-block-type="payment-terms"]) {
+      --product-info-block-spacing: 8px;
+    }
+
+    {{ pdp_scope }} .product-info__block-item:where([data-block-type="buy-buttons"]) {
+      --product-info-block-spacing: 14px;
+    }
+  }
+
+  /* ------------------------------------------------------------------
+     Title: Inter 22px 700, letter-spacing -0.44px
+     ------------------------------------------------------------------ */
+  {{ pdp_scope }} h1.product-info__title,
+  {{ pdp_scope }} .product-info__title {
+    font-family: var(--pdp-font);
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.25;
+    letter-spacing: -0.44px;
+    text-transform: none;
+    color: var(--pdp-text);
+    margin: 0;
+  }
+
+  /* ------------------------------------------------------------------
+     Add to cart: yellow pill, 62px tall, full width
+     ------------------------------------------------------------------ */
+  {{ pdp_scope }} .product-info__buy-buttons .buy-buttons {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  {{ pdp_scope }} .product-info__buy-buttons .button,
+  {{ pdp_scope }} .product-info__buy-buttons [type="submit"] {
+    --button-background: 255 208 20 / 1;
+    --button-text-color: 0 0 0;
+    --button-outline-color: 255 208 20;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 62px;
+    height: 62px;
+    padding-block: 0;
+    padding-inline: 24px;
+    border: 0;
+    border-radius: 9999px;
+    background-color: var(--pdp-cta);
+    color: var(--pdp-cta-text);
+    font-family: var(--pdp-font);
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 1.2;
+    letter-spacing: 0;
+    text-transform: none;
+    box-shadow: none;
+    transition: filter .15s ease-in-out, background-color .15s ease-in-out, color .15s ease-in-out;
+  }
+
+  {{ pdp_scope }} .product-info__buy-buttons .button[disabled],
+  {{ pdp_scope }} .product-info__buy-buttons [type="submit"][disabled] {
+    background-color: var(--pdp-muted-bg);
+    color: var(--pdp-muted-text);
+    cursor: not-allowed;
+  }
+
+  @media screen and (pointer: fine) {
+    {{ pdp_scope }} .product-info__buy-buttons .button:not([disabled]):hover,
+    {{ pdp_scope }} .product-info__buy-buttons [type="submit"]:not([disabled]):hover {
+      filter: brightness(.97);
+      box-shadow: none;
+    }
+  }
+
+  /* The theme's loader/feedback layers are absolutely positioned inside the button: keep them centred in the pill */
+  {{ pdp_scope }} .product-info__buy-buttons .button .button__loader,
+  {{ pdp_scope }} .product-info__buy-buttons .button .button__feedback {
+    border-radius: 9999px;
+  }
+
+  /* Dynamic checkout button (if enabled): match the pill shape only, keep its own colours */
+  {{ pdp_scope }} .product-info__buy-buttons .shopify-payment-button__button--unbranded {
+    border-radius: 9999px !important;
+    min-height: 62px;
+    font-family: var(--pdp-font) !important;
+    font-weight: 500 !important;
+    font-size: 16px !important;
+  }
+
+  /* ------------------------------------------------------------------
+     collapsible_text accordions: 16px, thin bottom border, "+" / "–" marker
+     ------------------------------------------------------------------ */
+  {{ pdp_scope }} .product-info__accordion {
+    --accordion-spacing: 16px;
+    border-block-start-width: 0;
+    border-block-end: 1px solid rgba(240, 240, 240, .6);
+    font-family: var(--pdp-font);
+    font-size: 16px;
+    color: var(--pdp-text);
+  }
+
+  {{ pdp_scope }} .product-info__accordion .accordion__toggle {
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 1.4;
+    gap: 12px;
+  }
+
+  {{ pdp_scope }} .product-info__accordion .accordion__toggle .h6 {
+    font-size: 16px;
+    font-weight: 500;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+
+  {{ pdp_scope }} .product-info__accordion .accordion__content {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--pdp-text);
+    padding-inline-end: 32px;
+    transform: none;
+  }
+
+  {{ pdp_scope }} .product-info__accordion .circle-chevron {
+    width: 20px;
+    height: 20px;
+    background: transparent !important;
+    color: var(--pdp-text) !important;
+    transform: none !important;
+    transition: none;
+    position: relative;
+  }
+
+  {{ pdp_scope }} .product-info__accordion .circle-chevron svg {
+    display: none;
+  }
+
+  {{ pdp_scope }} .product-info__accordion .circle-chevron::before {
+    content: "+";
+    font-family: var(--pdp-font);
+    font-size: 20px;
+    font-weight: 400;
+    line-height: 1;
+    display: block;
+  }
+
+  {{ pdp_scope }} .product-info__accordion[open] .circle-chevron::before,
+  {{ pdp_scope }} .product-info__accordion[aria-expanded="true"] .circle-chevron::before {
+    content: "\2013";
+  }
+
+  {{ pdp_scope }} .product-info__accordion summary {
+    cursor: pointer;
+    list-style: none;
+  }
+
+  {{ pdp_scope }} .product-info__accordion summary::-webkit-details-marker {
+    display: none;
+  }
+
+  {{ pdp_scope }} .product-info__accordion .prose {
+    font-family: var(--pdp-font);
+  }
+
+  /* ------------------------------------------------------------------
+     Utilities reused by the other pdp-* snippets
+     ------------------------------------------------------------------ */
+  {{ pdp_scope }} .pdp-label {
+    display: block;
+    font-family: var(--pdp-font);
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.3;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--pdp-text);
+  }
+
+  {{ pdp_scope }} .pdp-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-family: var(--pdp-font);
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 1.3;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: var(--pdp-muted-bg);
+    color: var(--pdp-text);
+    white-space: nowrap;
+  }
+</style>

@@ -1,0 +1,1710 @@
+{%- comment -%}
+IMPLEMENTATION NOTE: Impact header with all the menu is an extremely complex piece of code. Due to requirements from design
+team, we had to cover over hundred of potential combinations. As a consequence, this part (and all the menu snippets) are
+extremely sensitive code that should (if possible) not be touched unless you have spend enough time to study and understand
+the underlying logic of the menu.
+{%- endcomment -%}
+
+{%- if section.settings.show_country_selector and localization.available_countries.size > 1 -%}
+  {%- assign will_show_country_selector = true -%}
+{%- endif -%}
+
+{%- if section.settings.show_locale_selector and localization.available_languages.size > 1 -%}
+  {%- assign will_show_locale_selector = true -%}
+{%- endif -%}
+
+{%- liquid
+  comment
+    Inline search (opt-in) and the two-row desktop layout (logo / search / icons on the first row, navigation on the second).
+    The two-row layout is only activated for the "logo left, navigation center" layout when the inline search is on.
+  endcomment
+  assign inline_search_enabled = false
+  if section.settings.show_inline_search and section.settings.layout != 'drawer'
+    assign inline_search_enabled = true
+  endif
+
+  assign two_row_header = false
+  if inline_search_enabled and section.settings.layout == 'logo_left_navigation_center'
+    assign two_row_header = true
+  endif
+
+  assign nav_highlight_item = section.settings.nav_highlight_item | strip | downcase
+
+  comment
+    Team grid: the menu item(s) named in "team_menu_item" open a grid of team logos with a search field (the drawer
+    part lives in snippets/navigation-panel.liquid, the markup in snippets/team-menu-grid.liquid).
+  endcomment
+  assign team_grid_enabled = false
+  assign team_menu_names = ''
+  if section.settings.team_collections != blank and section.settings.team_menu_item != blank
+    assign team_grid_enabled = true
+    assign team_menu_names = section.settings.team_menu_item | downcase | replace: ', ', ',' | replace: ' ,', ',' | strip | split: ','
+  endif
+
+  assign team_search_placeholder = section.settings.team_search_placeholder | default: 'Search a team'
+  assign team_no_results_text = section.settings.team_no_results_text | default: 'No team found'
+
+  assign typewriter_terms = ''
+  if section.settings.search_placeholder_terms != blank
+    assign typewriter_terms = section.settings.search_placeholder_terms | strip | replace: ',', '<br />' | newline_to_br | split: '<br />'
+  endif
+-%}
+
+{%- capture nav_highlight_icon -%}
+  <svg role="presentation" focusable="false" width="14" height="14" class="icon icon-trophy header__nav-highlight-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></svg>
+{%- endcapture -%}
+
+<style>
+  {%- comment -%}
+    The theme only loads the regular and bold faces of the body font. The two-row navigation and the highlighted
+    menu item use a medium (500) weight, so that face is emitted here when it is needed.
+  {%- endcomment -%}
+  {%- if two_row_header or nav_highlight_item != blank -%}
+    {%- assign text_font_medium = settings.text_font | font_modify: 'weight', '500' -%}
+    {%- if text_font_medium -%}
+      {{ text_font_medium | font_face: font_display: 'fallback' }}
+    {%- endif -%}
+  {%- endif -%}
+
+  :root {
+    --sticky-header-enabled: {%- if section.settings.enable_sticky -%}1{% else %}0{% endif %};
+  }
+
+  #shopify-section-{{ section.id }} {
+    --header-grid-template: "main-nav logo secondary-nav" / minmax(0, 1fr) auto minmax(0, 1fr);
+    --header-padding-block: {% if section.settings.reduce_padding %}var(--spacing-3){% else %}var(--spacing-4-5){% endif %};
+    --header-background-opacity: {{ section.settings.background_opacity | divided_by: 100.0 }};
+    --header-background-blur-radius: {{ section.settings.background_blur_radius }}px;
+    --header-transparent-text-color: {{ section.settings.transparent_header_text_color.rgb }};
+
+    {%- if section.settings.logo != blank -%}
+      --header-logo-width: {{ section.settings.logo_mobile_max_width }}px;
+      --header-logo-height: {{ section.settings.logo_mobile_max_width | divided_by: section.settings.logo.aspect_ratio | round }}px;
+    {%- endif -%}
+
+    position: {% if section.settings.enable_sticky %}sticky{% else %}relative{% endif %};
+    top: 0;
+    z-index: 10;
+  }
+
+  {%- if section.settings.enable_sticky -%}
+    .shopify-section--announcement-bar ~ #shopify-section-{{ section.id }} {
+      top: calc(var(--sticky-announcement-bar-enabled, 0) * var(--announcement-bar-height, 0px));
+    }
+  {%- endif -%}
+
+  {%- if section.settings.opening_from == 'left' -%}
+    @media screen and (max-width: 699px) {
+      .navigation-drawer {
+        --drawer-content-max-height: calc(100vh - (var(--spacing-2) * 2));
+      }
+    }
+  {%- endif -%}
+
+  @media screen and (min-width: 700px) {
+    #shopify-section-{{ section.id }} {
+      {%- if section.settings.logo != blank -%}
+        --header-logo-width: {{ section.settings.logo_max_width }}px;
+        --header-logo-height: {{ section.settings.logo_max_width | divided_by: section.settings.logo.aspect_ratio | round }}px;
+      {%- endif -%}
+
+      --header-padding-block: {% if section.settings.reduce_padding %}var(--spacing-6){% else %}var(--spacing-8-5){% endif %};
+    }
+  }
+
+  {%- if section.settings.layout contains 'logo_left' -%}
+    @media screen and (min-width: 1150px) {
+      {%- if section.settings.secondary_menu != blank or will_show_country_selector or will_show_locale_selector -%}
+        {%- assign max_percent = '55%' -%}
+      {%- else -%}
+        {%- assign max_percent = '70%' -%}
+      {%- endif -%}
+
+      #shopify-section-{{ section.id }} {
+        --header-grid-template: "logo main-nav secondary-nav" / {% if section.settings.layout == 'logo_left_navigation_inline' %}auto minmax(0, 1fr) minmax(0, max-content){% else %}minmax(0, 1fr) fit-content({{ max_percent }}) minmax(0, 1fr){% endif %};
+      }
+    }
+  {%- endif -%}
+
+  .header__search-form {
+    display: none;
+  }
+
+  header-search-typewriter {
+    display: contents;
+  }
+
+  .header__nav-highlight-icon {
+    flex-shrink: 0;
+    color: var(--header-nav-highlight-icon-color, currentColor);
+  }
+
+  a.header__nav-item--highlight {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-1-5, 6px);
+  }
+
+  {%- if inline_search_enabled -%}
+    @media screen and (min-width: 1150px) {
+      .header--inline-search .header__main-nav {
+        display: grid;
+        justify-items: center;
+        align-content: center;
+        gap: var(--spacing-2-5, 10px);
+      }
+
+      /* Only holds the hamburger and the mobile search icon, both hidden at this width */
+      .header--inline-search .header__main-nav > .header__icon-list {
+        display: none;
+      }
+
+      .header__search-form {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-3);
+        width: 100%;
+        max-width: var(--header-search-max-width, 640px);
+        height: var(--header-search-height, 36px);
+        padding-inline: var(--spacing-4);
+        {%- comment -%}A white pill would disappear on a light header, so light headers get a light grey one{%- endcomment -%}
+        {%- assign header_background_brightness = settings.header_background | color_brightness -%}
+        background: {% if header_background_brightness > 200 %}#f2f2f2{% else %}#ffffff{% endif %};
+        color: #121212;
+        border-radius: 9999px;
+      }
+
+      .header__search-form svg {
+        width: 18px;
+        height: 18px;
+        flex-shrink: 0;
+      }
+
+      .header__search-input {
+        flex: 1 1 auto;
+        min-width: 0;
+        border: 0;
+        background: transparent;
+        color: inherit;
+        font: inherit;
+        font-size: var(--text-sm, 14px);
+        outline: none;
+      }
+
+      .header__search-input::placeholder {
+        color: rgb(18 18 18 / .55);
+      }
+
+      .header__search-input::-webkit-search-cancel-button {
+        -webkit-appearance: none;
+      }
+    }
+  {%- endif -%}
+
+  {%- if two_row_header -%}
+    @media screen and (min-width: 1150px) {
+      #shopify-section-{{ section.id }} {
+        --header-padding-block: 15px;
+        --header-nav-height: 44px;
+        --header-two-row-logo-height: {{ section.settings.two_row_logo_height | default: 24 }}px;
+        /* Own variable: theme.css redeclares --header-link-list-spacing on .header, which would win over the section value */
+        --header-two-row-nav-gap: 22px;
+      }
+
+      /*
+        Declared on the header element itself, not on the section: --header-part-gap only exists on .header. Declared
+        higher up, var(--header-part-gap) is undefined, which invalidates the whole grid template and stacks the logo,
+        search bar, menu and icons in a single cell.
+        Gutter columns replace the wrapper's inline padding so the navigation row can span the full width.
+      */
+      #shopify-section-{{ section.id }} .header--two-row {
+        --header-gutter-column: max(0px, max(var(--container-gutter), 50% - var(--container-max-width) / 2) - var(--header-part-gap));
+        --header-grid-template: ". logo search secondary-nav ." "nav nav nav nav nav" / var(--header-gutter-column) minmax(0, 1fr) minmax(0, var(--header-search-max-width, 640px)) minmax(0, 1fr) var(--header-gutter-column);
+      }
+
+      .header--two-row .header__wrapper {
+        padding-inline: 0;
+        padding-block-end: 0;
+        row-gap: 0;
+      }
+
+      .header--two-row .header__main-nav {
+        display: contents;
+      }
+
+      .header--two-row .header__search-form {
+        grid-area: search;
+        justify-self: center;
+      }
+
+      .header--two-row .header__logo {
+        grid-area: logo;
+      }
+
+      /* Row 1 logo: fixed height, width follows the image ratio instead of the "Image width" setting */
+      .header--two-row .header__logo-image {
+        height: var(--header-two-row-logo-height);
+        width: auto;
+        max-width: 100%;
+        object-fit: contain;
+        object-position: left center;
+      }
+
+      .header--two-row .header__secondary-nav {
+        grid-area: secondary-nav;
+      }
+
+      .header--two-row .header__link-list--main {
+        grid-area: nav;
+        justify-content: center;
+        align-items: center;
+        gap: var(--spacing-3) var(--header-two-row-nav-gap, 22px);
+        min-height: var(--header-nav-height);
+        margin-block-start: var(--header-padding-block);
+        padding-inline: var(--container-gutter);
+        border-block-start: 1px solid rgb(var(--text-color) / .1);
+        font-size: 12px;
+        line-height: 1.2;
+      }
+
+      .header--two-row .header__link-list--main > ul > li > :is(a, button, details > summary) {
+        font-weight: 400;
+        color: rgb(var(--text-color) / .85);
+      }
+
+      .header--two-row .header__link-list--main > ul > li > :is(a[aria-current="page"], .header__nav-item--highlight) {
+        font-weight: 500;
+        color: rgb(var(--text-color));
+      }
+
+      .header--two-row .header__link-list--main .text-with-icon {
+        gap: var(--spacing-1-5, 6px);
+      }
+
+      .header--two-row .header__link-list--main .icon-chevron-bottom {
+        top: 0;
+      }
+    }
+  {%- endif -%}
+
+  /* Mobile menu drawer extras, markup in snippets/drawer-menu-extras.liquid */
+  .drawer-menu {
+    gap: var(--spacing-6);
+  }
+
+  .drawer-menu__search {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2-5);
+    height: 44px;
+    padding-inline: var(--spacing-4);
+    border-radius: 9999px;
+    background: rgb(var(--text-color) / .06);
+    color: rgb(var(--text-color) / .6);
+  }
+
+  .drawer-menu__search input[type="search"] {
+    flex: 1 1 auto;
+    min-width: 0;
+    height: 100%;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: rgb(var(--text-color));
+    font: inherit;
+    font-size: 16px; /* 16px or more keeps iOS from zooming in on focus */
+    outline: none;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
+  .drawer-menu__search input[type="search"]::placeholder {
+    color: rgb(var(--text-color) / .55);
+  }
+
+  .drawer-menu__search:focus-within {
+    box-shadow: 0 0 0 2px rgb(var(--text-color) / .25);
+  }
+
+  .drawer-menu__teams {
+    display: grid;
+    gap: var(--spacing-3);
+  }
+
+  .drawer-menu__label {
+    margin: 0;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.5;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: rgb(var(--text-color) / .6);
+  }
+
+  .drawer-menu__team-list {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 64px;
+    gap: var(--spacing-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .drawer-menu__team {
+    display: grid;
+    justify-items: center;
+    gap: var(--spacing-1-5);
+    text-align: center;
+  }
+
+  .drawer-menu__team-logo {
+    display: grid;
+    place-items: center;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: rgb(var(--text-color) / .05);
+    transition: background-color .2s ease;
+  }
+
+  .drawer-menu__team:hover .drawer-menu__team-logo {
+    background: rgb(var(--text-color) / .1);
+  }
+
+  .drawer-menu__team-logo img {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+  }
+
+  .drawer-menu__team-initial {
+    font-size: 18px;
+    font-weight: bold;
+  }
+
+  .drawer-menu__team-name {
+    max-width: 100%;
+    overflow: hidden;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.3;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .drawer-menu__offer {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-3);
+    padding: var(--spacing-4);
+    border-radius: 12px;
+    background: #111111;
+    color: #ffffff;
+  }
+
+  .drawer-menu__offer-icon {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #ffd014;
+    color: #111111;
+  }
+
+  .drawer-menu__offer-text {
+    display: grid;
+    flex: 1 1 auto;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  .drawer-menu__offer-title {
+    font-size: 15px;
+    font-weight: bold;
+    line-height: 1.3;
+    letter-spacing: .02em;
+    text-transform: uppercase;
+  }
+
+  .drawer-menu__offer-subtitle {
+    font-size: 13px;
+    line-height: 1.4;
+    opacity: .75;
+  }
+
+  .drawer-menu__help-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-2) var(--spacing-5);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: 14px;
+  }
+
+  .drawer-menu__help-list a {
+    color: rgb(var(--text-color) / .7);
+    transition: color .2s ease;
+  }
+
+  .drawer-menu__help-list a:hover {
+    color: rgb(var(--text-color));
+  }
+
+  {%- if section.settings.drawer_compact_links -%}
+    /* Mobile menu: compact rows with separators instead of large headings (every level of the menu drawer) */
+    #header-sidebar-menu .navigation-drawer__main-links,
+    #header-sidebar-menu .panel + .panel .panel__wrapper > ul.v-stack {
+      gap: 0;
+    }
+
+    #header-sidebar-menu .panel + .panel .panel__wrapper > ul.v-stack > li:first-child {
+      margin-block-end: var(--spacing-2);
+    }
+
+    #header-sidebar-menu .panel li.h3 {
+      font-family: var(--text-font-family);
+      font-size: 17px;
+      font-style: normal;
+      font-weight: 500;
+      line-height: 1.3;
+      letter-spacing: normal;
+      text-transform: none;
+      border-block-end: 1px solid rgb(var(--text-color) / .08);
+    }
+
+    #header-sidebar-menu .panel li.h3 > :is(a, button) {
+      padding-block: 14px;
+    }
+  {%- endif -%}
+
+  {%- if team_grid_enabled -%}
+    /* Team grid (mobile menu drawer + desktop mega menu), markup in snippets/team-menu-grid.liquid */
+    .team-menu-grid {
+      display: grid;
+      gap: var(--spacing-4);
+      font-size: var(--text-sm, 14px);
+      line-height: 1.4;
+    }
+
+    .team-menu-grid__head {
+      display: grid;
+      gap: var(--spacing-3);
+    }
+
+    .team-menu-grid__title {
+      margin: 0;
+    }
+
+    .team-menu-grid__search {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-2-5);
+      height: 44px;
+      padding-inline: var(--spacing-4);
+      border-radius: 9999px;
+      background: rgb(var(--text-color) / .06);
+      color: rgb(var(--text-color) / .6);
+      cursor: text;
+    }
+
+    .team-menu-grid__search svg {
+      flex-shrink: 0;
+    }
+
+    .team-menu-grid__search input {
+      flex: 1 1 auto;
+      min-width: 0;
+      height: 100%;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: rgb(var(--text-color));
+      font: inherit;
+      font-size: 16px; /* 16px or more keeps iOS from zooming in on focus */
+      outline: none;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    .team-menu-grid__search input::placeholder {
+      color: rgb(var(--text-color) / .55);
+    }
+
+    .team-menu-grid__search:focus-within {
+      box-shadow: 0 0 0 2px rgb(var(--text-color) / .25);
+    }
+
+    .team-menu-grid__list {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: var(--spacing-2);
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .team-menu-grid__card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--spacing-2);
+      height: 100%;
+      padding: var(--spacing-4) var(--spacing-1-5) var(--spacing-3);
+      border-radius: 10px;
+      background: rgb(var(--text-color) / .045);
+      color: rgb(var(--text-color));
+      text-align: center;
+      transition: background-color .2s ease;
+    }
+
+    .team-menu-grid__card:hover,
+    .team-menu-grid__card:focus-visible {
+      background: rgb(var(--text-color) / .09);
+    }
+
+    .team-menu-grid__logo {
+      display: grid;
+      place-items: center;
+      width: 48px;
+      height: 48px;
+      flex-shrink: 0;
+    }
+
+    .team-menu-grid__logo img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .team-menu-grid__initials {
+      display: grid;
+      place-items: center;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: rgb(var(--text-color) / .1);
+      font-size: 15px;
+      font-weight: bold;
+    }
+
+    .team-menu-grid__name {
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      overflow: hidden;
+      font-size: 12.5px;
+      font-weight: 500;
+      line-height: 1.25;
+    }
+
+    .team-menu-grid__empty {
+      margin: 0;
+      color: rgb(var(--text-color) / .65);
+      text-align: center;
+    }
+
+    .team-menu-grid__all {
+      justify-self: center;
+      font-weight: bold;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    .team-mega-menu {
+      display: block;
+    }
+
+    .team-menu-grid--mega {
+      max-width: 1180px;
+      margin-inline: auto;
+    }
+
+    .team-menu-grid--mega .team-menu-grid__head {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 320px);
+      align-items: center;
+    }
+
+    .team-menu-grid--mega .team-menu-grid__search {
+      height: 40px;
+    }
+
+    .team-menu-grid--mega .team-menu-grid__search input {
+      font-size: 14px;
+    }
+
+    .team-menu-grid--mega .team-menu-grid__list {
+      grid-template-columns: repeat(10, minmax(0, 1fr));
+    }
+
+    .team-menu-grid--mega .team-menu-grid__logo {
+      width: 40px;
+      height: 40px;
+    }
+
+    .team-menu-grid--mega .team-menu-grid__name {
+      font-size: 12px;
+    }
+  {%- endif -%}
+</style>
+
+<height-observer variable="header">
+  <store-header class="header{% if inline_search_enabled %} header--inline-search{% endif %}{% if two_row_header %} header--two-row{% endif %}" {% if section.settings.hide_on_scroll %}hide-on-scroll="100"{% endif %} {% if section.settings.enable_sticky %}sticky{% endif %}>
+    <div class="header__wrapper">
+      {%- comment -%}
+      --------------------------------------------------------------------------------------------------------------------
+      MAIN NAV AREA
+      --------------------------------------------------------------------------------------------------------------------
+      {%- endcomment -%}
+
+      <div class="header__main-nav">
+        <div class="header__icon-list">
+          <button type="button" class="tap-area {% if section.settings.layout != 'drawer' %}lg:hidden{% endif %}" aria-controls="header-sidebar-menu">
+            <span class="sr-only">{{ 'header.general.menu' | t }}</span>
+            {%- render 'icon' with 'hamburger' -%}
+          </button>
+
+          <a href="{{ routes.search_url }}" class="tap-area sm:hidden" aria-controls="search-drawer">
+            <span class="sr-only">{{ 'header.general.search' | t }}</span>
+            {%- render 'icon' with 'search' -%}
+          </a>
+        </div>
+
+        {%- if inline_search_enabled -%}
+          <form action="{{ routes.search_url }}" method="get" role="search" class="header__search-form">
+            <input type="hidden" name="type" value="product">
+            {%- render 'icon' with 'search', width: 18, height: 18 -%}
+            <header-search-typewriter {% if typewriter_terms != '' %}terms="{{ typewriter_terms | json | escape }}" prefix="{{ section.settings.search_placeholder_prefix | escape }}"{% endif %}>
+              <input type="search" name="q" class="header__search-input" placeholder="{{ section.settings.inline_search_placeholder | escape }}" aria-label="{{ 'header.general.search' | t }}" autocomplete="off">
+            </header-search-typewriter>
+          </form>
+        {%- endif -%}
+
+        {%- if section.settings.layout != 'drawer' and section.settings.menu.links.size > 0 -%}
+          <nav class="header__link-list header__link-list--main {% if section.settings.layout == 'logo_left_navigation_center' %}justify-center{% endif %} wrap" role="navigation">
+              <ul class="contents" role="list">
+                {%- for link in section.settings.menu.links -%}
+                  {% liquid
+                    assign link_title_downcase = link.title | strip | downcase
+                    assign mega_menu_block = ''
+                    assign is_highlighted_link = false
+
+                    if nav_highlight_item != blank and link_title_downcase == nav_highlight_item
+                      assign is_highlighted_link = true
+                    endif
+
+                    assign is_team_link = false
+                    if team_menu_names contains link_title_downcase
+                      assign is_team_link = true
+                    endif
+
+                    for block in section.blocks
+                      assign menu_item_downcase = block.settings.menu_item | strip | downcase
+
+                      if menu_item_downcase == link_title_downcase
+                        assign mega_menu_block = block
+                        break
+                      endif
+
+                    endfor
+                  %}
+
+                  <li>
+                    {%- if is_team_link -%}
+                      <details is="mega-menu-disclosure" trigger="{{ section.settings.menu_open_trigger | escape }}">
+                        <summary class="text-with-icon gap-2.5 bold link-faded-reverse{% if is_highlighted_link %} header__nav-item--highlight{% endif %}" {% if link.url != '#' %}data-url="{{ link.url | escape }}"{% endif %}>
+                          {% if is_highlighted_link %}{{ nav_highlight_icon }}{% endif %}{{- link.title -}} {%- render 'icon' with 'chevron-bottom' -%}
+                        </summary>
+
+                        <div class="mega-menu team-mega-menu">
+                          {%- render 'team-menu-grid',
+                            teams: section.settings.team_collections,
+                            strip_text: section.settings.team_strip_text,
+                            context: 'mega',
+                            title: section.settings.team_grid_title,
+                            search_placeholder: team_search_placeholder,
+                            no_results_text: team_no_results_text,
+                            view_all_url: link.url,
+                            view_all_text: section.settings.team_view_all_text
+                          -%}
+                        </div>
+                      </details>
+                    {%- elsif link.levels == 0 and mega_menu_block == '' -%}
+                      <a href="{{ link.url }}" class="bold link-faded-reverse{% if is_highlighted_link %} header__nav-item--highlight{% endif %}" {% if link.current %}aria-current="page"{% endif %}>{% if is_highlighted_link %}{{ nav_highlight_icon }}{% endif %}{{- link.title -}}</a>
+                    {%- else -%}
+                      {%- if mega_menu_block != '' -%}
+                        {%- comment -%}
+                        Implementation note: the designers had the desire to show a lot of different kind of menus in Impact: one standard
+                        mega menu but also a kind of "sidebar" mode when the mega-menu appears in a drawer. Unfortunately, this comes with
+                        a lot of extra complexity as we have to go through two different code path: a "details" element for the standard
+                        menu, and a full drawer for the other one.
+                        {%- endcomment -%}
+                        {%- unless mega_menu_block.settings.layout == 'drawer' -%}
+                          <details is="mega-menu-disclosure" trigger="{{ section.settings.menu_open_trigger | escape }}" {{ mega_menu_block.shopify_attributes }}>
+                            <summary class="text-with-icon gap-2.5 bold link-faded-reverse{% if is_highlighted_link %} header__nav-item--highlight{% endif %}" {% if link.url != '#' %}data-url="{{ link.url | escape }}"{% endif %}>
+                              {% if is_highlighted_link %}{{ nav_highlight_icon }}{% endif %}{{- link.title -}} {%- render 'icon' with 'chevron-bottom' -%}
+                            </summary>
+
+                           {%- render 'mega-menu-horizontal', link: link, mega_menu_block: mega_menu_block -%}
+                          </details>
+                        {%- else -%}
+                          <button aria-controls="navigation-drawer-{{ forloop.index }}" aria-expanded="false" class="text-with-icon gap-2.5 bold link-faded-reverse{% if is_highlighted_link %} header__nav-item--highlight{% endif %}">
+                            {% if is_highlighted_link %}{{ nav_highlight_icon }}{% endif %}{{- link.title -}} {%- render 'icon' with 'chevron-bottom' -%}
+                          </button>
+
+                          <navigation-drawer class="navigation-drawer drawer lg-max:hidden" id="navigation-drawer-{{ forloop.index }}" open-from="left" mega-menu>
+                            {%- render 'navigation-panel', navigation_layout: section.settings.layout, main_menu: link, is_mega_menu: true, mega_menu_block: mega_menu_block -%}
+                          </navigation-drawer>
+                        {%- endunless -%}
+                      {%- else -%}
+                        <details class="relative" is="dropdown-disclosure" trigger="{{ section.settings.menu_open_trigger | escape }}">
+                          <summary class="text-with-icon gap-2.5 bold link-faded-reverse{% if is_highlighted_link %} header__nav-item--highlight{% endif %}" {% if link.url != '#' %}data-url="{{ link.url | escape }}"{% endif %}>
+                            {% if is_highlighted_link %}{{ nav_highlight_icon }}{% endif %}{{- link.title -}} {%- render 'icon' with 'chevron-bottom' -%}
+                          </summary>
+
+                          <div class="dropdown-menu {% if link.levels <= 1 %}dropdown-menu--restrictable{% endif %}">
+                            <ul class="contents" role="list">
+                              {%- for sub_link in link.links -%}
+                                <li>
+                                  {%- if sub_link.levels == 0 -%}
+                                    <a href="{{ sub_link.url }}" class="dropdown-menu__item group" {% if sub_link.current %}aria-current="page"{% endif %}>
+                                      <span><span class="reversed-link">{{ sub_link.title }}</span></span>
+                                    </a>
+                                  {%- else -%}
+                                    <details class="relative" is="dropdown-disclosure" trigger="{{ section.settings.menu_open_trigger | escape }}">
+                                      <summary class="dropdown-menu__item group" {% if sub_link.url != '#' %}data-url="{{ sub_link.url | escape }}"{% endif %}>
+                                        <span><span class="reversed-link">{{- sub_link.title -}}</span></span>
+                                        {%- render 'icon' with 'chevron-right' -%}
+                                      </summary>
+
+                                      <div class="dropdown-menu">
+                                        <ul class="contents" role="list">
+                                          {%- for sub_sub_link in sub_link.links -%}
+                                            <li>
+                                              <a href="{{ sub_sub_link.url }}" class="dropdown-menu__item group" {% if sub_sub_link.current %}aria-current="page"{% endif %}>
+                                                <span><span class="reversed-link">{{ sub_sub_link.title }}</span></span>
+                                              </a>
+                                            </li>
+                                          {%- endfor -%}
+                                        </ul>
+                                      </div>
+                                    </details>
+                                  {%- endif -%}
+                                </li>
+                              {%- endfor -%}
+                            </ul>
+                          </div>
+                        </details>
+                      {%- endif -%}
+                    {%- endif -%}
+                  </li>
+                {%- endfor -%}
+              </ul>
+          </nav>
+        {%- endif -%}
+      </div>
+
+      {%- comment -%}
+      --------------------------------------------------------------------------------------------------------------------
+      LOGO AREA
+      --------------------------------------------------------------------------------------------------------------------
+      {%- endcomment -%}
+
+      {%- capture logo_content -%}
+        {%- if section.settings.logo -%}
+          {%- capture sizes -%}{{ section.settings.logo_max_width }}px{%- endcapture -%}
+          {%- capture widths -%}{{ section.settings.logo_max_width | times: 2 | at_most: section.settings.logo.width }}, {{ section.settings.logo_max_width | times: 3 | at_most: section.settings.logo.width }}{%- endcapture -%}
+          <span class="sr-only">{{ shop.name }}</span>
+          {{- section.settings.logo | image_url: width: section.settings.logo.width | image_tag: sizes: sizes, widths: widths, class: 'header__logo-image' -}}
+
+          {%- if section.settings.transparent_logo -%}
+            {{- section.settings.transparent_logo | image_url: width: section.settings.transparent_logo.width | image_tag: sizes: sizes, widths: widths, class: 'header__logo-image header__logo-image--transparent' -}}
+          {%- endif -%}
+        {%- else -%}
+          <span class="header__logo-text h4">{{ shop.name }}</span>
+        {%- endif -%}
+      {%- endcapture -%}
+
+      {%- if request.page_type == 'index' -%}
+        <h1 class="header__logo">
+          <a href="{{ routes.root_url }}">{{ logo_content }}</a>
+        </h1>
+      {% else %}
+        <a href="{{ routes.root_url }}" class="header__logo">{{ logo_content }}</a>
+      {% endif %}
+
+      {%- comment -%}
+      --------------------------------------------------------------------------------------------------------------------
+      SECONDARY NAV AREA
+      --------------------------------------------------------------------------------------------------------------------
+      {%- endcomment -%}
+
+      <div class="header__secondary-nav">
+        {%- if section.settings.header != 'drawer' and section.settings.secondary_menu.links.size > 0 -%}
+          <nav class="header__link-list" role="navigation">
+            <ul class="contents">
+              {%- for link in section.settings.secondary_menu.links -%}
+                <li>
+                  <a href="{{ link.url }}" class="bold link-faded-reverse">{{ link.title }}</a>
+                </li>
+              {%- endfor -%}
+            </ul>
+          </nav>
+        {%- endif -%}
+
+        <ul class="header__icon-list">
+          {%- if section.settings.show_country_selector and localization.available_countries.size > 1 -%}
+            <li class="hidden md:block shrink-0">
+              {%- render 'localization-selector', type: 'country', show_country_name: section.settings.show_country_name, show_country_flag: section.settings.show_country_flag, popover_vertical_position: 'end' -%}
+            </li>
+          {%- endif -%}
+
+          {%- if section.settings.show_locale_selector and localization.available_languages.size > 1 -%}
+            <li class="hidden md:block shrink-0">
+              {%- render 'localization-selector', type: 'locale', popover_vertical_position: 'end' -%}
+            </li>
+          {%- endif -%}
+
+          <li{% if two_row_header %} class="lg:hidden"{% endif %}>
+            <a href="{{ routes.search_url }}" class="hidden tap-area sm:block" aria-controls="search-drawer">
+              <span class="sr-only">{{ 'header.general.search' | t }}</span>
+              {%- render 'icon' with 'search' -%}
+            </a>
+          </li>
+          
+          {%- if shop.customer_accounts_enabled -%}
+            <li>
+              <a href="{% if customer %}{{ routes.account_url }}{% else %}{{ routes.account_login_url }}{% endif %}" class="hidden tap-area sm:block">
+                <span class="sr-only">{% if customer %}{{ 'header.general.account' | t }}{% else %}{{ 'header.general.login' | t }}{% endif %}</span>
+                {%- render 'icon' with 'account' -%}
+              </a>
+            </li>
+          {%- endif -%}
+
+          <li>
+            <a href="{{ routes.cart_url }}" data-no-instant class="relative block tap-area" {% if settings.cart_type != 'page' and request.page_type != 'cart' %}aria-controls="cart-drawer"{% endif %}>
+              <span class="sr-only">{{ 'header.general.cart' | t }}</span>
+              {%- render 'icon' with 'cart' -%}
+
+              <div class="header__cart-count">
+                <cart-count class="count-bubble {% if cart.item_count == 0 %}opacity-0{% endif %}">
+                  <span class="sr-only">{{ 'cart.general.item_count' | t: count: cart.item_count }}</span>
+                  <span aria-hidden="true">{{ cart.item_count }}</span>
+                </cart-count>
+              </div>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </store-header>
+</height-observer>
+
+{%- comment -%}
+  --------------------------------------------------------------------------------------------------------------------
+  NAVIGATION MENU DRAWER
+  --------------------------------------------------------------------------------------------------------------------
+{%- endcomment -%}
+
+{%- assign main_menu = section.settings.sidebar_menu | default: section.settings.menu -%}
+{%- assign secondary_menu = section.settings.secondary_menu -%}
+
+{%- if main_menu.links.size > 0 or secondary_menu.links.size > 0 -%}
+  <navigation-drawer mobile-opening="{{ section.settings.opening_from }}" open-from="left" id="header-sidebar-menu" class="navigation-drawer drawer {% if section.settings.layout != 'drawer' %}lg:hidden{% endif %}" {% if request.design_mode %}handle-section-events{% endif %}>
+    <button is="close-button" aria-label="{{ 'general.accessibility.close' | t | escape }}" {%- if section.settings.opening_from == 'bottom' -%}class="sm-max:hidden"{%- endif -%}>
+      {%- render 'icon' with 'close', width: 19, height: 19 -%}
+    </button>
+
+    {%- render 'navigation-panel',
+      is_mega_menu: false,
+      main_menu: main_menu,
+      secondary_menu: secondary_menu,
+      mobile_opening: section.settings.opening_from,
+      layout: section.settings.layout,
+      show_social_media: section.settings.show_social_media,
+      show_country_selector: section.settings.show_country_selector,
+      show_country_name: section.settings.show_country_name,
+      show_country_flag: section.settings.show_country_flag,
+      show_locale_selector: section.settings.show_locale_selector -%}
+  </navigation-drawer>
+{%- endif -%}
+
+{%- if inline_search_enabled and typewriter_terms != '' -%}
+  <script>
+    (function () {
+      if (window.customElements.get('header-search-typewriter')) {
+        return;
+      }
+
+      /* typewriter-frames:start */
+      /**
+       * Pure function: builds the frame sequence of the animated placeholder.
+       * Each frame is { text, delay } where delay is how long (ms) the frame stays visible before the next one.
+       * For every term: type it one character at a time (typeMs), hold the full "prefix term…" (holdMs),
+       * then delete it one character at a time (deleteMs) back to the bare prefix, and move to the next term.
+       */
+      function typewriterFrames(terms, options) {
+        options = options || {};
+
+        var prefix = (options.prefix === undefined || options.prefix === null ? 'Search' : String(options.prefix)).trim();
+        var ellipsis = options.ellipsis === undefined || options.ellipsis === null ? '\u2026' : String(options.ellipsis);
+        var typeMs = options.typeMs > 0 ? options.typeMs : 60;
+        var holdMs = options.holdMs > 0 ? options.holdMs : 1400;
+        var deleteMs = options.deleteMs > 0 ? options.deleteMs : 30;
+        var base = prefix === '' ? '' : prefix + ' ';
+        var frames = [];
+
+        (Array.isArray(terms) ? terms : []).forEach(function (term) {
+          var chars = Array.from(String(term === undefined || term === null ? '' : term).trim());
+
+          if (chars.length === 0) {
+            return;
+          }
+
+          for (var i = 1; i <= chars.length; i++) {
+            frames.push({ text: base + chars.slice(0, i).join(''), delay: typeMs });
+          }
+
+          frames.push({ text: base + chars.join('') + ellipsis, delay: holdMs });
+
+          for (var j = chars.length - 1; j >= 0; j--) {
+            frames.push({ text: base + chars.slice(0, j).join(''), delay: deleteMs });
+          }
+        });
+
+        return frames;
+      }
+      /* typewriter-frames:end */
+
+      class HeaderSearchTypewriter extends HTMLElement {
+        connectedCallback() {
+          this.input = this.querySelector('input');
+
+          if (!this.input) {
+            return;
+          }
+
+          let terms = [];
+
+          try {
+            terms = JSON.parse(this.getAttribute('terms') || '[]');
+          } catch (error) {
+            terms = [];
+          }
+
+          this.frames = typewriterFrames(terms, { prefix: this.getAttribute('prefix') });
+
+          if (this.frames.length === 0) {
+            return;
+          }
+
+          this.frameIndex = 0;
+          this.staticPlaceholder = this.input.getAttribute('placeholder') || '';
+          this.reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+          this.onMotionChange = () => (this.reducedMotion.matches ? this.stop() : this.start());
+          this.onFocus = () => this.stop();
+          this.onBlur = () => this.start();
+          this.onVisibility = () => (document.hidden ? this.stop() : this.start());
+
+          this.reducedMotion.addEventListener('change', this.onMotionChange);
+          this.input.addEventListener('focus', this.onFocus);
+          this.input.addEventListener('blur', this.onBlur);
+          document.addEventListener('visibilitychange', this.onVisibility);
+
+          this.onMotionChange();
+        }
+
+        disconnectedCallback() {
+          this.stop();
+
+          if (this.reducedMotion) {
+            this.reducedMotion.removeEventListener('change', this.onMotionChange);
+            this.input.removeEventListener('focus', this.onFocus);
+            this.input.removeEventListener('blur', this.onBlur);
+            document.removeEventListener('visibilitychange', this.onVisibility);
+          }
+        }
+
+        start() {
+          if (this.timer || this.reducedMotion.matches || document.hidden || document.activeElement === this.input || this.input.value !== '') {
+            return;
+          }
+
+          this.tick();
+        }
+
+        tick() {
+          const frame = this.frames[this.frameIndex % this.frames.length];
+
+          this.input.setAttribute('placeholder', frame.text);
+          this.frameIndex = (this.frameIndex + 1) % this.frames.length;
+          this.timer = setTimeout(() => this.tick(), frame.delay);
+        }
+
+        stop() {
+          clearTimeout(this.timer);
+          this.timer = null;
+
+          // A static placeholder is shown whenever the animation is not running (reduced motion, focus, hidden tab)
+          this.input.setAttribute('placeholder', this.staticPlaceholder);
+        }
+      }
+
+      window.HeaderSearchTypewriter = { frames: typewriterFrames };
+      window.customElements.define('header-search-typewriter', HeaderSearchTypewriter);
+    })();
+  </script>
+{%- endif -%}
+
+{%- if team_grid_enabled -%}
+  <script>
+    (function () {
+      if (window.customElements.get('team-menu-grid')) {
+        return;
+      }
+
+      /* Filters the team cards while typing: a team matches when its name, or a word of it, starts with the query */
+      class TeamMenuGrid extends HTMLElement {
+        connectedCallback() {
+          this.input = this.querySelector('[data-team-search]');
+          this.items = Array.from(this.querySelectorAll('[data-team-name]'));
+          this.empty = this.querySelector('[data-team-empty]');
+
+          if (!this.input) {
+            return;
+          }
+
+          this.input.addEventListener('input', () => this.filter());
+          this.input.addEventListener('keydown', (event) => {
+            if (event.key !== 'Enter') {
+              return;
+            }
+
+            event.preventDefault();
+            const firstMatch = this.items.find((item) => !item.hidden);
+            const link = firstMatch && firstMatch.querySelector('a');
+
+            if (link) {
+              window.location.href = link.href;
+            }
+          });
+
+          /* Start from the full list next time the menu opens */
+          const container = this.closest('navigation-drawer, details');
+
+          if (container) {
+            container.addEventListener(container.tagName === 'DETAILS' ? 'toggle' : 'dialog:after-hide', () => {
+              if (container.tagName !== 'DETAILS' || !container.hasAttribute('open')) {
+                this.reset();
+              }
+            });
+          }
+        }
+
+        filter() {
+          const query = this.input.value.trim().toLowerCase();
+          let visibleCount = 0;
+
+          this.items.forEach((item) => {
+            const name = item.getAttribute('data-team-name');
+            const matches = query === '' || name.startsWith(query) || name.split(' ').some((word) => word.startsWith(query)) || (query.includes(' ') && name.includes(query));
+
+            item.hidden = !matches;
+            visibleCount += matches ? 1 : 0;
+          });
+
+          if (this.empty) {
+            this.empty.hidden = visibleCount > 0;
+          }
+        }
+
+        reset() {
+          if (this.input.value !== '') {
+            this.input.value = '';
+            this.filter();
+          }
+        }
+      }
+
+      window.customElements.define('team-menu-grid', TeamMenuGrid);
+    })();
+  </script>
+{%- endif -%}
+
+<script>
+  document.documentElement.style.setProperty('--header-height', Math.round(document.getElementById('shopify-section-{{ section.id }}').clientHeight) + 'px');
+</script>
+
+{% schema %}
+{
+  "name": "Header",
+  "class": "shopify-section--header",
+  "tag": "header",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "enable_sticky",
+      "label": "Enable sticky header",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "hide_on_scroll",
+      "label": "Hide on scroll",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_inline_search",
+      "label": "Show search bar in header",
+      "info": "Large screens only. Smaller screens keep the search icon.",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "inline_search_placeholder",
+      "label": "Search bar placeholder",
+      "info": "Also used as the static placeholder when the visitor prefers reduced motion.",
+      "default": "Search a team, player or season"
+    },
+    {
+      "type": "text",
+      "id": "search_placeholder_prefix",
+      "label": "Animated placeholder prefix",
+      "info": "Typed before each term, e.g. \"Search\" gives \"Search Lakers…\".",
+      "default": "Search"
+    },
+    {
+      "type": "textarea",
+      "id": "search_placeholder_terms",
+      "label": "Animated placeholder terms",
+      "info": "One term per line. When set, the search bar types the terms one after another (typewriter effect). Leave empty to keep the static placeholder."
+    },
+    {
+      "type": "header",
+      "content": "Logo"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "Image",
+      "info": "280 x 80px .png recommended"
+    },
+    {
+      "type": "range",
+      "id": "logo_max_width",
+      "min": 40,
+      "max": 300,
+      "step": 5,
+      "unit": "px",
+      "label": "Image width",
+      "default": 140
+    },
+    {
+      "type": "range",
+      "id": "logo_mobile_max_width",
+      "min": 25,
+      "max": 170,
+      "step": 5,
+      "unit": "px",
+      "label": "Mobile image width",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "two_row_logo_height",
+      "min": 16,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "label": "Two-row header image height",
+      "info": "Large screens only, when the search bar is shown with the \"Logo left, navigation center\" layout. The width follows the image ratio.",
+      "default": 24
+    },
+    {
+      "type": "header",
+      "content": "Navigation"
+    },
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Menu",
+      "default": "main-menu"
+    },
+    {
+      "type": "link_list",
+      "id": "sidebar_menu",
+      "label": "Drawer menu"
+    },
+    {
+      "type": "link_list",
+      "id": "secondary_menu",
+      "label": "Secondary menu",
+      "info": "This menu won't show dropdown items. For best results, limit the number of links to 1 or 2."
+    },
+    {
+      "type": "text",
+      "id": "nav_highlight_item",
+      "label": "Highlighted menu item",
+      "info": "Title of the menu item that gets a trophy icon before its label (and a medium weight on the two-row desktop header)."
+    },
+    {
+      "type": "select",
+      "id": "menu_open_trigger",
+      "label": "Open dropdown items on...",
+      "info": "Click mode is forced on touch devices.",
+      "options": [
+        {
+          "value": "hover",
+          "label": "Hover"
+        },
+        {
+          "value": "click",
+          "label": "Click"
+        }
+      ],
+      "default": "click"
+    },
+    {
+      "type": "header",
+      "content": "Team grid"
+    },
+    {
+      "type": "paragraph",
+      "content": "Turns a menu item into a grid of team logos with a search field. It opens inside the mobile menu, and under the item on desktop."
+    },
+    {
+      "type": "text",
+      "id": "team_menu_item",
+      "label": "Menu item",
+      "info": "Title of the menu item that opens the grid. Separate several titles with commas.",
+      "default": "Teams, Shop by team"
+    },
+    {
+      "type": "collection_list",
+      "id": "team_collections",
+      "label": "Teams",
+      "info": "The collection image is used as the team logo.",
+      "limit": 50
+    },
+    {
+      "type": "text",
+      "id": "team_strip_text",
+      "label": "Text removed from team names",
+      "default": "Jerseys"
+    },
+    {
+      "type": "text",
+      "id": "team_grid_title",
+      "label": "Heading on desktop",
+      "default": "Shop by team"
+    },
+    {
+      "type": "text",
+      "id": "team_search_placeholder",
+      "label": "Search placeholder",
+      "default": "Search a team"
+    },
+    {
+      "type": "text",
+      "id": "team_no_results_text",
+      "label": "Text when no team matches",
+      "default": "No team found"
+    },
+    {
+      "type": "text",
+      "id": "team_view_all_text",
+      "label": "Link under the grid",
+      "info": "Opens the menu item's own page. Leave empty to hide.",
+      "default": "View all jerseys"
+    },
+    {
+      "type": "header",
+      "content": "Mobile navigation"
+    },
+    {
+      "type": "select",
+      "id": "opening_from",
+      "label": "Opening from",
+      "options": [
+        {
+          "value": "bottom",
+          "label": "Bottom"
+        },
+        {
+          "value": "left",
+          "label": "Left"
+        }
+      ],
+      "default": "bottom"
+    },
+    {
+      "type": "checkbox",
+      "id": "drawer_compact_links",
+      "label": "Compact links with separators",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "drawer_show_search",
+      "label": "Search bar at the top",
+      "default": true
+    },
+    {
+      "type": "collection_list",
+      "id": "drawer_featured_teams",
+      "label": "Popular teams",
+      "info": "Round logos at the top of the mobile menu (collection image). Leave empty to hide.",
+      "limit": 12
+    },
+    {
+      "type": "text",
+      "id": "drawer_featured_title",
+      "label": "Popular teams heading",
+      "default": "Popular teams"
+    },
+    {
+      "type": "text",
+      "id": "drawer_offer_title",
+      "label": "Offer card title",
+      "info": "Card at the bottom of the mobile menu. Leave empty to hide.",
+      "default": "Buy 3, get 1 free"
+    },
+    {
+      "type": "text",
+      "id": "drawer_offer_text",
+      "label": "Offer card text",
+      "default": "Discount applied automatically at checkout"
+    },
+    {
+      "type": "url",
+      "id": "drawer_offer_url",
+      "label": "Offer card link"
+    },
+    {
+      "type": "link_list",
+      "id": "drawer_help_menu",
+      "label": "Help links",
+      "info": "Small links at the bottom of the mobile menu (FAQ, contact...)."
+    },
+    {
+      "type": "header",
+      "content": "Desktop"
+    },
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Layout",
+      "info": "When centering navigation, you should limit your links to 5.",
+      "options": [
+        {
+          "value": "logo_left_navigation_inline",
+          "label": "Logo left, navigation inline"
+        },
+        {
+          "value": "logo_left_navigation_center",
+          "label": "Logo left, navigation center"
+        },
+        {
+          "value": "logo_center_navigation_inline",
+          "label": "Logo center, navigation inline"
+        },
+        {
+          "value": "drawer",
+          "label": "Drawer"
+        }
+      ],
+      "default": "logo_left_navigation_inline"
+    },
+    {
+      "type": "header",
+      "content": "Social media",
+      "info": "This will only show in the drawer navigation."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_social_media",
+      "label": "Show social media",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Language selector",
+      "info": "To add a language, go to your [language settings.](/admin/settings/languages)"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_locale_selector",
+      "label": "Show language selector",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Country/region selector",
+      "info": "To add a country/region, go to your [markets settings.](/admin/settings/markets). For best user experience, we recommend to keep this setting off and to use the free [Shopify Geolocation app](https://apps.shopify.com/geolocation)."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_country_selector",
+      "label": "Show country/region selector",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_country_flag",
+      "label": "Show country flag",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_country_name",
+      "label": "Show country name",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Transparent header",
+      "info": "Add a section on first position which allows transparent header such as slideshow or image with text overlay."
+    },
+    {
+      "type": "color",
+      "id": "transparent_header_text_color",
+      "label": "Text color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "image_picker",
+      "id": "transparent_logo",
+      "label": "Logo image",
+      "info": "Use the same dimensions as main logo."
+    },
+    {
+      "type": "header",
+      "content": "Appearance"
+    },
+    {
+      "type": "checkbox",
+      "id": "reduce_padding",
+      "label": "Reduce padding",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "background_opacity",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "label": "Background opacity",
+      "default": 1
+    },
+    {
+      "type": "range",
+      "id": "background_blur_radius",
+      "min": 0,
+      "max": 20,
+      "step": 2,
+      "unit": "px",
+      "label": "Background blur radius",
+      "default": 4
+    }
+  ],
+  "blocks": [
+    {
+      "type": "mega_menu",
+      "name": "Mega menu",
+      "settings": [
+        {
+          "type": "text",
+          "id": "menu_item",
+          "label": "Menu item",
+          "info": "Enter menu item to apply a mega menu dropdown. [Learn more](https://support.maestrooo.com/article/180-navigation-enabling-and-configuring-mega-navigation)."
+        },
+        {
+          "type": "select",
+          "id": "layout",
+          "label": "Layout",
+          "options": [
+            {
+              "value": "horizontal",
+              "label": "Horizontal"
+            },
+            {
+              "value": "horizontal_center",
+              "label": "Horizontal (centered)"
+            },
+            {
+              "value": "drawer",
+              "label": "Drawer"
+            }
+          ],
+          "default": "horizontal"
+        },
+        {
+          "type": "select",
+          "id": "submenu_style",
+          "label": "Submenu",
+          "options": [
+            {
+              "value": "bold_text",
+              "label": "Bold - text only"
+            },
+            {
+              "value": "bold_heading",
+              "label": "Bold - headings only"
+            }
+          ],
+          "default": "bold_heading"
+        },
+        {
+          "type": "header",
+          "content": "Image 1"
+        },
+        {
+          "type": "image_picker",
+          "id": "image_1",
+          "label": "Image",
+          "info": "1200 x 1200px .jpg recommended"
+        },
+        {
+          "type": "text",
+          "id": "image_heading_1",
+          "label": "Heading"
+        },
+        {
+          "type": "url",
+          "id": "image_link_1",
+          "label": "Link"
+        },
+        {
+          "type": "color",
+          "id": "image_text_color_1",
+          "label": "Heading",
+          "default": "#ffffff"
+        },
+        {
+          "type": "header",
+          "content": "Image 2"
+        },
+        {
+          "type": "image_picker",
+          "id": "image_2",
+          "label": "Image",
+          "info": "1200 x 1200px .jpg recommended"
+        },
+        {
+          "type": "text",
+          "id": "image_heading_2",
+          "label": "Heading"
+        },
+        {
+          "type": "url",
+          "id": "image_link_2",
+          "label": "Link"
+        },
+        {
+          "type": "color",
+          "id": "image_text_color_2",
+          "label": "Heading",
+          "default": "#ffffff"
+        },
+        {
+          "type": "header",
+          "content": "Image 3"
+        },
+        {
+          "type": "image_picker",
+          "id": "image_3",
+          "label": "Image",
+          "info": "1200 x 1200px .jpg recommended"
+        },
+        {
+          "type": "text",
+          "id": "image_heading_3",
+          "label": "Heading"
+        },
+        {
+          "type": "url",
+          "id": "image_link_3",
+          "label": "Link"
+        },
+        {
+          "type": "color",
+          "id": "image_text_color_3",
+          "label": "Heading",
+          "default": "#ffffff"
+        },
+        {
+          "type": "header",
+          "content": "Featured product"
+        },
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Product"
+        },
+        {
+          "type": "color",
+          "id": "product_card_background",
+          "label": "Card background"
+        },
+        {
+          "type": "color",
+          "id": "product_card_text_color",
+          "label": "Card text"
+        },
+        {
+          "type": "header",
+          "content": "Appearance"
+        },
+        {
+          "type": "select",
+          "id": "promo_content_layout",
+          "label": "Promotional content layout",
+          "info": "To improve readability, layout can be changed automatically depending on the screen size, menu column count and promotional content. [Learn more](https://support.maestrooo.com/article/296-navigation-understanding-impact-mega-menu-strategy)",
+          "options": [
+            {
+              "value": "grid",
+              "label": "Grid"
+            },
+            {
+              "value": "collage",
+              "label": "Collage"
+            },
+            {
+              "value": "carousel",
+              "label": "Carousel"
+            }
+          ],
+          "default": "grid"
+        },
+        {
+          "type": "checkbox",
+          "id": "stretch_promo",
+          "label": "Stretch to fill",
+          "default": false
+        },
+        {
+          "type": "select",
+          "id": "drawer_link_image",
+          "label": "Drawer link image",
+          "options": [
+            {
+              "value": "hide",
+              "label": "Hide"
+            },
+            {
+              "value": "show",
+              "label": "Show product image"
+            }
+          ],
+          "default": "hide"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

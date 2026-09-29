@@ -1,0 +1,33 @@
+{%- comment -%}
+----------------------------------------------------------------------------------------------------------------------
+CART QUANTITY STEPPER
+----------------------------------------------------------------------------------------------------------------------
+
+A "- 1 +" quantity selector for a cart line. It reuses the theme's <quantity-selector> element: the buttons step the
+input and fire a "change" event, which the surrounding <line-item-quantity> element sends to the cart. The minus button
+is disabled at the minimum quantity (the "Remove" link removes the line), the plus button at the maximum.
+
+********************************************
+Supported variables
+********************************************
+
+* line_item: the cart line (required)
+* max_quantity: the maximum quantity allowed for the line, if any
+{%- endcomment -%}
+
+{%- liquid
+  assign cqs_min = line_item.variant.quantity_rule.min | default: 1
+  assign cqs_step = line_item.variant.quantity_rule.increment | default: 1
+-%}
+
+<quantity-selector class="quantity-selector cart-quantity-stepper">
+  <button type="button" class="quantity-selector__button" aria-label="{{ 'product.quantity.decrease_quantity' | t | escape }}" {% if line_item.quantity <= cqs_min %}disabled{% endif %}>
+    {%- render 'icon' with 'minus', width: 10, height: 2 -%}
+  </button>
+
+  <input class="quantity-selector__input" type="number" is="quantity-input" inputmode="numeric" min="{{ cqs_min }}" step="{{ cqs_step }}" {% if max_quantity != nil %}max="{{ max_quantity }}"{% endif %} data-line-key="{{ line_item.key }}" aria-label="{{ 'cart.order.change_quantity' | t | escape }}" value="{{ line_item.quantity }}" autocomplete="off">
+
+  <button type="button" class="quantity-selector__button" aria-label="{{ 'product.quantity.increase_quantity' | t | escape }}" {% if max_quantity != nil and line_item.quantity >= max_quantity %}disabled{% endif %}>
+    {%- render 'icon' with 'plus', width: 10, height: 10 -%}
+  </button>
+</quantity-selector>

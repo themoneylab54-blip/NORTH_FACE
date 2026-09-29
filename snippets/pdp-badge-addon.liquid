@@ -1,0 +1,353 @@
+{%- comment -%}
+----------------------------------------------------------------------------------------------------------------------
+PDP BADGE ADD-ON (block type "pdp_badge_addon")
+----------------------------------------------------------------------------------------------------------------------
+
+Buy-box item 7: "Choose a patch". A header row shows the label (12px uppercase) on the left and the surcharge
+("+ {price}", numeric block setting formatted with | money) on the right. Below it, two outline buttons side by side
+(38px tall, 1px #F0F0F0 border, 6px radius, 14px/500) behave like a radio group: clicking a button selects it
+(border #121212), clicking the active button again clears the choice (unless "required" is on). One hidden input
+carries the choice as properties[Patch] (property name configurable) and is DISABLED while nothing is chosen so
+no empty property reaches the cart.
+
+The surcharge is INFORMATIONAL: this block does not change the price charged. Wire a variant, a bundle app or a
+Shopify Function to the "Patch" line-item property if the surcharge must be billed.
+
+The product-info column is re-rendered by <product-rerender> on variant change, so the current choice is persisted
+OUTSIDE the re-rendered tree (a data attribute on #shopify-section-{{ section.id }}) and in localStorage keyed by
+product.id, then restored on the next connect.
+
+********************************************
+Supported variables
+********************************************
+
+* block: the section block (settings: label, patch_price, option_1, option_2, required, property_name, required_message)
+* product: the product being rendered
+* product_form_id: the ID of the product form the hidden input is attached to (form="...")
+* section: the current section
+{%- endcomment -%}
+
+{%- liquid
+  assign pba_label = block.settings.label | default: 'Choose a patch'
+  assign pba_property = block.settings.property_name | default: 'Patch' | strip
+  if pba_property == blank
+    assign pba_property = 'Patch'
+  endif
+  assign pba_required_message = block.settings.required_message | default: 'Please choose a patch before adding to cart.'
+
+  assign pba_price_cents = 0
+  if block.settings.patch_price != blank and block.settings.patch_price > 0
+    assign pba_price_cents = block.settings.patch_price | times: 100 | round
+  endif
+
+  assign pba_options = '' | split: ''
+  assign pba_option_1 = block.settings.option_1 | strip
+  assign pba_option_2 = block.settings.option_2 | strip
+  if pba_option_1 != blank
+    assign pba_opt1_arr = pba_option_1 | split: "|||"
+    assign pba_options = pba_options | concat: pba_opt1_arr
+  endif
+  if pba_option_2 != blank and pba_option_2 != pba_option_1
+    assign pba_opt2_arr = pba_option_2 | split: "|||"
+    assign pba_options = pba_options | concat: pba_opt2_arr
+  endif
+
+  assign pba_uid = section.id | append: '-' | append: block.id | append: '-' | append: product.id
+  assign pba_input_name = 'properties[' | append: pba_property | append: ']'
+-%}
+
+{%- if pba_options.size > 0 -%}
+  <style>
+    .pdp-badge-addon-{{ block.id }} {
+      --pba-text: #121212;
+      --pba-muted: #737373;
+      --pba-border: #F0F0F0;
+      --pba-active: #121212;
+      --pba-error: #F04242;
+      display: block;
+      font-family: Inter, -apple-system, "Segoe UI", sans-serif;
+      color: var(--pba-text);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Header row: label left, surcharge right */
+    .pdp-badge-addon-{{ block.id }} .pdp-badge-addon__header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 0 0 8px;
+    }
+
+    .pdp-badge-addon-{{ block.id }} .pdp-badge-addon__label {
+      font-size: 12px;
+      font-weight: 500;
+      line-height: 16px;
+      letter-spacing: .02em;
+      text-transform: uppercase;
+      color: var(--pba-text);
+    }
+
+    .pdp-badge-addon-{{ block.id }} .pdp-badge-addon__price {
+      flex-shrink: 0;
+      font-size: 12px;
+      font-weight: 500;
+      line-height: 16px;
+      color: var(--pba-text);
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    /* Two outline buttons side by side: 38px, 1px #F0F0F0, radius 6px, 14px 500 */
+    .pdp-badge-addon-{{ block.id }} .pdp-badge-addon__options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 0;
+      padding: 0;
+    }
+
+    .pdp-badge-addon-{{ block.id }} .pdp-badge-addon__option {
+      appearance: none;
+      -webkit-appearance: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-sizing: border-box;
+      min-width: 0;
+      height: 38px;
+      padding: 0 16px;
+      margin: 0;
+      border: 1px solid var(--pba-border);
+      border-radius: 6px;
+      background: transparent;
+      color: var(--pba-text);
+      font: inherit;
+      font-size: 14px;
+      font-weight: 500;
+      line-height: 1;
+      letter-spacing: -0.14px;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: border-color .15s ease, box-shadow .15s ease, background-color .15s ease;
+    }
+
+    .pdp-badge-addon-{{ block.id }} .pdp-badge-addon__option:hover {
+      border-color: rgba(18, 18, 18, .35);
+    }
+
+    .pdp-badge-addon-{{ block.id }} .pdp-badge-addon__option[aria-checked="true"] {
+      border-color: var(--pba-active);
+      box-shadow: inset 0 0 0 1px var(--pba-active);
+    }
+
+    .pdp-badge-addon-{{ block.id }} .pdp-badge-addon__option:focus-visible {
+      outline: 2px solid var(--pba-active);
+      outline-offset: 2px;
+    }
+
+    .pdp-badge-addon-{{ block.id }}[data-invalid="true"] .pdp-badge-addon__option {
+      border-color: var(--pba-error);
+    }
+
+    .pdp-badge-addon-{{ block.id }} .pdp-badge-addon__error {
+      display: none;
+      margin: 8px 0 0;
+      font-size: 12px;
+      line-height: 16px;
+      color: var(--pba-error);
+    }
+
+    .pdp-badge-addon-{{ block.id }}[data-invalid="true"] .pdp-badge-addon__error {
+      display: block;
+    }
+  </style>
+
+  <pdp-badge-addon
+    class="product-info__badge-addon pdp-badge-addon-{{ block.id }}"
+    product-id="{{ product.id }}"
+    section-id="{{ section.id }}"
+    form-id="{{ product_form_id }}"
+    {% if block.settings.required %}required{% endif %}
+    data-invalid="false"
+    {{ block.shopify_attributes }}
+  >
+    <div class="pdp-badge-addon__header">
+      <span class="pdp-badge-addon__label" id="pba-label-{{ pba_uid }}">{{ pba_label | escape }}</span>
+      {%- if pba_price_cents > 0 -%}
+        <span class="pdp-badge-addon__price" data-pba-price>+ {{ pba_price_cents | money }}</span>
+      {%- endif -%}
+    </div>
+
+    <div class="pdp-badge-addon__options" role="radiogroup" aria-labelledby="pba-label-{{ pba_uid }}" {% if block.settings.required %}aria-required="true"{% endif %}>
+      {%- for pba_option in pba_options -%}
+        <button
+          type="button"
+          role="radio"
+          class="pdp-badge-addon__option"
+          data-pba-option
+          data-pba-value="{{ pba_option | escape }}"
+          aria-checked="false"
+          tabindex="{% if forloop.first %}0{% else %}-1{% endif %}"
+        >{{ pba_option | escape }}</button>
+      {%- endfor -%}
+    </div>
+
+    <input
+      type="hidden"
+      name="{{ pba_input_name | escape }}"
+      value=""
+      form="{{ product_form_id }}"
+      data-pba-input
+      disabled
+    >
+
+    <p class="pdp-badge-addon__error" data-pba-error role="alert" aria-live="polite">{{ pba_required_message | escape }}</p>
+  </pdp-badge-addon>
+
+  <script>
+    if (!window.customElements.get('pdp-badge-addon')) {
+      /* pdp-badge:pure:start */
+      // Pure helpers (no DOM). Extracted and unit-tested with node, see the block's self-test.
+      var PdpBadgeAddonLogic = {
+        // Next selection after a click: same value again clears the choice, unless the choice is required.
+        toggle: function (current, clicked, required) {
+          var next = String(clicked == null ? '' : clicked);
+          if (next === '') return String(current == null ? '' : current);
+          if (next === current) return required ? current : '';
+          return next;
+        },
+
+        // First candidate (section attribute, localStorage) that is one of the rendered options, else ''.
+        restore: function (candidates, options) {
+          for (var i = 0; i < candidates.length; i++) {
+            var candidate = candidates[i];
+            if (typeof candidate === 'string' && candidate !== '' && options.indexOf(candidate) !== -1) return candidate;
+          }
+          return '';
+        },
+
+        // What the hidden input must look like: disabled (never submitted) while nothing is chosen.
+        inputState: function (value) {
+          var chosen = String(value == null ? '' : value).trim();
+          return { disabled: chosen === '', value: chosen };
+        },
+
+        // Arrow-key navigation inside the radio group (wraps around).
+        nextIndex: function (index, count, key) {
+          if (count <= 0) return -1;
+          if (key === 'ArrowRight' || key === 'ArrowDown') return (index + 1) % count;
+          if (key === 'ArrowLeft' || key === 'ArrowUp') return (index - 1 + count) % count;
+          return index;
+        },
+
+        // A required group with no choice blocks the form submission.
+        blocksSubmit: function (value, required) {
+          return !!required && String(value == null ? '' : value).trim() === '';
+        }
+      };
+      /* pdp-badge:pure:end */
+
+      window.customElements.define('pdp-badge-addon', class extends HTMLElement {
+        connectedCallback() {
+          this._logic = PdpBadgeAddonLogic;
+          this._productId = this.getAttribute('product-id') || '';
+          this._sectionId = this.getAttribute('section-id') || '';
+          this._formId = this.getAttribute('form-id') || '';
+          this._required = this.hasAttribute('required');
+          this._storageKey = 'pdp-badge-addon:' + this._productId;
+          this._hostAttr = 'data-pba-patch-' + this._productId;
+
+          // Host outside the re-rendered tree: the section wrapper survives <product-rerender>.
+          this._host = document.getElementById('shopify-section-' + this._sectionId) || document.body;
+
+          this._buttons = Array.from(this.querySelectorAll('[data-pba-option]'));
+          this._input = this.querySelector('[data-pba-input]');
+          this._options = this._buttons.map(function (button) { return button.dataset.pbaValue; });
+
+          this._onClick = this._onClick.bind(this);
+          this._onKeydown = this._onKeydown.bind(this);
+          this._onSubmit = this._onSubmit.bind(this);
+          this.addEventListener('click', this._onClick);
+          this.addEventListener('keydown', this._onKeydown);
+
+          this._form = document.getElementById(this._formId);
+          if (this._form) this._form.addEventListener('submit', this._onSubmit, true);
+
+          var restored = this._logic.restore([this._host.getAttribute(this._hostAttr), this._readStored()], this._options);
+          this._apply(restored, false);
+        }
+
+        disconnectedCallback() {
+          this.removeEventListener('click', this._onClick);
+          this.removeEventListener('keydown', this._onKeydown);
+          if (this._form) this._form.removeEventListener('submit', this._onSubmit, true);
+        }
+
+        _readStored() {
+          try { return window.localStorage.getItem(this._storageKey); } catch (error) { return null; }
+        }
+
+        _writeStored(value) {
+          try {
+            if (value === '') window.localStorage.removeItem(this._storageKey);
+            else window.localStorage.setItem(this._storageKey, value);
+          } catch (error) { /* private mode, quota... */ }
+        }
+
+        _onClick(event) {
+          var button = event.target.closest('[data-pba-option]');
+          if (!button || !this.contains(button)) return;
+          event.preventDefault();
+          this._apply(this._logic.toggle(this._value, button.dataset.pbaValue, this._required), true);
+        }
+
+        _onKeydown(event) {
+          var button = event.target.closest('[data-pba-option]');
+          if (!button) return;
+          var index = this._buttons.indexOf(button);
+          var next = this._logic.nextIndex(index, this._buttons.length, event.key);
+          if (next === index || next === -1) {
+            if (event.key === ' ' || event.key === 'Enter') {
+              event.preventDefault();
+              this._apply(this._logic.toggle(this._value, button.dataset.pbaValue, this._required), true);
+            }
+            return;
+          }
+          event.preventDefault();
+          this._apply(this._buttons[next].dataset.pbaValue, true);
+          this._buttons[next].focus();
+        }
+
+        _onSubmit(event) {
+          if (!this._logic.blocksSubmit(this._value, this._required)) return;
+          event.preventDefault();
+          event.stopImmediatePropagation();
+          this.setAttribute('data-invalid', 'true');
+          this.scrollIntoView({ block: 'center', behavior: 'smooth' });
+          if (this._buttons[0]) this._buttons[0].focus();
+        }
+
+        _apply(value, persist) {
+          this._value = value;
+          if (value !== '') this.setAttribute('data-invalid', 'false');
+
+          this._buttons.forEach(function (button) {
+            var checked = button.dataset.pbaValue === value;
+            button.setAttribute('aria-checked', checked ? 'true' : 'false');
+            button.setAttribute('tabindex', checked || (value === '' && button === this._buttons[0]) ? '0' : '-1');
+          }, this);
+
+          var state = this._logic.inputState(value);
+          if (this._input) {
+            this._input.value = state.value;
+            this._input.disabled = state.disabled;
+          }
+
+          this._host.setAttribute(this._hostAttr, value);
+          if (persist) this._writeStored(value);
+        }
+      });
+    }
+  </script>
+{%- endif -%}

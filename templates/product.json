@@ -1,0 +1,1090 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main": {
+      "type": "main-product",
+      "blocks": {
+        "credit": {
+          "type": "pdp_credit_line",
+          "settings": {
+            "credit_percent": 5,
+            "text": "Earn [amount] in store credit",
+            "icon_color": "#ffd014",
+            "background": "#f5f5f5",
+            "text_color": "#121212"
+          }
+        },
+        "title": {
+          "type": "title",
+          "settings": {
+            "heading_tag": "h1"
+          }
+        },
+        "price_row": {
+          "type": "pdp_price_row",
+          "settings": {
+            "show_badge": true,
+            "badge_background": "#f04242",
+            "badge_text_color": "#ffffff"
+          }
+        },
+        "stock_alert": {
+          "type": "stock_alert",
+          "settings": {
+            "text": "Selling fast — [count] people are viewing this jersey right now",
+            "color": "#f04242",
+            "dynamic_count": true,
+            "count_min": 14,
+            "count_max": 47,
+            "count_interval": 16
+          }
+        },
+        "size": {
+          "type": "pdp_size_selector",
+          "settings": {
+            "label_text": "Choose your size",
+            "size_option_name": "Size",
+            "show_size_guide": true,
+            "size_guide_text": "Size guide",
+            "other_options": "show",
+            "hide_sold_out_variants": false
+          }
+        },
+        "personalise": {
+          "type": "pdp_personalisation",
+          "settings": {
+            "label": "Personalise your jersey",
+            "tab_player_label": "Choose a player",
+            "tab_name_label": "Add your name",
+            "default_tab": "player",
+            "accent_color": "#121212",
+            "players": "",
+            "player_placeholder": "Choose a player (optional)",
+            "name_label": "Name",
+            "name_placeholder": "YOUR NAME",
+            "name_max_length": 12,
+            "number_label": "Number",
+            "number_placeholder": "00",
+            "helper_text": "Printed on the back exactly as entered. Numbers: 2 digits max."
+          }
+        },
+        "patch": {
+          "type": "pdp_badge_addon",
+          "settings": {
+            "label": "Choose a patch",
+            "patch_price": 9.9,
+            "option_1": "Playoffs 2026",
+            "option_2": "Champions",
+            "required": false,
+            "property_name": "Patch",
+            "required_message": "Please choose a patch before adding to cart."
+          }
+        },
+        "buy_buttons": {
+          "type": "buy_buttons",
+          "settings": {
+            "show_payment_button": false,
+            "show_gift_card_recipient": false,
+            "atc_button_background": "#ffd014",
+            "atc_button_text_color": "#000000",
+            "payment_button_background": "",
+            "payment_button_text_color": ""
+          }
+        },
+        "payment": {
+          "type": "pdp_payment_icons",
+          "settings": {
+            "icons_source": "custom",
+            "icons_list": "visa, master, american_express, discover, paypal, apple_pay, google_pay, shopify_pay, venmo, klarna, afterpay",
+            "alignment": "center"
+          }
+        },
+        "tiers": {
+          "type": "pdp_tiers",
+          "settings": {
+            "title": "The more you take, the more you save",
+            "take_label": "Take",
+            "pay_label": "Pay",
+            "tier1_quantity": 3,
+            "tier1_pay": 2,
+            "tier1_percent": 33,
+            "tier2_quantity": 6,
+            "tier2_pay": 3,
+            "tier2_percent": 50,
+            "tier3_quantity": 9,
+            "tier3_pay": 4,
+            "tier3_percent": 56,
+            "tier4_quantity": 12,
+            "tier4_pay": 5,
+            "tier4_percent": 58,
+            "tier5_quantity": 15,
+            "tier5_pay": 6,
+            "tier5_percent": 60
+          }
+        },
+        "social": {
+          "type": "pdp_social_videos",
+          "settings": {
+            "label": "Loved on socials",
+            "verified_text": "Verified",
+            "show_verified": true,
+            "video_1": "shopify://files/videos/ssstik.io_1790099795471.webm",
+            "video_url_1": "",
+            "video_2": "shopify://files/videos/ssstik.io_1790100121631 (1).webm",
+            "video_url_2": "",
+            "video_3": "shopify://files/videos/ssstik.io_1790100075857.webm",
+            "video_url_3": ""
+          }
+        },
+        "bundle": {
+          "type": "pdp_bundle_builder",
+          "disabled": true,
+          "settings": {
+            "collection": "",
+            "hide_current_product": false,
+            "default_tab": "1",
+            "tab1_quantity": 4,
+            "tab1_free": 1,
+            "tab1_percent": 0,
+            "tab2_quantity": 0,
+            "tab2_free": 2,
+            "tab2_percent": 0,
+            "tab3_quantity": 0,
+            "tab3_free": 3,
+            "tab3_percent": 0,
+            "tabs_label": "Bundle size",
+            "tab_items_label": "[count] items",
+            "tab_free_label": "Get [count] free!",
+            "card_title": "Buy [pay], get [free] free",
+            "this_item_label": "This item",
+            "size_label": "Size",
+            "one_size_label": "One size",
+            "sold_out_label": "Sold out",
+            "personalise_text": "Personalise",
+            "personalise_target": "pdp-personalisation, .product-info__personalisation",
+            "placeholder_text": "Choose a jersey",
+            "change_label": "Change this jersey",
+            "remove_label": "Remove from bundle",
+            "button_incomplete_text": "[count] more to choose",
+            "button_ready_text": "Add [count] to cart",
+            "button_adding_text": "Adding to cart…",
+            "error_text": "Something went wrong. Please try again.",
+            "drawer_title": "Choose a jersey",
+            "drawer_subtitle": "Pick any jersey and its size. It is added to your bundle right away.",
+            "drawer_add_text": "Add to bundle",
+            "empty_collection_text": "No jerseys are available right now.",
+            "button_background": "#ffcc00",
+            "button_text_color": "#000000",
+            "badge_color": "#f04242"
+          }
+        },
+        "trust": {
+          "type": "pdp_trust_icons",
+          "settings": {
+            "text_color": "#121212",
+            "border_color": "#f0f0f0",
+            "icon_1": "picto-truck",
+            "icon_color_1": "#121212",
+            "text_1": "Free delivery",
+            "icon_2": "picto-gift",
+            "icon_color_2": "#00b67a",
+            "text_2": "Money-back guarantee",
+            "icon_3": "picto-star",
+            "icon_color_3": "#121212",
+            "text_3": "10,000+ happy fans"
+          }
+        },
+        "ct_details": {
+          "type": "collapsible_text",
+          "settings": {
+            "icon": "picto-question",
+            "icon_width": 20,
+            "title": "Jersey details",
+            "content": "<p>Lightweight recycled performance mesh, 160 gsm, with the oversized basketball cut. Heat-pressed, stitched-look name, number and team wordmark. Sizes S to 3XL adult, youth S to XL.</p>",
+            "page": ""
+          }
+        },
+        "ct_care": {
+          "type": "collapsible_text",
+          "settings": {
+            "icon": "picto-leaf",
+            "icon_width": 20,
+            "title": "Quality & care",
+            "content": "<p>Every jersey is inspected by hand for lettering alignment and stitching before it ships. Machine wash cold, inside out, and hang dry. Do not iron directly over the lettering or the wordmark — it survives 50+ washes without cracking.</p>",
+            "page": ""
+          }
+        },
+        "delivery": {
+          "type": "delivery_estimate",
+          "settings": {
+            "icon": "picto-box",
+            "min_days": 3,
+            "max_days": 6,
+            "text": "Order now — delivered between [date_min] and [date_max]"
+          }
+        },
+        "reviews_left": {
+          "type": "pdp_gallery_reviews",
+          "settings": {
+            "rating": "4.6",
+            "count": 970,
+            "banner_text": "All reviews are from verified purchases",
+            "reviews_url": "",
+            "see_all_text": "See all [count] reviews",
+            "tab_recommended_label": "Recommended",
+            "tab_recent_label": "Most recent",
+            "bought_label": "Bought:",
+            "helpful_label": "Helpful",
+            "review_1_author": "Marcus T.",
+            "review_1_city": "Chicago, IL",
+            "review_1_flag": "🇺🇸",
+            "review_1_date": "09/12/2026",
+            "review_1_rating": 5,
+            "review_1_size": "L",
+            "review_1_fit": "True to size",
+            "review_1_body": "<p>Wore it to a pickup game the same week it arrived. The mesh breathes well and the stitching on the numbers has held up after several washes.</p>",
+            "review_1_helpful": 14,
+            "review_2_author": "Danielle R.",
+            "review_2_city": "Austin, TX",
+            "review_2_flag": "🇺🇸",
+            "review_2_date": "09/05/2026",
+            "review_2_rating": 5,
+            "review_2_size": "M",
+            "review_2_fit": "True to size",
+            "review_2_body": "<p>Ordered it as a gift and the print on the name and number came out crisp. Fits exactly like the size chart says.</p>",
+            "review_2_helpful": 9,
+            "review_3_author": "Anthony P.",
+            "review_3_city": "Brooklyn, NY",
+            "review_3_flag": "🇺🇸",
+            "review_3_date": "08/28/2026",
+            "review_3_rating": 4,
+            "review_3_size": "XL",
+            "review_3_fit": "Slightly loose",
+            "review_3_body": "<p>Great colours and the fabric feels like a real game jersey. I would go one size down if you like a snug fit.</p>",
+            "review_3_helpful": 6,
+            "review_4_author": "Jasmine W.",
+            "review_4_city": "Atlanta, GA",
+            "review_4_flag": "🇺🇸",
+            "review_4_date": "08/21/2026",
+            "review_4_rating": 5,
+            "review_4_size": "S",
+            "review_4_fit": "True to size",
+            "review_4_body": "<p>Third order this year and the quality has been the same every time. Shipping beat the estimate by two days.</p>",
+            "review_4_helpful": 11,
+            "review_5_author": "Tyler B.",
+            "review_5_city": "Phoenix, AZ",
+            "review_5_flag": "🇺🇸",
+            "review_5_date": "08/14/2026",
+            "review_5_rating": 5,
+            "review_5_size": "2XL",
+            "review_5_fit": "True to size",
+            "review_5_body": "<p>Finally a shop that carries my size without charging extra. The cut is long enough and the shoulders sit right.</p>",
+            "review_5_helpful": 8,
+            "review_6_author": "Brianna C.",
+            "review_6_city": "Portland, OR",
+            "review_6_flag": "🇺🇸",
+            "review_6_date": "08/06/2026",
+            "review_6_rating": 5,
+            "review_6_size": "M",
+            "review_6_fit": "True to size",
+            "review_6_body": "<p>Bought two during the bundle deal. Both arrived folded properly in sealed bags, no creases and no loose threads.</p>",
+            "review_6_helpful": 13,
+            "review_7_author": "Devin M.",
+            "review_7_city": "Denver, CO",
+            "review_7_flag": "🇺🇸",
+            "review_7_date": "07/30/2026",
+            "review_7_rating": 4,
+            "review_7_size": "L",
+            "review_7_fit": "Runs small",
+            "review_7_body": "<p>Fabric and print are excellent. Mine came a little tighter than expected, so the free size swap came in handy.</p>",
+            "review_7_helpful": 5,
+            "review_8_author": "Kayla S.",
+            "review_8_city": "Miami, FL",
+            "review_8_flag": "🇺🇸",
+            "review_8_date": "07/22/2026",
+            "review_8_rating": 5,
+            "review_8_size": "S",
+            "review_8_fit": "True to size",
+            "review_8_body": "<p>The lettering still looks new after a month of weekly washes. My partner immediately asked where I got it.</p>",
+            "review_8_helpful": 7,
+            "review_9_author": "Jordan L.",
+            "review_9_city": "Seattle, WA",
+            "review_9_flag": "🇺🇸",
+            "review_9_date": "07/15/2026",
+            "review_9_rating": 5,
+            "review_9_size": "XL",
+            "review_9_fit": "True to size",
+            "review_9_body": "<p>Customer service answered within the hour when I asked about sizing before ordering. Saved me a return.</p>",
+            "review_9_helpful": 10,
+            "review_10_author": "Nia H.",
+            "review_10_city": "Detroit, MI",
+            "review_10_flag": "🇺🇸",
+            "review_10_date": "07/08/2026",
+            "review_10_rating": 5,
+            "review_10_size": "L",
+            "review_10_fit": "True to size",
+            "review_10_body": "<p>Lightweight enough to wear courtside in summer without overheating. Colours match the photos exactly.</p>",
+            "review_10_helpful": 12
+          }
+        },
+        "sticky": {
+          "type": "pdp_sticky_bar",
+          "settings": {
+            "button_text": "Add to cart",
+            "show_delivery": true,
+            "min_days": 5,
+            "max_days": 12,
+            "mobile_only": false
+          }
+        }
+      },
+      "block_order": [
+        "credit",
+        "title",
+        "price_row",
+        "stock_alert",
+        "size",
+        "personalise",
+        "patch",
+        "buy_buttons",
+        "payment",
+        "tiers",
+        "social",
+        "bundle",
+        "trust",
+        "ct_details",
+        "ct_care",
+        "delivery",
+        "reviews_left",
+        "sticky"
+      ],
+      "name": "Product",
+      "settings": {
+        "full_width": true,
+        "show_fixed_add_to_cart": false,
+        "desktop_media_width": 55,
+        "desktop_media_layout": "carousel_thumbnails_left",
+        "mobile_media_size": "expanded",
+        "mobile_carousel_control": "dots",
+        "enable_video_autoplay": false,
+        "enable_video_looping": false,
+        "enable_image_zoom": true,
+        "max_image_zoom_level": 2,
+        "background": "",
+        "background_gradient": "",
+        "text_color": "",
+        "input_background": "",
+        "input_text_color": ""
+      }
+    },
+    "complete_look": {
+      "type": "related-products",
+      "name": "Complete the look",
+      "settings": {
+        "recommendations_count": 8,
+        "products": [],
+        "full_width": true,
+        "stack_products": false,
+        "show_progress_bar": true,
+        "products_per_row_mobile": "2",
+        "products_per_row_desktop": 4,
+        "subheading": "Other fans bought these together",
+        "title": "COMPLETE THE LOOK",
+        "content": "",
+        "background": "",
+        "background_gradient": "",
+        "text_color": "",
+        "heading_color": "",
+        "heading_gradient": "",
+        "product_card_background": "",
+        "product_card_text_color": ""
+      }
+    },
+    "closeups": {
+      "type": "video-testimonials",
+      "blocks": {
+        "v1": {
+          "type": "video",
+          "settings": {
+            "video": "shopify://files/videos/ssstik.io_1790099795471.webm",
+            "video_url": "",
+            "rating": 5,
+            "testimonial": "",
+            "attr_1": "",
+            "attr_2": ""
+          }
+        },
+        "v2": {
+          "type": "video",
+          "settings": {
+            "video": "shopify://files/videos/ssstik.io_1790100121631 (1).webm",
+            "video_url": "",
+            "rating": 5,
+            "testimonial": "",
+            "attr_1": "",
+            "attr_2": ""
+          }
+        },
+        "v3": {
+          "type": "video",
+          "settings": {
+            "video": "shopify://files/videos/ssstik.io_1790100075857.webm",
+            "video_url": "",
+            "rating": 5,
+            "testimonial": "",
+            "attr_1": "",
+            "attr_2": ""
+          }
+        },
+        "v4": {
+          "type": "video",
+          "settings": {
+            "video": "shopify://files/videos/ssstik.io_1790099690547.webm",
+            "video_url": "",
+            "rating": 5,
+            "testimonial": "",
+            "attr_1": "",
+            "attr_2": ""
+          }
+        }
+      },
+      "block_order": [
+        "v1",
+        "v2",
+        "v3",
+        "v4"
+      ],
+      "name": "Close-up videos",
+      "settings": {
+        "full_width": true,
+        "badge": "",
+        "title": "See for yourself, no filters",
+        "content": "<p>Mesh, stitching and crests filmed up close. Nothing retouched.</p>",
+        "text_alignment": "center",
+        "heading_style": "theme",
+        "heading_uppercase": false,
+        "subtitle_color": "",
+        "card_ratio": "9 / 16",
+        "desktop_layout": "carousel",
+        "cards_per_row_desktop": 6,
+        "card_gap": "theme",
+        "card_width_mobile": "62",
+        "center_cards_mobile": true,
+        "autoplay_muted": true,
+        "tap_toggles_sound": true,
+        "play_glyph": false,
+        "background": "",
+        "background_gradient": "",
+        "text_color": "",
+        "heading_color": "",
+        "heading_gradient": "",
+        "badge_background": "",
+        "badge_text_color": "",
+        "stars_color": "#00b67a",
+        "hide_captions": true,
+        "caption_text_color": "#ffffff",
+        "caption_overlay_color": "#000000",
+        "caption_overlay_opacity": 85,
+        "card_radius": 12
+      }
+    },
+    "reviews": {
+      "type": "reviews-carousel",
+      "blocks": {
+        "r1": {
+          "type": "review",
+          "settings": {
+            "author": "Daniel M.",
+            "city": "",
+            "date": "",
+            "title": "Fast delivery",
+            "verified": true,
+            "rating": 5,
+            "content": "<p>Beat the estimate by two days and the packaging was sealed properly. Mesh, stitching, lettering — it feels like the jersey I paid four times as much for at the arena store.</p>"
+          }
+        },
+        "r2": {
+          "type": "review",
+          "settings": {
+            "author": "Sofia R.",
+            "city": "",
+            "date": "",
+            "title": "Would recommend",
+            "verified": true,
+            "rating": 5,
+            "content": "<p>Got my son's name on the back for his birthday. The stitched-look numbers match the real thing and it survived the washing machine without cracking.</p>"
+          }
+        },
+        "r3": {
+          "type": "review",
+          "settings": {
+            "author": "Marcus T.",
+            "city": "",
+            "date": "",
+            "title": "Best shop online",
+            "verified": true,
+            "rating": 5,
+            "content": "<p>Third order this year. Sizes run true to the chart — I ordered a large again and it fits exactly like the last one. Easy return the one time I got it wrong.</p>"
+          }
+        },
+        "r4": {
+          "type": "review",
+          "settings": {
+            "author": "Ana P.",
+            "city": "",
+            "date": "",
+            "title": "Great quality",
+            "verified": true,
+            "rating": 4,
+            "content": "<p>Wore it courtside the weekend it arrived. Only reason it is not five stars is that I wanted a size up — the swap was free though.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "r1",
+        "r2",
+        "r3",
+        "r4"
+      ],
+      "name": "Customer reviews",
+      "settings": {
+        "full_width": true,
+        "subheading": "",
+        "title": "",
+        "content": "",
+        "link_url": "",
+        "link_text": "",
+        "rating_value": "4.6",
+        "reviews_count": "2,947",
+        "reviews_count_label": "verified reviews",
+        "card_style": "compact",
+        "compact_show_photo": false,
+        "image_ratio": "1 / 1",
+        "card_width_mobile": "62",
+        "center_cards_mobile": true,
+        "autoplay": true,
+        "autoplay_speed": 40,
+        "verified_text": "Verified purchase",
+        "verified_color": "#00b67a",
+        "stars_color": "#00b67a",
+        "background": "#f5f5f5",
+        "background_gradient": "",
+        "text_color": "",
+        "heading_color": "",
+        "heading_gradient": "",
+        "review_card_background": "#ffffff",
+        "review_card_text_color": ""
+      }
+    },
+    "fans_heading": {
+      "type": "rich-text",
+      "blocks": {
+        "h": {
+          "type": "heading",
+          "settings": {
+            "text": "THE BRAND LOVED BY THOUSANDS OF FANS",
+            "heading_tag": "h2",
+            "text_color": "",
+            "gradient": ""
+          }
+        },
+        "t": {
+          "type": "richtext",
+          "settings": {
+            "content": "<p>Real fans, real jerseys. Tag us to be featured.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "h",
+        "t"
+      ],
+      "name": "Fans heading",
+      "settings": {
+        "full_width": true,
+        "content_width": "small",
+        "text_position": "center",
+        "background": "",
+        "background_gradient": "",
+        "text_color": ""
+      }
+    },
+    "fans_grid": {
+      "type": "media-grid",
+      "blocks": {
+        "p1": {
+          "type": "image",
+          "settings": {
+            "title": "",
+            "heading_tag": "h3",
+            "link_url": "",
+            "link_text": "",
+            "mobile_text_position": "place-self-center text-center",
+            "desktop_column_span": 1,
+            "desktop_row_span": 1,
+            "desktop_text_position": "sm:place-self-center sm:text-center",
+            "background": "",
+            "background_gradient": "",
+            "text_color": "",
+            "text_gradient": "",
+            "button_background": "",
+            "button_text_color": "",
+            "overlay_color": "#000000",
+            "overlay_opacity": 0
+          }
+        },
+        "p2": {
+          "type": "image",
+          "settings": {
+            "title": "",
+            "heading_tag": "h3",
+            "link_url": "",
+            "link_text": "",
+            "mobile_text_position": "place-self-center text-center",
+            "desktop_column_span": 1,
+            "desktop_row_span": 1,
+            "desktop_text_position": "sm:place-self-center sm:text-center",
+            "background": "",
+            "background_gradient": "",
+            "text_color": "",
+            "text_gradient": "",
+            "button_background": "",
+            "button_text_color": "",
+            "overlay_color": "#000000",
+            "overlay_opacity": 0
+          }
+        },
+        "p3": {
+          "type": "image",
+          "settings": {
+            "title": "",
+            "heading_tag": "h3",
+            "link_url": "",
+            "link_text": "",
+            "mobile_text_position": "place-self-center text-center",
+            "desktop_column_span": 1,
+            "desktop_row_span": 1,
+            "desktop_text_position": "sm:place-self-center sm:text-center",
+            "background": "",
+            "background_gradient": "",
+            "text_color": "",
+            "text_gradient": "",
+            "button_background": "",
+            "button_text_color": "",
+            "overlay_color": "#000000",
+            "overlay_opacity": 0
+          }
+        },
+        "p4": {
+          "type": "image",
+          "settings": {
+            "title": "",
+            "heading_tag": "h3",
+            "link_url": "",
+            "link_text": "",
+            "mobile_text_position": "place-self-center text-center",
+            "desktop_column_span": 1,
+            "desktop_row_span": 1,
+            "desktop_text_position": "sm:place-self-center sm:text-center",
+            "background": "",
+            "background_gradient": "",
+            "text_color": "",
+            "text_gradient": "",
+            "button_background": "",
+            "button_text_color": "",
+            "overlay_color": "#000000",
+            "overlay_opacity": 0
+          }
+        },
+        "p5": {
+          "type": "image",
+          "settings": {
+            "title": "",
+            "heading_tag": "h3",
+            "link_url": "",
+            "link_text": "",
+            "mobile_text_position": "place-self-center text-center",
+            "desktop_column_span": 1,
+            "desktop_row_span": 1,
+            "desktop_text_position": "sm:place-self-center sm:text-center",
+            "background": "",
+            "background_gradient": "",
+            "text_color": "",
+            "text_gradient": "",
+            "button_background": "",
+            "button_text_color": "",
+            "overlay_color": "#000000",
+            "overlay_opacity": 0
+          }
+        },
+        "p6": {
+          "type": "image",
+          "settings": {
+            "title": "",
+            "heading_tag": "h3",
+            "link_url": "",
+            "link_text": "",
+            "mobile_text_position": "place-self-center text-center",
+            "desktop_column_span": 1,
+            "desktop_row_span": 1,
+            "desktop_text_position": "sm:place-self-center sm:text-center",
+            "background": "",
+            "background_gradient": "",
+            "text_color": "",
+            "text_gradient": "",
+            "button_background": "",
+            "button_text_color": "",
+            "overlay_color": "#000000",
+            "overlay_opacity": 0
+          }
+        },
+        "p7": {
+          "type": "image",
+          "settings": {
+            "title": "",
+            "heading_tag": "h3",
+            "link_url": "",
+            "link_text": "",
+            "mobile_text_position": "place-self-center text-center",
+            "desktop_column_span": 1,
+            "desktop_row_span": 1,
+            "desktop_text_position": "sm:place-self-center sm:text-center",
+            "background": "",
+            "background_gradient": "",
+            "text_color": "",
+            "text_gradient": "",
+            "button_background": "",
+            "button_text_color": "",
+            "overlay_color": "#000000",
+            "overlay_opacity": 0
+          }
+        },
+        "p8": {
+          "type": "image",
+          "settings": {
+            "title": "",
+            "heading_tag": "h3",
+            "link_url": "",
+            "link_text": "",
+            "mobile_text_position": "place-self-center text-center",
+            "desktop_column_span": 1,
+            "desktop_row_span": 1,
+            "desktop_text_position": "sm:place-self-center sm:text-center",
+            "background": "",
+            "background_gradient": "",
+            "text_color": "",
+            "text_gradient": "",
+            "button_background": "",
+            "button_text_color": "",
+            "overlay_color": "#000000",
+            "overlay_opacity": 0
+          }
+        },
+        "p9": {
+          "type": "image",
+          "settings": {
+            "title": "",
+            "heading_tag": "h3",
+            "link_url": "",
+            "link_text": "",
+            "mobile_text_position": "place-self-center text-center",
+            "desktop_column_span": 1,
+            "desktop_row_span": 1,
+            "desktop_text_position": "sm:place-self-center sm:text-center",
+            "background": "",
+            "background_gradient": "",
+            "text_color": "",
+            "text_gradient": "",
+            "button_background": "",
+            "button_text_color": "",
+            "overlay_color": "#000000",
+            "overlay_opacity": 0
+          }
+        },
+        "p10": {
+          "type": "image",
+          "settings": {
+            "title": "",
+            "heading_tag": "h3",
+            "link_url": "",
+            "link_text": "",
+            "mobile_text_position": "place-self-center text-center",
+            "desktop_column_span": 1,
+            "desktop_row_span": 1,
+            "desktop_text_position": "sm:place-self-center sm:text-center",
+            "background": "",
+            "background_gradient": "",
+            "text_color": "",
+            "text_gradient": "",
+            "button_background": "",
+            "button_text_color": "",
+            "overlay_color": "#000000",
+            "overlay_opacity": 0
+          }
+        },
+        "p11": {
+          "type": "image",
+          "settings": {
+            "title": "",
+            "heading_tag": "h3",
+            "link_url": "",
+            "link_text": "",
+            "mobile_text_position": "place-self-center text-center",
+            "desktop_column_span": 1,
+            "desktop_row_span": 1,
+            "desktop_text_position": "sm:place-self-center sm:text-center",
+            "background": "",
+            "background_gradient": "",
+            "text_color": "",
+            "text_gradient": "",
+            "button_background": "",
+            "button_text_color": "",
+            "overlay_color": "#000000",
+            "overlay_opacity": 0
+          }
+        },
+        "p12": {
+          "type": "image",
+          "settings": {
+            "title": "",
+            "heading_tag": "h3",
+            "link_url": "",
+            "link_text": "",
+            "mobile_text_position": "place-self-center text-center",
+            "desktop_column_span": 1,
+            "desktop_row_span": 1,
+            "desktop_text_position": "sm:place-self-center sm:text-center",
+            "background": "",
+            "background_gradient": "",
+            "text_color": "",
+            "text_gradient": "",
+            "button_background": "",
+            "button_text_color": "",
+            "overlay_color": "#000000",
+            "overlay_opacity": 0
+          }
+        },
+        "p13": {
+          "type": "image",
+          "settings": {
+            "title": "",
+            "heading_tag": "h3",
+            "link_url": "",
+            "link_text": "",
+            "mobile_text_position": "place-self-center text-center",
+            "desktop_column_span": 1,
+            "desktop_row_span": 1,
+            "desktop_text_position": "sm:place-self-center sm:text-center",
+            "background": "",
+            "background_gradient": "",
+            "text_color": "",
+            "text_gradient": "",
+            "button_background": "",
+            "button_text_color": "",
+            "overlay_color": "#000000",
+            "overlay_opacity": 0
+          }
+        },
+        "p14": {
+          "type": "image",
+          "settings": {
+            "title": "",
+            "heading_tag": "h3",
+            "link_url": "",
+            "link_text": "",
+            "mobile_text_position": "place-self-center text-center",
+            "desktop_column_span": 1,
+            "desktop_row_span": 1,
+            "desktop_text_position": "sm:place-self-center sm:text-center",
+            "background": "",
+            "background_gradient": "",
+            "text_color": "",
+            "text_gradient": "",
+            "button_background": "",
+            "button_text_color": "",
+            "overlay_color": "#000000",
+            "overlay_opacity": 0
+          }
+        },
+        "p15": {
+          "type": "image",
+          "settings": {
+            "title": "",
+            "heading_tag": "h3",
+            "link_url": "",
+            "link_text": "",
+            "mobile_text_position": "place-self-center text-center",
+            "desktop_column_span": 1,
+            "desktop_row_span": 1,
+            "desktop_text_position": "sm:place-self-center sm:text-center",
+            "background": "",
+            "background_gradient": "",
+            "text_color": "",
+            "text_gradient": "",
+            "button_background": "",
+            "button_text_color": "",
+            "overlay_color": "#000000",
+            "overlay_opacity": 0
+          }
+        },
+        "p16": {
+          "type": "image",
+          "settings": {
+            "title": "",
+            "heading_tag": "h3",
+            "link_url": "",
+            "link_text": "",
+            "mobile_text_position": "place-self-center text-center",
+            "desktop_column_span": 1,
+            "desktop_row_span": 1,
+            "desktop_text_position": "sm:place-self-center sm:text-center",
+            "background": "",
+            "background_gradient": "",
+            "text_color": "",
+            "text_gradient": "",
+            "button_background": "",
+            "button_text_color": "",
+            "overlay_color": "#000000",
+            "overlay_opacity": 0
+          }
+        }
+      },
+      "block_order": [
+        "p1",
+        "p2",
+        "p3",
+        "p4",
+        "p5",
+        "p6",
+        "p7",
+        "p8",
+        "p9",
+        "p10",
+        "p11",
+        "p12",
+        "p13",
+        "p14",
+        "p15",
+        "p16"
+      ],
+      "disabled": true,
+      "name": "Fan photos",
+      "settings": {
+        "full_width": true,
+        "reduce_width": false,
+        "subheading": "",
+        "title": "",
+        "content": "",
+        "text_alignment": "center",
+        "columns_desktop": 8,
+        "columns_mobile": 3,
+        "mobile_layout": "grid",
+        "grid_gap": 3,
+        "frame": true,
+        "frame_max_width": 1400,
+        "desktop_row_height": 170,
+        "mobile_row_height": 120,
+        "mobile_item_width": 150,
+        "background": "",
+        "background_gradient": ""
+      }
+    },
+    "faq": {
+      "type": "faq",
+      "blocks": {
+        "f1": {
+          "type": "item",
+          "settings": {
+            "title": "When will I receive my order?",
+            "content": "<p>We dispatch within 24 hours on working days. Delivery takes 3-6 days worldwide, tracked from the moment it leaves our warehouse.</p>"
+          }
+        },
+        "f2": {
+          "type": "item",
+          "settings": {
+            "title": "What is the quality of your jerseys like?",
+            "content": "<p>Lightweight recycled performance mesh with the oversized basketball cut, heat-pressed stitched-look lettering and wordmarks. Every one is checked by hand before it ships.</p>"
+          }
+        },
+        "f3": {
+          "type": "item",
+          "settings": {
+            "title": "Can I swap the size if it doesn't fit?",
+            "content": "<p>Yes. You have 30 days to exchange any unworn jersey, and size swaps are free — even on personalised jerseys.</p>"
+          }
+        },
+        "f4": {
+          "type": "item",
+          "settings": {
+            "title": "Which size should I choose?",
+            "content": "<p>Basketball jerseys are cut long and loose. Our chart follows standard US sizing: size down for a fitted look, stay true to size for the classic on-court look.</p>"
+          }
+        },
+        "f5": {
+          "type": "item",
+          "settings": {
+            "title": "Can I personalise the jersey with my name and number?",
+            "content": "<p>Yes, and it is free. Add any name up to 12 characters and a number at checkout and we letter it in the correct font for that team.</p>"
+          }
+        },
+        "f6": {
+          "type": "item",
+          "settings": {
+            "title": "How does the \"buy 3, get 1 free\" offer work?",
+            "content": "<p>Add four jerseys to your cart: you pay for three and the cheapest one is free. The discount is applied automatically at checkout.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "f1",
+        "f2",
+        "f3",
+        "f4",
+        "f5",
+        "f6"
+      ],
+      "name": "FAQ",
+      "settings": {
+        "full_width": true,
+        "layout": "centered_column",
+        "column_max_width": 600,
+        "show_support": false,
+        "subheading": "",
+        "title": "FREQUENTLY ASKED QUESTIONS",
+        "content": "",
+        "team_avatar_width": 160,
+        "support_hours": "Monday to Saturday, 9am-6pm",
+        "answer_time": "We reply within 2 hours",
+        "button_text": "Contact us",
+        "button_url": "/pages/contact",
+        "text_position": "center",
+        "background": "",
+        "background_gradient": "",
+        "text_color": "",
+        "heading_color": "",
+        "heading_gradient": "",
+        "button_background": "#121212",
+        "button_text_color": "#ffffff",
+        "accordion_background": "",
+        "accordion_text_color": ""
+      }
+    }
+  },
+  "order": [
+    "main",
+    "complete_look",
+    "closeups",
+    "reviews",
+    "fans_heading",
+    "fans_grid",
+    "faq"
+  ]
+}

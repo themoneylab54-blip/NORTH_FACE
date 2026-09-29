@@ -1,0 +1,91 @@
+{%- comment -%}
+----------------------------------------------------------------------------------------------------------------------
+SIZE GUIDE — PAGE
+----------------------------------------------------------------------------------------------------------------------
+
+Page version of the size guide (/pages/size-guide). The content lives in snippets/size-guide.liquid,
+shared with the product page modal — a single source of truth.
+{%- endcomment -%}
+
+{%- render 'section-spacing-collapsing' -%}
+
+<div {% render 'section-properties' %}>
+  <div class="section-stack" style="max-width: 720px; margin-inline: auto;">
+    {%- render 'section-header', subheading: section.settings.subheading, heading: section.settings.title, heading_color: section.settings.heading_color, content: section.settings.content, text_alignment: 'center' -%}
+
+    {%- render 'size-guide', context: 'page', reassurance_text: section.settings.reassurance_text -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Size guide",
+  "class": "shopify-section--size-guide-page",
+  "tag": "section",
+  "disabled_on": {
+    "groups": ["header", "custom.overlay"]
+  },
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "label": "Full width",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Size guide"
+    },
+    {
+      "type": "richtext",
+      "id": "content",
+      "label": "Intro text",
+      "default": "<p>Find your jersey size in seconds from your chest measurement or the size you usually wear.</p>"
+    },
+    {
+      "type": "text",
+      "id": "reassurance_text",
+      "label": "Reassurance text",
+      "info": "Use the exact wording of your returns policy — never promise more than it covers.",
+      "default": "Between two sizes? Size down for a fitted look, up for the classic oversized look."
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading color"
+    },
+    {
+      "type": "header",
+      "content": "Colors",
+      "info": "The gradient replaces the solid color when set."
+    },
+    {
+      "type": "color",
+      "id": "background",
+      "label": "Background"
+    },
+    {
+      "type": "color_background",
+      "id": "background_gradient",
+      "label": "Background gradient"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Size guide"
+    }
+  ]
+}
+{% endschema %}

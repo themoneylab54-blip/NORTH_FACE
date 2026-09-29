@@ -1,0 +1,83 @@
+{
+  "type": "footer",
+  "name": "Footer group",
+  "sections": {
+    "footer": {
+      "type": "footer",
+      "blocks": {
+        "mission": {
+          "type": "text",
+          "settings": {
+            "title": "",
+            "content": "<p>Game-ready basketball jerseys at a price that makes sense — lettered right, shipped fast, and backed by a 30-day size-swap guarantee.</p>",
+            "enable_follow_on_shop": false
+          }
+        },
+        "newsletter": {
+          "type": "newsletter",
+          "settings": {
+            "image": "",
+            "title": "Join the community and unlock exclusive offers",
+            "content": "<p>Restock alerts, new drops and subscriber-only discounts. One email a week, unsubscribe any time.</p>"
+          }
+        },
+        "help": {
+          "type": "links",
+          "settings": {
+            "menu": "footer",
+            "show_menu_title": true,
+            "menu_title": "Help & contact"
+          }
+        },
+        "shop": {
+          "type": "links",
+          "settings": {
+            "menu": "main-menu",
+            "show_menu_title": true,
+            "menu_title": "Categories"
+          }
+        },
+        "policies": {
+          "type": "text",
+          "settings": {
+            "title": "Policies",
+            "content": "<p><a href=\"/policies/privacy-policy\">Privacy policy</a><br><a href=\"/policies/refund-policy\">Returns &amp; exchanges</a><br><a href=\"/policies/shipping-policy\">Shipping policy</a><br><a href=\"/policies/terms-of-service\">Terms of service</a><br><a href=\"/policies/legal-notice\">Legal notice</a></p>",
+            "enable_follow_on_shop": false
+          }
+        },
+        "contact": {
+          "type": "text",
+          "settings": {
+            "title": "Contact & company",
+            "content": "<p><a href=\"/pages/contact\">Write to us</a> — we reply within 2 hours.<br>Customer care Monday to Saturday, 9am-6pm.</p><p><strong>Secure payments</strong></p>",
+            "enable_follow_on_shop": false
+          }
+        }
+      },
+      "block_order": [
+        "mission",
+        "newsletter",
+        "help",
+        "shop",
+        "policies",
+        "contact"
+      ],
+      "settings": {
+        "show_social_media": true,
+        "show_payment_icons": true,
+        "payment_icons_source": "custom",
+        "payment_icons_list": "visa, master, american_express, discover, paypal, apple_pay, google_pay, shopify_pay, venmo, klarna, afterpay",
+        "show_policy_links": false,
+        "show_country_selector": false,
+        "show_country_flag": false,
+        "show_country_name": false,
+        "show_locale_selector": false,
+        "footer_style": "editorial",
+        "contact_email": ""
+      }
+    }
+  },
+  "order": [
+    "footer"
+  ]
+}

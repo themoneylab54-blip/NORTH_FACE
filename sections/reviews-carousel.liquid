@@ -1,0 +1,1147 @@
+{%- comment -%}
+----------------------------------------------------------------------------------------------------------------------
+REVIEWS CAROUSEL
+----------------------------------------------------------------------------------------------------------------------
+
+Carrousel d'avis clients : note moyenne globale + cards avec grande photo, étoiles style Trustpilot, nom et citation.
+
+Deux rendus cohabitent, pilotés par les réglages de section :
+
+* En-tête « résumé » (rating_value renseigné, par défaut « 4.8 ») : cinq carrés verts avec une étoile blanche, la
+  note, puis le nombre d'avis vérifiés, le tout centré. Le sous-titre, le titre, le texte et le lien restent rendus
+  via section-header (au-dessus du résumé) dès qu'ils sont remplis : un gabarit qui met la note dans le titre
+  (« ★★★★★ 4.8 ») l'afficherait donc deux fois, videz-le. Videz rating_value pour retrouver l'ancien en-tête
+  (titre + sous-titre + moyenne calculée à partir des avis).
+* Style de carte « compact » (card_style, par défaut « compact ») : carte blanche 280 / 320 px, rayon 12 px, bordure
+  fine, padding 20 px, hauteur égale. Ligne 1 : étoiles + date alignée à droite ; titre (h3) ; texte ; ligne du bas
+  collée au pied de la carte : auteur + ville à gauche, mention vérifiée à droite. La photo du client n'est pas
+  rendue en compact, sauf si compact_show_photo est coché (avatar rond à côté du nom). « classic » conserve le rendu
+  historique (grande photo, nom · ville, citation).
+* Défilement automatique (autoplay, par défaut activé) : marquee infini, mis en pause au survol, au focus, au toucher
+  et hors écran. Le nombre de jeux de clones est calculé en Liquid (≥ 12 cartes de chaque côté) et le script en
+  ajoute au besoin pour que la piste dépasse toujours la fenêtre : sans cela, scrollLeft butait sur son maximum et le
+  marquee se figeait sur les très grands écrans ou avec 2-3 avis.
+* L'élément personnalisé s'appelle <reviews-marquee>, PAS <loop-carousel> : sections/video-testimonials.liquid
+  définit déjà un <loop-carousel> plus simple (sans autoplay ni lead-sets) sous le même garde customElements.get ;
+  avec un nom commun, la première section rendue sur la page imposait sa classe à l'autre et le marquee ne
+  démarrait pas sur l'accueil (la rangée vidéo y précède les avis).
+{%- endcomment -%}
+
+{%- if section.blocks.size > 0 -%}
+  {%- render 'section-spacing-collapsing' -%}
+
+  {%- liquid
+    # La mention s'affiche des que son texte est renseigne : videz le champ pour la
+    # retirer partout, ou decochez un avis pour la masquer sur celui-la seulement.
+    # Aucun interrupteur de section, qu'une sauvegarde de l'editeur pourrait figer.
+    assign verified_label = section.settings.verified_text | default: 'Verified purchase'
+
+    assign verified_color = '#12866A'
+    if section.settings.verified_color != blank and section.settings.verified_color.alpha != 0
+      assign verified_color = section.settings.verified_color
+    endif
+
+    assign stars_color = '#0DA558'
+    if section.settings.stars_color != blank and section.settings.stars_color.alpha != 0
+      assign stars_color = section.settings.stars_color
+    endif
+
+    # Compact est le rendu de reference : seul un choix explicite « classic » restaure l'ancien.
+    assign compact_cards = true
+    if section.settings.card_style == 'classic'
+      assign compact_cards = false
+    endif
+
+    assign summary_header = false
+    if section.settings.rating_value != blank
+      assign summary_header = true
+    endif
+
+    assign header_alignment = 'start'
+    if compact_cards or summary_header
+      assign header_alignment = 'center'
+    endif
+
+    assign autoplay_enabled = true
+    if section.settings.autoplay == false
+      assign autoplay_enabled = false
+    endif
+    assign autoplay_speed = section.settings.autoplay_speed | default: 40
+
+    assign loop_enabled = false
+    if section.blocks.size >= 2
+      assign loop_enabled = true
+    endif
+
+    # Le marquee ne peut avancer que si la piste depasse la fenetre d'au moins
+    # (clone_sets + 0,5) jeux + une carte. Au moins 12 cartes clonees de chaque cote
+    # (~4 000 px en 320 px) couvrent les ecrans courants sans attendre le script, qui
+    # complete ensuite pour les fenetres encore plus larges.
+    assign clone_sets = 12.0 | divided_by: section.blocks.size | ceil | at_least: 1
+  -%}
+
+  <style>
+    #shopify-section-{{ section.id }} {
+      --testimonial-list-items-per-row: 1;
+      --testimonial-list-carousel-item-width: {{ section.settings.card_width_mobile | default: 62 }}vw;
+      --testimonial-list-grid: auto / auto-flow var(--testimonial-list-carousel-item-width);
+      --reviews-star-color: {{ stars_color }};
+      --reviews-star-empty-color: #DCDCE6;
+      --reviews-muted-color: #737373;
+      --reviews-verified-color: {{ verified_color }};
+    }
+
+    {%- if section.settings.stars_color != blank and section.settings.stars_color.alpha != 0 %}
+    #shopify-section-{{ section.id }} .rating__star--full {
+      --star-color: {{ section.settings.stars_color.rgb }};
+    }
+    {%- endif %}
+
+    #shopify-section-{{ section.id }} .review-verified {
+      display: inline-flex;
+      align-items: center;
+      gap: .375rem;
+      white-space: nowrap;
+    }
+
+    #shopify-section-{{ section.id }} .review-verified svg {
+      flex-shrink: 0;
+      width: 1.0625rem;
+      height: 1.0625rem;
+      fill: var(--reviews-verified-color);
+    }
+
+    /* Étoiles « carrés » : un carré plein contenant une étoile blanche (résumé + cartes compactes). */
+    #shopify-section-{{ section.id }} .reviews-stars {
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+      --reviews-star-size: 16px;
+    }
+
+    #shopify-section-{{ section.id }} .reviews-stars--sm {
+      --reviews-star-size: 12px;
+    }
+
+    #shopify-section-{{ section.id }} .reviews-star {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: var(--reviews-star-size);
+      height: var(--reviews-star-size);
+      border-radius: 2px;
+      background: var(--reviews-star-color);
+      color: #FFFFFF;
+      flex-shrink: 0;
+    }
+
+    #shopify-section-{{ section.id }} .reviews-star--empty {
+      background: var(--reviews-star-empty-color);
+    }
+
+    #shopify-section-{{ section.id }} .reviews-star svg {
+      display: block;
+      width: 62.5%;
+      height: 62.5%;
+    }
+
+    /* En-tête résumé : carrés + note, puis nombre d'avis, centrés. */
+    #shopify-section-{{ section.id }} .reviews-summary {
+      display: grid;
+      justify-items: center;
+      text-align: center;
+      gap: .375rem;
+    }
+
+    #shopify-section-{{ section.id }} .reviews-summary__row {
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+    }
+
+    #shopify-section-{{ section.id }} .reviews-summary__value {
+      font-size: 14px;
+      font-weight: 900;
+      line-height: 1;
+      color: rgb(var(--text-color));
+    }
+
+    #shopify-section-{{ section.id }} .reviews-summary__count {
+      font-size: 14px;
+      line-height: 1.4;
+      color: var(--reviews-muted-color);
+      margin: 0;
+    }
+
+    /* Toutes les cartes à la hauteur de la plus grande : les avis longs s'affichent en entier. */
+    #shopify-section-{{ section.id }} .testimonial-list {
+      align-items: stretch;
+    }
+
+    /* Le défilement automatique désactive l'aimantation : un marquee ne doit pas « accrocher » les cartes. */
+    #shopify-section-{{ section.id }} reviews-marquee[autoplay] {
+      scroll-snap-type: none;
+    }
+
+    #shopify-section-{{ section.id }} .testimonial {
+      padding: 0;
+      overflow: hidden;
+    }
+
+    #shopify-section-{{ section.id }} .testimonial__photo {
+      display: block;
+      width: 100%;
+      aspect-ratio: {{ section.settings.image_ratio | default: '1 / 1' }};
+      object-fit: cover;
+    }
+
+    #shopify-section-{{ section.id }} .testimonial__body {
+      padding: var(--spacing-4) var(--spacing-5) var(--spacing-5);
+    }
+
+    @media screen and (max-width: 699px) {
+      {%- if section.settings.center_cards_mobile %}
+      #shopify-section-{{ section.id }} .testimonial-list {
+        padding-inline: calc((100vw - var(--testimonial-list-carousel-item-width)) / 2);
+        scroll-padding-inline: calc((100vw - var(--testimonial-list-carousel-item-width)) / 2);
+      }
+
+      #shopify-section-{{ section.id }} .testimonial {
+        scroll-snap-align: center;
+        scroll-snap-stop: always;
+      }
+      {%- endif %}
+
+      #shopify-section-{{ section.id }} .testimonial__body {
+        padding: var(--spacing-3) var(--spacing-4) var(--spacing-4);
+      }
+    }
+
+    @media screen and (min-width: 700px) {
+      #shopify-section-{{ section.id }} {
+        --testimonial-list-carousel-item-width: 52vw;
+      }
+    }
+
+    @media screen and (min-width: 1000px) {
+      #shopify-section-{{ section.id }} {
+        --testimonial-list-carousel-item-width: 36vw;
+      }
+    }
+
+    @media screen and (min-width: 1150px) {
+      #shopify-section-{{ section.id }} {
+        --testimonial-list-carousel-item-width: calc(100% / 3 - (var(--grid-gutter) / 3 * 2));
+      }
+    }
+
+    {%- if compact_cards %}
+    /* Style compact : carte fixe 280 px (320 px dès 700 px), rayon 12 px, bordure fine, padding 20 px. */
+    #shopify-section-{{ section.id }},
+    #shopify-section-{{ section.id }} .testimonial-list {
+      --testimonial-list-carousel-item-width: 280px;
+      --grid-gutter: 16px;
+    }
+
+    #shopify-section-{{ section.id }} .testimonial-list {
+      padding-inline: var(--container-outer-width);
+      scroll-padding-inline: var(--container-outer-width);
+    }
+
+    /* Hauteur égale : la carte (grid) étire son unique rangée, le corps remplit la carte. */
+    #shopify-section-{{ section.id }} .testimonial {
+      align-content: stretch;
+      border-radius: 12px;
+      border: 1px solid #F3F4F6;
+      scroll-snap-align: start;
+    }
+
+    /* Corps en colonne : étoiles + date › titre › texte › pied (poussé en bas par margin auto). */
+    #shopify-section-{{ section.id }} .testimonial__body {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: .5rem;
+      height: 100%;
+      min-height: 0;
+      padding: 20px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    #shopify-section-{{ section.id }} .testimonial__meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: .75rem;
+    }
+
+    #shopify-section-{{ section.id }} .testimonial__date,
+    #shopify-section-{{ section.id }} .testimonial__city {
+      font-size: 12px;
+      line-height: 1.4;
+      color: var(--reviews-muted-color);
+      margin: 0;
+    }
+
+    #shopify-section-{{ section.id }} .testimonial__date {
+      margin-inline-start: auto;
+      text-align: end;
+      white-space: nowrap;
+    }
+
+    #shopify-section-{{ section.id }} .testimonial__title {
+      font-size: 15px;
+      font-weight: 700;
+      line-height: 1.3;
+      margin: 0;
+    }
+
+    #shopify-section-{{ section.id }} .testimonial__content {
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    #shopify-section-{{ section.id }} .testimonial__footer {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: .75rem;
+      margin-block-start: auto;
+      padding-block-start: .75rem;
+    }
+
+    #shopify-section-{{ section.id }} .testimonial__who {
+      display: grid;
+      gap: .125rem;
+      min-width: 0;
+    }
+
+    /* Avatar optionnel en compact (compact_show_photo) : photo ronde 36 px à gauche du nom + ville. */
+    #shopify-section-{{ section.id }} .testimonial__person {
+      display: flex;
+      align-items: center;
+      gap: .625rem;
+      min-width: 0;
+    }
+
+    #shopify-section-{{ section.id }} .testimonial__avatar {
+      display: block;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+
+    #shopify-section-{{ section.id }} .testimonial__author {
+      font-size: 13px;
+      font-weight: 600;
+      line-height: 1.4;
+      margin: 0;
+    }
+
+    #shopify-section-{{ section.id }} .testimonial__footer .review-verified {
+      margin-inline-start: auto;
+      flex-shrink: 0;
+    }
+
+    #shopify-section-{{ section.id }} .review-verified {
+      font-size: 10.5px;
+      font-weight: 500;
+      line-height: 1.2;
+      color: var(--reviews-verified-color);
+      gap: .25rem;
+    }
+
+    #shopify-section-{{ section.id }} .review-verified svg {
+      width: 12px;
+      height: 12px;
+    }
+
+    @media screen and (min-width: 700px) {
+      #shopify-section-{{ section.id }},
+      #shopify-section-{{ section.id }} .testimonial-list {
+        --testimonial-list-carousel-item-width: 320px;
+      }
+    }
+    {%- endif %}
+  </style>
+
+  {%- liquid
+    assign total_rating = 0
+
+    for block in section.blocks
+      assign total_rating = total_rating | plus: block.settings.rating
+    endfor
+
+    assign average_rating = total_rating | times: 1.0 | divided_by: section.blocks.size | round: 1
+    assign average_rating_stars = average_rating | round
+  -%}
+
+  {%- capture star_square -%}
+    <span class="reviews-star">{%- render 'icon' with 'rating-star', width: 10, height: 10 -%}</span>
+  {%- endcapture -%}
+
+  {%- capture star_square_empty -%}
+    <span class="reviews-star reviews-star--empty">{%- render 'icon' with 'rating-star', width: 10, height: 10 -%}</span>
+  {%- endcapture -%}
+
+  <div {% render 'section-properties' %}>
+    <div class="section-stack">
+      <div class="v-stack gap-4 sm:gap-5 {% if header_alignment == 'center' %}justify-items-center text-center{% endif %}">
+        {%- if summary_header -%}
+          {%- comment -%}
+            Sous-titre, titre, texte et lien passent toujours par section-header (rien n'est rendu s'ils sont
+            vides, ce qui est l'en-tête de référence : carrés verts + note + nombre d'avis, seuls et centrés).
+          {%- endcomment -%}
+          {%- render 'section-header', subheading: section.settings.subheading, heading: section.settings.title, heading_color: section.settings.heading_color, heading_gradient: section.settings.heading_gradient, content: section.settings.content, link_text: section.settings.link_text, link_url: section.settings.link_url, text_alignment: header_alignment -%}
+
+          <div class="reviews-summary">
+            <div class="reviews-summary__row">
+              <div class="reviews-stars" role="img" aria-label="{{ 'general.rating.info' | t: rating_value: section.settings.rating_value, rating_max: 5 }}">
+                {%- for i in (1..5) -%}{{ star_square }}{%- endfor -%}
+              </div>
+
+              <span class="reviews-summary__value">{{ section.settings.rating_value | escape }}</span>
+            </div>
+
+            {%- liquid
+              # Nombre + libellé joints par une espace (une balise if vide entre deux {{- -}} la perdait au rendu).
+              assign reviews_count_text = section.settings.reviews_count | strip | append: ' ' | append: section.settings.reviews_count_label | strip
+            -%}
+
+            {%- if reviews_count_text != blank -%}
+              <p class="reviews-summary__count">{{ reviews_count_text | escape }}</p>
+            {%- endif -%}
+          </div>
+        {%- else -%}
+          {%- render 'section-header', subheading: section.settings.subheading, heading: section.settings.title, heading_color: section.settings.heading_color, heading_gradient: section.settings.heading_gradient, content: section.settings.content, link_text: section.settings.link_text, link_url: section.settings.link_url, text_alignment: header_alignment -%}
+
+          <div class="h-stack gap-3 sm:gap-4">
+            <span class="h1">{{ average_rating }}</span>
+
+            <div class="rating">
+              <div class="rating__stars" role="img" aria-label="{{ 'general.rating.info' | t: rating_value: average_rating, rating_max: 5 }}">
+                {%- for i in (1..5) -%}
+                  {%- if i <= average_rating_stars -%}
+                    {%- render 'icon' with 'rating-star', class: 'rating__star rating__star--full' -%}
+                  {%- else -%}
+                    {%- render 'icon' with 'rating-star', class: 'rating__star rating__star--empty' -%}
+                  {%- endif -%}
+                {%- endfor -%}
+              </div>
+            </div>
+          </div>
+
+          <p class="text-subdued text-sm">{{ 'general.rating.info' | t: rating_value: average_rating, rating_max: 5 }} &middot; {{ section.blocks.size }} avis</p>
+        {%- endif -%}
+      </div>
+
+      <div class="floating-controls-container">
+        {%- assign scroll_area_id = 'scroll-area-' | append: section.id -%}
+
+        <reviews-marquee id="{{ scroll_area_id }}" {% if loop_enabled %}loop lead-sets="{{ clone_sets }}"{% endif %} {% if autoplay_enabled and loop_enabled %}autoplay autoplay-speed="{{ autoplay_speed }}"{% endif %} per-set="{{ section.blocks.size }}" class="testimonial-list scroll-area bleed is-scrollable">
+          {%- capture real_cards -%}{%- endcapture -%}
+          {%- capture clone_cards -%}{%- endcapture -%}
+
+          {%- for block in section.blocks -%}
+            {%- liquid
+              assign loading_strategy = nil
+
+              if section.index > 3 or forloop.index > 3
+                assign loading_strategy = 'lazy'
+              endif
+
+              assign show_verified = false
+              if verified_label != blank and block.settings.verified != false
+                assign show_verified = true
+              endif
+            -%}
+
+            {%- capture verified_badge -%}
+              {%- if show_verified -%}
+                <span class="review-verified {% unless compact_cards %}text-sm text-subdued{% endunless %}">
+                  <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><circle cx="8" cy="8" r="8"/><path d="m4.5 8.3 2.3 2.3 4.7-4.7" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  {{- verified_label | escape -}}
+                </span>
+              {%- endif -%}
+            {%- endcapture -%}
+
+            {%- capture card_inner -%}
+              {%- if compact_cards -%}
+                {%- comment -%}
+                  Pas de grande photo en compact : la référence n'en a pas, et une photo carrée de 280 px écraserait
+                  la carte. Avec compact_show_photo, elle devient un avatar rond de 36 px dans le pied de carte.
+                {%- endcomment -%}
+                <div class="testimonial__body">
+                  <div class="testimonial__meta">
+                    <div class="reviews-stars reviews-stars--sm" role="img" aria-label="{{ 'general.rating.info' | t: rating_value: block.settings.rating, rating_max: 5 }}">
+                      {%- for i in (1..5) -%}
+                        {%- if i <= block.settings.rating -%}{{ star_square }}{%- else -%}{{ star_square_empty }}{%- endif -%}
+                      {%- endfor -%}
+                    </div>
+
+                    {%- if block.settings.date != blank -%}
+                      <p class="testimonial__date">{{ block.settings.date | escape }}</p>
+                    {%- endif -%}
+                  </div>
+
+                  {%- if block.settings.title != blank -%}
+                    <h3 class="testimonial__title">{{ block.settings.title | escape }}</h3>
+                  {%- endif -%}
+
+                  {%- if block.settings.content != blank -%}
+                    <div class="testimonial__content">
+                      {{- block.settings.content -}}
+                    </div>
+                  {%- endif -%}
+
+                  {%- liquid
+                    assign show_avatar = false
+                    if section.settings.compact_show_photo and block.settings.image != blank
+                      assign show_avatar = true
+                    endif
+                  -%}
+
+                  {%- if block.settings.author != blank or block.settings.city != blank or show_avatar or show_verified -%}
+                    <div class="testimonial__footer">
+                      {%- if block.settings.author != blank or block.settings.city != blank or show_avatar -%}
+                        <div class="testimonial__person">
+                          {%- if show_avatar -%}
+                            {{- block.settings.image | image_url: width: 144 | image_tag: loading: loading_strategy, sizes: '36px', widths: '72,108,144', class: 'testimonial__avatar' -}}
+                          {%- endif -%}
+
+                          {%- if block.settings.author != blank or block.settings.city != blank -%}
+                            <div class="testimonial__who">
+                              {%- if block.settings.author != blank -%}
+                                <p class="testimonial__author">{{ block.settings.author | escape }}</p>
+                              {%- endif -%}
+
+                              {%- if block.settings.city != blank -%}
+                                <p class="testimonial__city">{{ block.settings.city | escape }}</p>
+                              {%- endif -%}
+                            </div>
+                          {%- endif -%}
+                        </div>
+                      {%- endif -%}
+
+                      {{- verified_badge -}}
+                    </div>
+                  {%- endif -%}
+                </div>
+              {%- else -%}
+                {%- if block.settings.image != blank -%}
+                  {{- block.settings.image | image_url: width: block.settings.image.width | image_tag: loading: loading_strategy, sizes: '(max-width: 699px) 74vw, (max-width: 999px) 52vw, 36vw', widths: '300,400,500,600,700,800,900,1000,1200', class: 'testimonial__photo' -}}
+                {%- endif -%}
+
+                <div class="testimonial__body v-stack gap-2 sm:gap-2.5">
+                  <div class="h-stack gap-3 items-center" style="flex-wrap: wrap;">
+                    <div class="rating">
+                      <div class="rating__stars" role="img" aria-label="{{ 'general.rating.info' | t: rating_value: block.settings.rating, rating_max: 5 }}">
+                        {%- for i in (1..5) -%}
+                          {%- if i <= block.settings.rating -%}
+                            {%- render 'icon' with 'rating-star', class: 'rating__star rating__star--full' -%}
+                          {%- else -%}
+                            {%- render 'icon' with 'rating-star', class: 'rating__star rating__star--empty' -%}
+                          {%- endif -%}
+                        {%- endfor -%}
+                      </div>
+                    </div>
+
+                    {{- verified_badge -}}
+
+                    {%- if block.settings.date != blank -%}
+                      <span class="text-xs text-subdued">{{ block.settings.date | escape }}</span>
+                    {%- endif -%}
+                  </div>
+
+                  {%- if block.settings.author != blank or block.settings.city != blank -%}
+                    <p class="text-subdued">
+                      {{- block.settings.author | escape -}}
+                      {%- if block.settings.author != blank and block.settings.city != blank %} &middot; {% endif -%}
+                      {{- block.settings.city | escape -}}
+                    </p>
+                  {%- endif -%}
+
+                  {%- if block.settings.title != blank or block.settings.content != blank -%}
+                    <div class="v-stack gap-2 sm:gap-2.5">
+                      {%- if block.settings.title != blank -%}
+                        <p class="bold">{{ block.settings.title | escape }}</p>
+                      {%- endif -%}
+
+                      <div class="testimonial__content">
+                        {{- block.settings.content -}}
+                      </div>
+                    </div>
+                  {%- endif -%}
+                </div>
+              {%- endif -%}
+            {%- endcapture -%}
+
+            {%- capture real_cards -%}{{ real_cards }}<div {% render 'surface', class: 'testimonial rounded-sm', background: section.settings.review_card_background, text_color: section.settings.review_card_text_color, background_fallback: 'bg-secondary' %} {{ block.shopify_attributes }}>{{ card_inner }}</div>{%- endcapture -%}
+
+            {%- if loop_enabled -%}
+              {%- capture clone_cards -%}{{ clone_cards }}<div {% render 'surface', class: 'testimonial rounded-sm', background: section.settings.review_card_background, text_color: section.settings.review_card_text_color, background_fallback: 'bg-secondary' %} aria-hidden="true" inert>{{ card_inner }}</div>{%- endcapture -%}
+            {%- endif -%}
+          {%- endfor -%}
+
+          {%- if loop_enabled -%}
+            {%- for i in (1..clone_sets) -%}{{ clone_cards }}{%- endfor -%}
+          {%- endif -%}
+          {{ real_cards }}
+          {%- if loop_enabled -%}
+            {%- for i in (1..clone_sets) -%}{{ clone_cards }}{%- endfor -%}
+          {%- endif -%}
+        </reviews-marquee>
+
+        <button is="prev-button" class="circle-button circle-button--lg circle-button--fill border group" aria-controls="{{ scroll_area_id }}" {% unless loop_enabled %}disabled{% endunless %}>
+          <span class="sr-only">{{ 'general.accessibility.previous' | t }}</span>
+          <span class="animated-arrow animated-arrow--reverse"></span>
+        </button>
+
+        <button is="next-button" class="circle-button circle-button--lg circle-button--fill border group" aria-controls="{{ scroll_area_id }}">
+          <span class="sr-only">{{ 'general.accessibility.next' | t }}</span>
+          <span class="animated-arrow"></span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* Nom de balise propre à cette section : <loop-carousel> appartient à video-testimonials (autre implémentation). */
+    if (!window.customElements.get('reviews-marquee')) {
+      window.customElements.define('reviews-marquee', class extends HTMLElement {
+        connectedCallback() {
+          this._settleTimer = null;
+
+          if (this.hasAttribute('loop')) {
+            requestAnimationFrame(() => {
+              this._ensureCoverage();
+              this._recenter();
+            });
+
+            this.addEventListener('scroll', () => {
+              clearTimeout(this._settleTimer);
+              this._settleTimer = setTimeout(() => this._recenter(), 120);
+            }, { passive: true });
+
+            window.addEventListener('resize', () => {
+              this._ensureCoverage();
+              this._recenter();
+            });
+          }
+
+          this.addEventListener('control:prev', () => this._step(-1));
+          this.addEventListener('control:next', () => this._step(1));
+
+          if (this.hasAttribute('autoplay') && this.hasAttribute('loop')) {
+            this._setupAutoplay();
+          }
+        }
+
+        disconnectedCallback() {
+          if (this._raf) {
+            cancelAnimationFrame(this._raf);
+            this._raf = null;
+          }
+
+          if (this._observer) {
+            this._observer.disconnect();
+            this._observer = null;
+          }
+        }
+
+        get _perSet() {
+          return parseInt(this.getAttribute('per-set')) || 1;
+        }
+
+        get _leadSets() {
+          return parseInt(this.getAttribute('lead-sets')) || 1;
+        }
+
+        get _setWidth() {
+          const items = this.children;
+          return items.length > this._perSet ? items[this._perSet].offsetLeft - items[0].offsetLeft : 0;
+        }
+
+        get _itemOffset() {
+          const items = this.children;
+          return items.length < 2 ? this.clientWidth : items[1].offsetLeft - items[0].offsetLeft;
+        }
+
+        /* La bande de recentrage [lead - 0.5, lead + 0.5) doit rester atteignable : si son bord haut
+           dépasse le défilement maximal (scrollWidth - clientWidth), scrollLeft est écrêté à l'intérieur
+           de la bande et le marquee se fige. On clone alors le jeu réel (aria-hidden, inert) de chaque
+           côté jusqu'à ce que la piste couvre lead + 0.5 jeux + une carte, en mettant lead-sets à jour. */
+        _ensureCoverage() {
+          const perSet = this._perSet;
+          let guard = 0;
+
+          while (guard++ < 12) {
+            const width = this._setWidth;
+            const items = this.children;
+            const start = this._leadSets * perSet;
+
+            if (!width || items.length < start + perSet) {
+              return;
+            }
+
+            const needed = width * (this._leadSets + 0.5) + this._itemOffset;
+
+            if (this.scrollWidth - this.clientWidth >= needed) {
+              return;
+            }
+
+            const before = document.createDocumentFragment();
+            const after = document.createDocumentFragment();
+
+            for (let i = start; i < start + perSet; i++) {
+              before.appendChild(this._cloneItem(items[i]));
+              after.appendChild(this._cloneItem(items[i]));
+            }
+
+            this.insertBefore(before, this.firstChild);
+            this.appendChild(after);
+            this.setAttribute('lead-sets', this._leadSets + 1);
+          }
+        }
+
+        _cloneItem(item) {
+          const clone = item.cloneNode(true);
+          clone.setAttribute('aria-hidden', 'true');
+          clone.setAttribute('inert', '');
+          clone.removeAttribute('data-shopify-editor-block');
+          clone.querySelectorAll('[id]').forEach((node) => node.removeAttribute('id'));
+          return clone;
+        }
+
+        _recenter() {
+          const width = this._setWidth;
+
+          if (!width) {
+            return;
+          }
+
+          // Garde la position dans la bande [lead - 0.5, lead + 0.5) largeurs de jeu : toute
+          // sortie est ramenée d'un nombre entier de jeux, ce qui est invisible (clones identiques).
+          const lower = width * (this._leadSets - 0.5);
+          const upper = lower + width;
+
+          if (this.scrollLeft < lower || this.scrollLeft >= upper) {
+            const offset = (((this.scrollLeft - lower) % width) + width) % width;
+            this.scrollLeft = lower + offset;
+          }
+        }
+
+        _step(direction) {
+          this.scrollBy({ left: direction * this._itemOffset, behavior: 'smooth' });
+        }
+
+        /* Marquee : avance de quelques pixels par image, recentre en continu, et se met en pause
+           au survol, au focus clavier, au toucher, hors écran, onglet caché ou animations réduites. */
+        _setupAutoplay() {
+          this._speed = parseFloat(this.getAttribute('autoplay-speed')) || 40;
+          this._hovered = false;
+          this._focused = false;
+          this._touching = false;
+          this._visible = true;
+          this._carry = 0;
+          this._last = null;
+
+          const region = this.closest('.floating-controls-container') || this;
+          const reduceMotion = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : { matches: false };
+
+          region.addEventListener('pointerenter', () => { this._hovered = true; });
+          region.addEventListener('pointerleave', () => { this._hovered = false; });
+          region.addEventListener('focusin', () => { this._focused = true; });
+          region.addEventListener('focusout', () => { this._focused = false; });
+          this.addEventListener('touchstart', () => { this._touching = true; }, { passive: true });
+          this.addEventListener('touchend', () => { this._touching = false; }, { passive: true });
+          this.addEventListener('touchcancel', () => { this._touching = false; }, { passive: true });
+
+          if (window.IntersectionObserver) {
+            this._observer = new IntersectionObserver((entries) => {
+              entries.forEach((entry) => { this._visible = entry.isIntersecting; });
+            });
+            this._observer.observe(this);
+          }
+
+          const tick = (now) => {
+            const paused = this._hovered || this._focused || this._touching || !this._visible || reduceMotion.matches || document.visibilityState === 'hidden';
+
+            if (paused || this._last === null) {
+              this._last = now;
+              this._carry = 0;
+            } else {
+              const elapsed = Math.min(Math.max(now - this._last, 0), 100);
+              this._last = now;
+              this._carry += this._speed * elapsed / 1000;
+
+              const pixels = Math.floor(this._carry);
+
+              if (pixels > 0) {
+                this._carry -= pixels;
+                this.scrollLeft += pixels;
+                this._recenter();
+              }
+            }
+
+            this._raf = requestAnimationFrame(tick);
+          };
+
+          this._raf = requestAnimationFrame(tick);
+        }
+      });
+    }
+  </script>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Carrousel d'avis clients",
+  "class": "shopify-section--reviews-carousel",
+  "tag": "section",
+  "disabled_on": {
+    "groups": [
+      "header",
+      "custom.overlay"
+    ]
+  },
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "label": "Largeur pleine page",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Sous-titre"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Titre",
+      "default": "Ce que nos clients en pensent"
+    },
+    {
+      "type": "richtext",
+      "id": "content",
+      "label": "Texte"
+    },
+    {
+      "type": "url",
+      "id": "link_url",
+      "label": "URL du lien"
+    },
+    {
+      "type": "text",
+      "id": "link_text",
+      "label": "Texte du lien",
+      "default": "Voir tous les avis"
+    },
+    {
+      "type": "header",
+      "content": "En-tête résumé",
+      "info": "Cinq carrés verts avec la note, puis le nombre d'avis, centrés sous le titre et le sous-titre s'ils sont remplis (laissez-les vides pour l'en-tête de référence, et ne mettez pas la note dans le titre : elle serait affichée deux fois). Videz la note pour revenir à l'en-tête classique (moyenne calculée à partir des avis)."
+    },
+    {
+      "type": "text",
+      "id": "rating_value",
+      "label": "Note affichée",
+      "default": "4.8"
+    },
+    {
+      "type": "text",
+      "id": "reviews_count",
+      "label": "Nombre d'avis",
+      "default": "2,400"
+    },
+    {
+      "type": "text",
+      "id": "reviews_count_label",
+      "label": "Texte après le nombre",
+      "default": "verified reviews"
+    },
+    {
+      "type": "header",
+      "content": "Format des cartes"
+    },
+    {
+      "type": "select",
+      "id": "card_style",
+      "label": "Style des cartes",
+      "info": "Compact (par défaut) : carte blanche 280 / 320 px, étoiles + date, titre, texte, nom + ville et mention vérifiée en pied de carte ; la photo du client n'est affichée que si l'option ci-dessous est cochée. Classique : rendu historique avec grande photo.",
+      "options": [
+        {
+          "value": "classic",
+          "label": "Classique (photo, nom, citation)"
+        },
+        {
+          "value": "compact",
+          "label": "Compact (étoiles, titre, texte, nom, ville)"
+        }
+      ],
+      "default": "compact"
+    },
+    {
+      "type": "checkbox",
+      "id": "compact_show_photo",
+      "label": "Afficher la photo du client en compact",
+      "info": "Avatar rond de 36 px à côté du nom. Sans effet avec le style classique, qui affiche toujours la grande photo.",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "image_ratio",
+      "label": "Format de la photo",
+      "options": [
+        {
+          "value": "1 / 1",
+          "label": "Carré (recommandé)"
+        },
+        {
+          "value": "4 / 5",
+          "label": "Portrait 4:5"
+        },
+        {
+          "value": "3 / 2",
+          "label": "Paysage 3:2"
+        }
+      ],
+      "default": "1 / 1"
+    },
+    {
+      "type": "select",
+      "id": "card_width_mobile",
+      "label": "Largeur des cartes (mobile)",
+      "info": "Sans effet avec le style compact, dont la largeur est fixe.",
+      "options": [
+        {
+          "value": "78",
+          "label": "1 carte (pleine largeur)"
+        },
+        {
+          "value": "62",
+          "label": "1 carte + aperçu de la suivante (recommandé)"
+        },
+        {
+          "value": "46",
+          "label": "2 cartes"
+        }
+      ],
+      "default": "62"
+    },
+    {
+      "type": "checkbox",
+      "id": "center_cards_mobile",
+      "label": "Centrer les cartes (mobile)",
+      "info": "La carte active s'affiche au centre de l'écran, avec un aperçu de ses voisines de chaque côté. Sans effet avec le style compact.",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Défilement automatique"
+    },
+    {
+      "type": "checkbox",
+      "id": "autoplay",
+      "label": "Faire défiler les avis en continu",
+      "info": "Boucle infinie, mise en pause au survol et au toucher. Respecte la préférence « réduire les animations ».",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "autoplay_speed",
+      "label": "Vitesse (pixels par seconde)",
+      "min": 10,
+      "max": 120,
+      "step": 5,
+      "default": 40
+    },
+    {
+      "type": "header",
+      "content": "Avis vérifiés"
+    },
+    {
+      "type": "text",
+      "id": "verified_text",
+      "label": "Texte de la mention",
+      "info": "Videz le champ pour retirer la mention de tous les avis. À n'afficher que si vos avis sont réellement vérifiés : la mention est encadrée par la loi.",
+      "default": "Verified purchase"
+    },
+    {
+      "type": "color",
+      "id": "verified_color",
+      "label": "Couleur du badge",
+      "default": "#12866A"
+    },
+    {
+      "type": "header",
+      "content": "Étoiles"
+    },
+    {
+      "type": "color",
+      "id": "stars_color",
+      "label": "Couleur des étoiles",
+      "default": "#0DA558"
+    },
+    {
+      "type": "header",
+      "content": "Couleurs",
+      "info": "Le dégradé remplace la couleur unie si les deux sont définis."
+    },
+    {
+      "type": "color",
+      "id": "background",
+      "label": "Arrière-plan"
+    },
+    {
+      "type": "color_background",
+      "id": "background_gradient",
+      "label": "Dégradé d'arrière-plan"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Texte"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Couleur du titre"
+    },
+    {
+      "type": "color_background",
+      "id": "heading_gradient",
+      "label": "Dégradé du titre"
+    },
+    {
+      "type": "color",
+      "id": "review_card_background",
+      "label": "Arrière-plan des cartes d'avis"
+    },
+    {
+      "type": "color",
+      "id": "review_card_text_color",
+      "label": "Texte des cartes d'avis"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "review",
+      "name": "Avis",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Photo du client",
+          "info": "250 x 250px .jpg recommandé. Grande photo avec le style « Classique » ; avatar rond en « Compact » si l'option « Afficher la photo du client en compact » est cochée."
+        },
+        {
+          "type": "text",
+          "id": "author",
+          "label": "Nom du client"
+        },
+        {
+          "type": "text",
+          "id": "city",
+          "label": "Ville",
+          "info": "Affichée sous le nom du client."
+        },
+        {
+          "type": "text",
+          "id": "date",
+          "label": "Date",
+          "info": "Texte libre, par exemple « 3 days ago » ou « March 2026 »."
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Titre court de l'avis",
+          "default": "Avis client"
+        },
+        {
+          "type": "checkbox",
+          "id": "verified",
+          "label": "Avis vérifié",
+          "info": "Décochez pour masquer la mention sur cet avis précis.",
+          "default": true
+        },
+        {
+          "type": "range",
+          "id": "rating",
+          "label": "Note",
+          "min": 1,
+          "max": 5,
+          "step": 1,
+          "default": 5
+        },
+        {
+          "type": "richtext",
+          "id": "content",
+          "label": "Texte de l'avis",
+          "default": "<p>Partagez ici ce que vos clients pensent de vos produits, de votre service client ou de vos délais de livraison.</p>"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Carrousel d'avis clients",
+      "settings": {
+        "card_style": "compact",
+        "autoplay": true
+      },
+      "blocks": [
+        {
+          "type": "review",
+          "settings": {
+            "author": "Jordan K.",
+            "city": "Manchester",
+            "date": "2 days ago",
+            "title": "Arrived faster than expected",
+            "rating": 5,
+            "content": "<p>Ordered on Monday, wearing it by Wednesday. The print is sharp and the fabric feels premium for the price.</p>"
+          }
+        },
+        {
+          "type": "review",
+          "settings": {
+            "author": "Priya S.",
+            "city": "Dublin",
+            "date": "1 week ago",
+            "title": "Sizing was spot on",
+            "rating": 5,
+            "content": "<p>Followed the size chart and it fits perfectly. Colours match the photos and the stitching is clean.</p>"
+          }
+        },
+        {
+          "type": "review",
+          "settings": {
+            "author": "Mateo R.",
+            "city": "Lisbon",
+            "date": "2 weeks ago",
+            "title": "Great value for the quality",
+            "rating": 4,
+            "content": "<p>Looks exactly like the listing and came well packed. Would have liked one more colour option, but very happy overall.</p>"
+          }
+        },
+        {
+          "type": "review",
+          "settings": {
+            "author": "Lena W.",
+            "city": "Berlin",
+            "date": "3 weeks ago",
+            "title": "Second order, still impressed",
+            "rating": 5,
+            "content": "<p>Bought one for my brother after loving mine. Customer service answered my question within the hour.</p>"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

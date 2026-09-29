@@ -1,0 +1,96 @@
+{%- comment -%}
+  pdp-trust-icons — buy-box item 15: three centred reassurance columns.
+  Receives: block, product, product_form_id, section.
+  Each column: custom image (40px tall) or theme picto icon, then a 10px bold uppercase label.
+{%- endcomment -%}
+
+{%- liquid
+  assign ti_uid = 'pdp-trust-icons-' | append: block.id
+  assign ti_icon_size = 40
+  assign ti_img_w = 240
+  assign ti_border = block.settings.border_color | default: '#f0f0f0'
+  assign ti_text = block.settings.text_color | default: '#121212'
+-%}
+
+<style>
+  .{{ ti_uid }} {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    padding: 16px 0;
+    border-top: 1px solid {{ ti_border }};
+    font-family: Inter, -apple-system, "Segoe UI", sans-serif;
+    color: {{ ti_text }};
+  }
+  .{{ ti_uid }}__item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px;
+    text-align: center;
+    min-width: 0;
+  }
+  .{{ ti_uid }}__visual {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: {{ ti_icon_size }}px;
+    flex-shrink: 0;
+  }
+  .{{ ti_uid }}__visual img {
+    display: block;
+    height: {{ ti_icon_size }}px;
+    width: auto;
+    max-width: 100%;
+    object-fit: contain;
+  }
+  .{{ ti_uid }}__visual .icon {
+    width: 32px;
+    height: 32px;
+  }
+  .{{ ti_uid }}__label {
+    margin: 0;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1.3;
+    letter-spacing: .02em;
+    text-transform: uppercase;
+    opacity: .8;
+  }
+</style>
+
+<div class="{{ ti_uid }}" {{ block.shopify_attributes }}>
+  {%- for i in (1..3) -%}
+    {%- liquid
+      assign key_image = 'image_' | append: i
+      assign key_icon = 'icon_' | append: i
+      assign key_color = 'icon_color_' | append: i
+      assign key_text = 'text_' | append: i
+
+      assign ti_image = block.settings[key_image]
+      assign ti_icon = block.settings[key_icon] | default: 'none'
+      assign ti_color = block.settings[key_color]
+      assign ti_label = block.settings[key_text]
+      assign ti_alt = ti_label | escape
+
+      if ti_image == blank and ti_icon == 'none' and ti_label == blank
+        continue
+      endif
+    -%}
+    <div class="{{ ti_uid }}__item">
+      {%- if ti_image != blank -%}
+        <span class="{{ ti_uid }}__visual">
+          {{- ti_image | image_url: width: ti_img_w | image_tag: loading: 'lazy', widths: '120,240', sizes: '80px', alt: ti_alt -}}
+        </span>
+      {%- elsif ti_icon != 'none' -%}
+        <span class="{{ ti_uid }}__visual" style="{% if ti_color != blank and ti_color.alpha != 0 %}color: {{ ti_color }};{% endif %}">
+          {%- render 'icon' with ti_icon, width: 32, height: 32 -%}
+        </span>
+      {%- endif -%}
+      {%- if ti_label != blank -%}
+        <p class="{{ ti_uid }}__label">{{ ti_label | escape }}</p>
+      {%- endif -%}
+    </div>
+  {%- endfor -%}
+</div>

@@ -1,0 +1,786 @@
+{%- liquid
+  assign mode = section.settings.countdown_mode
+  assign shop_offset = 'now' | date: '%z'
+  assign end_date = section.settings.end_date | default: '2026-12-31'
+  assign end_time = section.settings.end_time | default: '23:59'
+  assign target_iso = end_date | append: 'T' | append: end_time | append: ':00' | append: shop_offset
+-%}
+
+{%- render 'section-spacing-collapsing' -%}
+
+<style>
+  #shopify-section-{{ section.id }} {
+    --countdown-accent: {{ section.settings.digit_background | default: '#111111' }};
+    --countdown-bar-digit-bg: {% if section.settings.digit_background != blank %}{{ section.settings.digit_background }}{% else %}rgba(255, 255, 255, 0.08){% endif %};
+    --countdown-digit-color: {{ section.settings.digit_text_color | default: '#ffffff' }};
+    --countdown-radius: {{ section.settings.digit_radius }}px;
+    --section-spacing-block-start: {{ section.settings.spacing_block_start }}px;
+    --section-spacing-block-end: {{ section.settings.spacing_block_end }}px;
+  }
+
+  .countdown__wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-4);
+    text-align: center;
+  }
+
+  @media screen and (min-width: 1000px) {
+    .countdown__wrapper--inline {
+      flex-direction: row;
+      justify-content: center;
+      gap: var(--spacing-8);
+      text-align: start;
+    }
+  }
+
+  /* Compact bar: one centred 53px row (bold 13px uppercase text + 32px digit boxes separated by ":") */
+  .countdown__wrapper--bar {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    min-height: 53px;
+    gap: var(--spacing-2) var(--spacing-3);
+  }
+
+  .countdown__wrapper--bar .countdown__content {
+    flex-direction: row;
+    align-items: center;
+    gap: var(--spacing-2);
+  }
+
+  .countdown__wrapper--bar .countdown__side {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-3);
+  }
+
+  .countdown__wrapper--bar .countdown__heading {
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: normal;
+    text-transform: uppercase;
+  }
+
+  .countdown__wrapper--bar .countdown__subheading {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    opacity: 1;
+  }
+
+  .countdown__wrapper--bar .countdown__clock {
+    align-items: center;
+    gap: var(--spacing-1);
+  }
+
+  .countdown__wrapper--bar .countdown__unit {
+    justify-content: center;
+    min-width: 40px;
+    height: 32px;
+    padding: 0 var(--spacing-1);
+    gap: 0;
+    background: var(--countdown-bar-digit-bg);
+    color: var(--countdown-digit-color);
+    border-radius: 4px;
+  }
+
+  .countdown__wrapper--bar .countdown__value {
+    width: auto;
+    padding: 0;
+    background: transparent;
+    border-radius: 0;
+    font-size: 14px;
+    line-height: 1;
+    letter-spacing: 0;
+  }
+
+  .countdown__wrapper--bar .countdown__label {
+    font-size: 9px;
+    line-height: 1.1;
+    letter-spacing: 0.02em;
+    opacity: 0.7;
+  }
+
+  .countdown__wrapper--bar .countdown__separator {
+    display: inline;
+    align-self: center;
+    padding-top: 0;
+    font-size: 14px;
+    opacity: 0.6;
+  }
+
+  .countdown__wrapper--bar .countdown__cta {
+    margin-top: 0;
+  }
+
+  .countdown__content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-2);
+    align-items: center;
+  }
+
+  @media screen and (min-width: 1000px) {
+    .countdown__wrapper--inline .countdown__content {
+      align-items: flex-start;
+    }
+  }
+
+  .countdown__heading {
+    margin: 0;
+    text-wrap: balance;
+  }
+
+  .countdown__subheading {
+    margin: 0;
+    opacity: 0.85;
+  }
+
+  .countdown__clock {
+    display: grid;
+    grid-auto-flow: column;
+    gap: var(--spacing-2);
+    align-items: start;
+  }
+
+  .countdown__unit {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-1);
+    min-width: 62px;
+  }
+
+  .countdown__value {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: var(--spacing-3) var(--spacing-2);
+    background: var(--countdown-accent);
+    color: var(--countdown-digit-color);
+    border-radius: var(--countdown-radius);
+    font-size: clamp(1.5rem, 1.1rem + 1.6vw, 2.35rem);
+    font-weight: 700;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.02em;
+  }
+
+  .countdown__label {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    opacity: 0.7;
+  }
+
+  .countdown__separator {
+    align-self: start;
+    padding-top: var(--spacing-3);
+    font-size: clamp(1.25rem, 1rem + 1vw, 1.9rem);
+    font-weight: 700;
+    line-height: 1;
+    opacity: 0.35;
+  }
+
+  .countdown__cta {
+    margin-top: var(--spacing-2);
+  }
+
+  countdown-timer:not(.countdown--ready) .countdown__clock {
+    visibility: hidden;
+  }
+
+  {%- if section.settings.sticky -%}
+    /* Stays on screen while scrolling (like the theme's sticky announcement bar); the sticky announcement bar and
+       header below are pushed down by its height, measured by <height-observer variable="offer-bar"> */
+    #shopify-section-{{ section.id }} {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+    }
+
+    :root #shopify-section-{{ section.id }} ~ .shopify-section--announcement-bar:not(.shopify-section--header ~ *) {
+      top: var(--offer-bar-height, 0px);
+    }
+
+    :root #shopify-section-{{ section.id }} ~ .shopify-section--header {
+      top: calc(var(--offer-bar-height, 0px) + var(--sticky-announcement-bar-enabled, 0) * var(--announcement-bar-height, 0px));
+    }
+  {%- endif -%}
+
+  @media (prefers-reduced-motion: no-preference) {
+    .countdown--pulse .countdown__value,
+    .countdown__wrapper--bar .countdown--pulse .countdown__unit {
+      animation: countdownPulse 1s ease-in-out infinite;
+    }
+
+    @keyframes countdownPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.04); }
+    }
+  }
+</style>
+
+{%- if section.settings.sticky -%}<height-observer variable="offer-bar">{%- endif -%}
+<div {% render 'section-properties' %}>
+  <countdown-timer
+    class="countdown"
+    data-mode="{{ mode }}"
+    data-target="{{ target_iso }}"
+    data-daily-hour="{{ section.settings.daily_reset_hour }}"
+    data-evergreen-minutes="{{ section.settings.evergreen_minutes }}"
+    data-evergreen-scope="{{ section.settings.evergreen_scope | default: 'visitor' }}"
+    data-timer-id="{{ section.id }}"
+    data-on-expiry="{{ section.settings.on_expiry }}"
+    data-hide-days="{% if section.settings.show_days %}false{% else %}true{% endif %}"
+  >
+    <div class="countdown__wrapper countdown__wrapper--{{ section.settings.layout }}">
+      <div class="countdown__content">
+        {%- if section.settings.subheading != blank -%}
+          <p class="countdown__subheading bold text-sm uppercase">{{ section.settings.subheading | escape }}</p>
+        {%- endif -%}
+
+        {%- if section.settings.title != blank -%}
+          {%- if section.settings.layout == 'bar' -%}
+            <p class="countdown__heading">{{ section.settings.title | escape }}</p>
+          {%- else -%}
+            <{{ section.settings.heading_tag | default: 'h2' }} class="countdown__heading h3">
+              {{- section.settings.title | escape -}}
+            </{{ section.settings.heading_tag | default: 'h2' }}>
+          {%- endif -%}
+        {%- endif -%}
+
+        {%- if section.settings.content != blank -%}
+          <div class="countdown__subheading text-sm">{{ section.settings.content }}</div>
+        {%- endif -%}
+      </div>
+
+      <div class="countdown__side">
+        <div class="countdown__clock{% if section.settings.pulse %} countdown--pulse{% endif %}" role="timer" aria-live="off">
+          {%- if section.settings.show_days -%}
+            <div class="countdown__unit" data-unit="days">
+              <span class="countdown__value" data-countdown-days>00</span>
+              <span class="countdown__label">{{ section.settings.label_days | escape }}</span>
+            </div>
+            <span class="countdown__separator" aria-hidden="true">:</span>
+          {%- endif -%}
+
+          <div class="countdown__unit">
+            <span class="countdown__value" data-countdown-hours>00</span>
+            <span class="countdown__label">{{ section.settings.label_hours | escape }}</span>
+          </div>
+          <span class="countdown__separator" aria-hidden="true">:</span>
+
+          <div class="countdown__unit">
+            <span class="countdown__value" data-countdown-minutes>00</span>
+            <span class="countdown__label">{{ section.settings.label_minutes | escape }}</span>
+          </div>
+          <span class="countdown__separator" aria-hidden="true">:</span>
+
+          <div class="countdown__unit">
+            <span class="countdown__value" data-countdown-seconds>00</span>
+            <span class="countdown__label">{{ section.settings.label_seconds | escape }}</span>
+          </div>
+        </div>
+
+        {%- if section.settings.button_text != blank -%}
+          <div class="countdown__cta">
+            {%- liquid
+              assign cta_size = 'lg'
+              if section.settings.layout == 'bar'
+                assign cta_size = 'sm'
+              endif
+            -%}
+            {%- render 'button',
+              content: section.settings.button_text,
+              href: section.settings.button_url,
+              size: cta_size,
+              background: section.settings.button_background,
+              text_color: section.settings.button_text_color
+            -%}
+          </div>
+        {%- endif -%}
+      </div>
+    </div>
+
+    {%- if section.settings.expired_text != blank -%}
+      <p class="countdown__expired text-center bold" hidden data-countdown-expired>
+        {{- section.settings.expired_text | escape -}}
+      </p>
+    {%- endif -%}
+  </countdown-timer>
+</div>
+{%- if section.settings.sticky -%}</height-observer>{%- endif -%}
+
+<script>
+  if (!window.customElements.get('countdown-timer')) {
+    window.customElements.define('countdown-timer', class extends HTMLElement {
+      connectedCallback() {
+        this.days = this.querySelector('[data-countdown-days]');
+        this.hours = this.querySelector('[data-countdown-hours]');
+        this.minutes = this.querySelector('[data-countdown-minutes]');
+        this.seconds = this.querySelector('[data-countdown-seconds]');
+        this.clock = this.querySelector('.countdown__clock');
+        this.expired = this.querySelector('[data-countdown-expired]');
+        this.hideDays = this.dataset.hideDays === 'true';
+
+        this.deadline = this.resolveDeadline();
+
+        if (!this.deadline) {
+          this.handleExpiry();
+          return;
+        }
+
+        this.tick();
+        this.classList.add('countdown--ready');
+        this.interval = setInterval(() => this.tick(), 1000);
+      }
+
+      disconnectedCallback() {
+        clearInterval(this.interval);
+      }
+
+      resolveDeadline() {
+        const now = Date.now();
+
+        if (this.dataset.mode === 'daily') {
+          const resetHour = parseInt(this.dataset.dailyHour, 10) || 0;
+          const next = new Date();
+          next.setHours(resetHour, 0, 0, 0);
+          if (next.getTime() <= now) next.setDate(next.getDate() + 1);
+          return next.getTime();
+        }
+
+        if (this.dataset.mode === 'evergreen') {
+          const minutes = parseInt(this.dataset.evergreenMinutes, 10) || 30;
+          const storageKey = 'countdown-timer-' + this.dataset.timerId;
+          // "session" keeps the deadline only for this tab's visit, so a new visit starts a
+          // fresh countdown; "visitor" keeps it across visits on this device.
+          const perSession = this.dataset.evergreenScope === 'session';
+          let store = null;
+
+          try {
+            store = perSession ? sessionStorage : localStorage;
+          } catch (error) {
+            store = null;
+          }
+
+          let stored = null;
+
+          try {
+            const raw = store && store.getItem(storageKey);
+            const parsedStore = raw === null || raw === undefined ? NaN : parseInt(raw, 10);
+            stored = Number.isFinite(parsedStore) ? parsedStore : null;
+          } catch (error) {
+            stored = null;
+          }
+
+          if (!stored || stored <= now) {
+            stored = now + minutes * 60000;
+            try {
+              if (store) store.setItem(storageKey, String(stored));
+            } catch (error) {
+              // Storage unavailable (private mode): the timer still runs for this page view.
+            }
+          }
+
+          return stored;
+        }
+
+        const parsed = Date.parse(this.dataset.target);
+        return isNaN(parsed) ? null : parsed;
+      }
+
+      tick() {
+        const remaining = this.deadline - Date.now();
+
+        if (remaining <= 0) {
+          clearInterval(this.interval);
+          this.handleExpiry();
+          return;
+        }
+
+        const totalSeconds = Math.floor(remaining / 1000);
+        let hours = Math.floor(totalSeconds / 3600);
+        const days = Math.floor(hours / 24);
+
+        if (!this.hideDays) {
+          hours = hours % 24;
+          this.days.textContent = this.pad(days);
+        }
+
+        this.hours.textContent = this.pad(hours);
+        this.minutes.textContent = this.pad(Math.floor((totalSeconds % 3600) / 60));
+        this.seconds.textContent = this.pad(totalSeconds % 60);
+      }
+
+      handleExpiry() {
+        if (this.dataset.onExpiry === 'hide') {
+          this.hidden = true;
+          return;
+        }
+
+        if (this.dataset.onExpiry === 'restart') {
+          const next = this.resolveDeadline();
+
+          // A fixed end date cannot restart: re-resolving returns the same past
+          // moment, so fall through to the expired state instead of looping.
+          if (next && next > Date.now()) {
+            this.deadline = next;
+            clearInterval(this.interval);
+            this.tick();
+            this.interval = setInterval(() => this.tick(), 1000);
+            return;
+          }
+        }
+
+        [this.days, this.hours, this.minutes, this.seconds].forEach((element) => {
+          if (element) element.textContent = '00';
+        });
+
+        this.classList.add('countdown--ready');
+
+        if (this.expired) {
+          this.expired.hidden = false;
+          if (this.clock) this.clock.hidden = true;
+        }
+      }
+
+      pad(value) {
+        return String(Math.max(0, value)).padStart(2, '0');
+      }
+    });
+  }
+</script>
+
+{% schema %}
+{
+  "name": "Countdown timer",
+  "class": "shopify-section--countdown-timer",
+  "tag": "section",
+  "disabled_on": {
+    "groups": [
+      "footer"
+    ]
+  },
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "label": "Full width",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Layout",
+      "options": [
+        {
+          "value": "stacked",
+          "label": "Stacked"
+        },
+        {
+          "value": "inline",
+          "label": "Side by side"
+        },
+        {
+          "value": "bar",
+          "label": "Compact bar"
+        }
+      ],
+      "default": "inline"
+    },
+    {
+      "type": "checkbox",
+      "id": "sticky",
+      "label": "Stay visible when scrolling",
+      "info": "For a bar at the very top of the page. The sticky header stays right under it.",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Countdown"
+    },
+    {
+      "type": "select",
+      "id": "countdown_mode",
+      "label": "Countdown type",
+      "options": [
+        {
+          "value": "fixed",
+          "label": "Fixed end date"
+        },
+        {
+          "value": "daily",
+          "label": "Resets every day"
+        },
+        {
+          "value": "evergreen",
+          "label": "Per visitor"
+        }
+      ],
+      "default": "fixed",
+      "info": "\"Per visitor\" starts a fresh timer the first time each visitor sees this section."
+    },
+    {
+      "type": "text",
+      "id": "end_date",
+      "label": "End date",
+      "default": "2026-12-31",
+      "info": "Format YYYY-MM-DD. Used with \"Fixed end date\"."
+    },
+    {
+      "type": "text",
+      "id": "end_time",
+      "label": "End time",
+      "default": "23:59",
+      "info": "Format HH:MM, in your store's timezone."
+    },
+    {
+      "type": "range",
+      "id": "daily_reset_hour",
+      "label": "Daily reset hour",
+      "min": 0,
+      "max": 23,
+      "step": 1,
+      "default": 0,
+      "info": "Used with \"Resets every day\"."
+    },
+    {
+      "type": "range",
+      "id": "evergreen_minutes",
+      "label": "Minutes per visitor",
+      "min": 10,
+      "max": 720,
+      "step": 10,
+      "default": 30,
+      "unit": "min",
+      "info": "Used with \"Per visitor\". 420 = 7 hours."
+    },
+    {
+      "type": "select",
+      "id": "evergreen_scope",
+      "label": "Countdown restarts",
+      "options": [
+        {
+          "value": "visitor",
+          "label": "Once per device"
+        },
+        {
+          "value": "session",
+          "label": "On every new visit"
+        }
+      ],
+      "default": "visitor",
+      "info": "A countdown that restarts is not a real deadline. Say only what you can stand behind."
+    },
+    {
+      "type": "select",
+      "id": "on_expiry",
+      "label": "When the countdown ends",
+      "options": [
+        {
+          "value": "message",
+          "label": "Show a message"
+        },
+        {
+          "value": "restart",
+          "label": "Restart the countdown"
+        },
+        {
+          "value": "hide",
+          "label": "Hide the section"
+        }
+      ],
+      "default": "restart"
+    },
+    {
+      "type": "text",
+      "id": "expired_text",
+      "label": "Expired message",
+      "default": "This offer has ended."
+    },
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Limited time"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Sale ends soon"
+    },
+    {
+      "type": "select",
+      "id": "heading_tag",
+      "label": "Heading tag",
+      "options": [
+        {
+          "value": "h2",
+          "label": "h2"
+        },
+        {
+          "value": "h3",
+          "label": "h3"
+        },
+        {
+          "value": "h4",
+          "label": "h4"
+        },
+        {
+          "value": "p",
+          "label": "p"
+        }
+      ],
+      "default": "h2"
+    },
+    {
+      "type": "richtext",
+      "id": "content",
+      "label": "Text"
+    },
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Button label"
+    },
+    {
+      "type": "url",
+      "id": "button_url",
+      "label": "Button link"
+    },
+    {
+      "type": "header",
+      "content": "Clock"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_days",
+      "label": "Show days",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "pulse",
+      "label": "Pulse animation",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "label_days",
+      "label": "Days label",
+      "default": "Days"
+    },
+    {
+      "type": "text",
+      "id": "label_hours",
+      "label": "Hours label",
+      "default": "Hours"
+    },
+    {
+      "type": "text",
+      "id": "label_minutes",
+      "label": "Minutes label",
+      "default": "Mins"
+    },
+    {
+      "type": "text",
+      "id": "label_seconds",
+      "label": "Seconds label",
+      "default": "Secs"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "background",
+      "label": "Background"
+    },
+    {
+      "type": "color_background",
+      "id": "background_gradient",
+      "label": "Background gradient"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text"
+    },
+    {
+      "type": "color",
+      "id": "digit_background",
+      "label": "Digit background",
+      "default": "#111111"
+    },
+    {
+      "type": "color",
+      "id": "digit_text_color",
+      "label": "Digit text",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "digit_radius",
+      "label": "Digit corner radius",
+      "min": 0,
+      "max": 30,
+      "step": 2,
+      "default": 12,
+      "unit": "px"
+    },
+    {
+      "type": "color",
+      "id": "button_background",
+      "label": "Button background"
+    },
+    {
+      "type": "color",
+      "id": "button_text_color",
+      "label": "Button text"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "spacing_block_start",
+      "label": "Top spacing",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "default": 28,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "spacing_block_end",
+      "label": "Bottom spacing",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "default": 28,
+      "unit": "px"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Countdown timer"
+    }
+  ]
+}
+{% endschema %}

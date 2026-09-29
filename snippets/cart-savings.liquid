@@ -1,0 +1,47 @@
+{%- comment -%}
+----------------------------------------------------------------------------------------------------------------------
+CART SAVINGS
+----------------------------------------------------------------------------------------------------------------------
+
+Green row with the money saved on the whole cart: for each line, its struck price minus what the customer pays (the
+same amount as the green badge of the line, see "line-item"), plus the order discounts. Renders nothing without saving.
+
+********************************************
+Supported variables
+********************************************
+
+* include_compare_at: count the compare at prices, like the lines do when they receive show_compare_at
+{%- endcomment -%}
+
+{%- liquid
+  assign cs_total = 0
+
+  for line_item in cart.items
+    assign cs_reference = line_item.original_line_price
+
+    if include_compare_at and line_item.variant.compare_at_price > line_item.variant.price
+      assign cs_compare = line_item.variant.compare_at_price | times: line_item.quantity
+
+      if cs_compare > cs_reference
+        assign cs_reference = cs_compare
+      endif
+    endif
+
+    assign cs_total = cs_total | plus: cs_reference | minus: line_item.final_line_price
+  endfor
+
+  for discount_application in cart.cart_level_discount_applications
+    assign cs_total = cs_total | plus: discount_application.total_allocated_amount
+  endfor
+-%}
+
+{%- if cs_total > 0 -%}
+  <p class="cart-savings">
+    <span class="cart-savings__label">
+      {%- render 'icon' with 'discount', width: 15, height: 14 -%}
+      {{- 'cart.general.total_savings' | t -}}
+    </span>
+
+    <span class="cart-savings__amount">{{ cs_total | money }}</span>
+  </p>
+{%- endif -%}

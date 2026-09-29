@@ -1,0 +1,169 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "type": "custom.overlay",
+  "name": "Overlay group",
+  "sections": {
+    "newsletter-popup": {
+      "type": "newsletter-popup",
+      "disabled": true,
+      "settings": {
+        "apparition_delay": 8,
+        "show_only_on_index": false,
+        "show_only_for_visitors": true,
+        "show_only_once": true,
+        "title": "10% off your first jersey",
+        "button_text": "Send my code",
+        "subtext": "Restock alerts and new drops. One email a week, unsubscribe any time."
+      }
+    },
+    "privacy-banner": {
+      "type": "privacy-banner",
+      "disabled": true,
+      "settings": {
+        "privacy_bar_title": "Cookie policy",
+        "privacy_bar_content": "<p>We use cookies and similar technologies to provide the best experience on our website. Refer to our Privacy Policy for more information.</p>"
+      }
+    },
+    "cart-drawer": {
+      "type": "cart-drawer",
+      "blocks": {
+        "timer_urgency": {
+          "type": "timer",
+          "settings": {
+            "minutes": 10,
+            "text": "Your cart is reserved for [time]",
+            "background": "#000000",
+            "text_color": "#ffffff",
+            "icon": "picto-timer",
+            "emoji": "",
+            "border_color": "",
+            "radius": 12,
+            "full_width": true
+          }
+        },
+        "offer_gauge": {
+          "type": "offer_gauge",
+          "settings": {
+            "collection": "all-jerseys",
+            "buy_quantity": 3,
+            "free_quantity": "1",
+            "text_progress": "Add [count] more jerseys to get [free] FREE",
+            "text_last": "Just 1 more jersey to get [free] FREE!",
+            "text_unlocked": "You've unlocked [free] FREE jersey!",
+            "free_label": "Free",
+            "fill_color": "",
+            "accent_color": "#ffd014",
+            "show_shipping": true,
+            "shipping_text": "Free shipping unlocked",
+            "shipping_icon": "picto-truck"
+          }
+        },
+        "progress_goals": {
+          "type": "progress_goals",
+          "disabled": true,
+          "settings": {
+            "goal1_amount": 79,
+            "goal1_text_unreached": "You are [amount] away from free shipping",
+            "goal1_icon": "picto-truck",
+            "goal1_emoji": "",
+            "goal2_enabled": false,
+            "goal2_amount": 129,
+            "goal2_text_unreached": "Add [amount] more to unlock a free gift",
+            "goal2_icon": "picto-gift",
+            "goal2_emoji": "",
+            "text_all_reached": "Congratulations! You've unlocked free shipping",
+            "free_shipping_unlocked": true,
+            "unlocked_text": "Congratulations! You've unlocked free shipping",
+            "unlocked_icon": "picto-truck"
+          }
+        },
+        "social_proof": {
+          "type": "social_proof",
+          "settings": {
+            "position": "header",
+            "style": "stars",
+            "rating": 5,
+            "stars_color": "#0da558",
+            "layout": "stacked",
+            "icon": "rating-star",
+            "text": "Rated 4.8/5 by 2,400+ fans",
+            "background": "",
+            "text_color": "",
+            "border_color": "",
+            "radius": 12
+          }
+        },
+        "guarantee": {
+          "type": "guarantee",
+          "settings": {
+            "style": "compact",
+            "icon": "picto-return",
+            "title": "30-day free returns",
+            "text": "Wrong size? Swap it free, no questions asked.",
+            "alignment": "left",
+            "background": "",
+            "text_color": "",
+            "icon_color": "#12866a",
+            "border_color": "",
+            "radius": 12
+          }
+        },
+        "payment_icons": {
+          "type": "payment_icons",
+          "settings": {
+            "title": "100% secure payment",
+            "icons_source": "custom",
+            "icons_list": "visa, master, american_express, discover, paypal, apple_pay, google_pay, shopify_pay, venmo, klarna, afterpay"
+          }
+        }
+      },
+      "block_order": [
+        "timer_urgency",
+        "offer_gauge",
+        "progress_goals",
+        "social_proof",
+        "guarantee",
+        "payment_icons"
+      ],
+      "custom_css": [
+        "p.ba-checkout-note {display: none;}"
+      ],
+      "settings": {
+        "show_cart_note": false,
+        "show_shipping_text": false,
+        "show_view_cart_button": true,
+        "show_checkout_button": true,
+        "show_savings": true,
+        "savings_include_compare_at": true,
+        "recommendations_title": "Complete the fit",
+        "products": [],
+        "product_card_background": "#f2f2f2",
+        "product_card_text_color": ""
+      }
+    },
+    "search-drawer": {
+      "type": "search-drawer",
+      "disabled": true,
+      "settings": {
+        "full_width": false,
+        "show_article_category": true,
+        "search_menu": "",
+        "search_menu_show_title": true
+      }
+    }
+  },
+  "order": [
+    "newsletter-popup",
+    "privacy-banner",
+    "cart-drawer",
+    "search-drawer"
+  ]
+}

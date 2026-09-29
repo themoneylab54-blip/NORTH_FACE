@@ -1,0 +1,488 @@
+{%- render 'section-spacing-collapsing' -%}
+
+{%- comment -%}
+----------------------------------------------------------------------------------------------------------------------
+FAQ
+----------------------------------------------------------------------------------------------------------------------
+
+Two layouts live side by side, driven by the "layout" setting:
+
+* current (default): the historical rendering (intro + support block beside or above an accordion box).
+* centered_column: centred heading, then a single centred column (max 600px) of accordions with a "+" glyph that
+  turns into "–" when open, 1px separators, no card background and a smaller, softer answer text.
+
+"show_support" (default true) toggles the team avatar / support hours / answer time / contact button block.
+{%- endcomment -%}
+
+{%- liquid
+  assign layout = section.settings.layout | default: 'current'
+  assign show_support = true
+  if section.settings.show_support == false
+    assign show_support = false
+  endif
+  assign text_position = section.settings.text_position
+
+  if layout == 'centered_column'
+    assign text_position = 'center'
+  endif
+-%}
+
+<style>
+  #shopify-section-{{ section.id }} {
+    --section-stack-intro: {% if text_position == 'center' %}60%{% else %}50%{% endif %};
+    --section-stack-main: {% if text_position == 'center' %}60%{% else %}50%{% endif %};
+  }
+
+  {%- if layout == 'centered_column' -%}
+    #shopify-section-{{ section.id }} {
+      --section-stack-intro: 100%;
+      --section-stack-main: 100%;
+      --faq-column-max-width: {{ section.settings.column_max_width | default: 600 }}px;
+      --faq-separator-color: #E5E5E5;
+      --faq-question-color: {% if section.settings.accordion_text_color != blank and section.settings.accordion_text_color.alpha != 0 %}{{ section.settings.accordion_text_color }}{% else %}#121212{% endif %};
+      --faq-answer-color: #4B4B4B;
+    }
+
+    /* Heading: centred, 19px / 700 / uppercase, tight tracking */
+    #shopify-section-{{ section.id }} .section-stack__intro .h2 {
+      font-size: 1.1875rem;
+      font-weight: 700;
+      line-height: 1.3;
+      text-transform: uppercase;
+      letter-spacing: -0.02em;
+    }
+
+    #shopify-section-{{ section.id }} .section-stack__intro,
+    #shopify-section-{{ section.id }} .faq-column {
+      width: 100%;
+      max-width: var(--faq-column-max-width);
+      margin-inline: auto;
+    }
+
+    /* Column: no card background, no inner padding, plain separators */
+    #shopify-section-{{ section.id }} .faq-column {
+      padding: 0;
+    }
+
+    #shopify-section-{{ section.id }} .faq-column .accordion {
+      --accordion-spacing: var(--spacing-4);
+      border-color: var(--faq-separator-color);
+      border-block-start-width: 1px;
+      border-block-end-width: 0;
+    }
+
+    #shopify-section-{{ section.id }} .faq-column .accordion:last-child {
+      border-block-end-width: 1px;
+    }
+
+    /* Question: full-width button, 16px, regular weight (overrides the snippet's .bold), page text colour */
+    #shopify-section-{{ section.id }} .faq-column .accordion__toggle {
+      font-size: 1rem;
+      font-weight: 400;
+      line-height: 1.4;
+      color: var(--faq-question-color);
+      text-align: start;
+    }
+
+    /* "+" glyph on the right that becomes "–" when open (replaces the circle chevron) */
+    #shopify-section-{{ section.id }} .faq-column .circle-chevron {
+      width: auto;
+      height: auto;
+      min-width: 1rem;
+      background: transparent;
+      color: var(--faq-question-color);
+      transform: none;
+      transition: none;
+      font-size: 1.25rem;
+      font-weight: 400;
+      line-height: 1;
+    }
+
+    #shopify-section-{{ section.id }} .faq-column .circle-chevron svg {
+      display: none;
+    }
+
+    #shopify-section-{{ section.id }} .faq-column .circle-chevron::before {
+      content: "+";
+    }
+
+    #shopify-section-{{ section.id }} .faq-column .group[aria-expanded="true"] .circle-chevron {
+      background: transparent;
+      color: var(--faq-question-color);
+      transform: none;
+    }
+
+    #shopify-section-{{ section.id }} .faq-column .group[aria-expanded="true"] .circle-chevron::before {
+      content: "\2013";
+    }
+
+    @media screen and (pointer: fine) {
+      #shopify-section-{{ section.id }} .faq-column .group:hover .circle-chevron {
+        background: transparent;
+        color: var(--faq-question-color);
+      }
+    }
+
+    /* Answer: 14px, softer colour */
+    #shopify-section-{{ section.id }} .faq-column .accordion__content {
+      padding-inline-end: 0;
+    }
+
+    #shopify-section-{{ section.id }} .faq-column .accordion__content .prose {
+      font-size: 0.875rem;
+      line-height: 1.6;
+      color: var(--faq-answer-color);
+    }
+
+    /* Support block (when shown) sits centred under the column */
+    #shopify-section-{{ section.id }} .faq-availability {
+      justify-items: center;
+      text-align: center;
+    }
+  {%- endif -%}
+</style>
+
+<div {% render 'section-properties' %}>
+  <div class="section-stack {% if text_position != 'center' %}section-stack--horizontal{% else %}section-stack--center{% endif %} {% if text_position == 'end' %}section-stack--reverse{% endif %}">
+    {%- capture content -%}
+      {%- if section.settings.subheading != blank -%}
+        <p class="subheading">{{ section.settings.subheading | escape }}</p>
+      {%- endif -%}
+
+      {%- if section.settings.title != blank -%}
+        <h2 class="h2">
+          {%- render 'styled-text', content: section.settings.title, text_color: section.settings.heading_color, gradient: section.settings.heading_gradient -%}
+        </h2>
+      {%- endif -%}
+
+      {{- section.settings.content -}}
+    {%- endcapture -%}
+
+    {%- capture subcontent -%}
+      {%- if show_support -%}
+      <div class="faq-availability">
+        {%- if section.settings.team_avatar != blank or section.settings.support_hours != blank or section.settings.answer_time != blank -%}
+          <div class="v-stack gap-4">
+            {%- if section.settings.team_avatar != blank -%}
+              {%- capture sizes -%}{{ section.settings.team_avatar_width }}px{%- endcapture -%}
+              {%- capture widths -%}{{ section.settings.team_avatar_width }}, {{ section.settings.team_avatar_width | times: 2 | at_most: section.settings.team_avatar.width }}{%- endcapture -%}
+              {%- capture style -%}max-width: {{ section.settings.team_avatar_width }}px{%- endcapture -%}
+              {{- section.settings.team_avatar | image_url: width: section.settings.team_avatar.width | image_tag: style: style, sizes: sizes, widths: widths -}}
+            {%- endif -%}
+
+            {%- if section.settings.support_hours != blank or section.settings.answer_time != blank -%}
+              <div class="v-stack">
+                {{- section.settings.support_hours -}}
+
+                {%- if section.settings.answer_time != blank -%}
+                  <span class="text-subdued">{{ section.settings.answer_time }}</span>
+                {%- endif -%}
+              </div>
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+
+        {%- if section.settings.button_text != blank -%}
+          {% render 'button', content: section.settings.button_text, href: section.settings.button_url, size: 'xl', background: section.settings.button_background, text_color: section.settings.button_text_color %}
+        {%- endif -%}
+      </div>
+      {%- endif -%}
+    {%- endcapture -%}
+
+    {%- if content != blank or subcontent != blank -%}
+      <div class="section-stack__intro">
+        <div class="v-stack gap-10">
+          {%- if content != blank -%}
+            <div class="prose {% if text_position == 'center' %}text-center{% endif %}">
+              {{- content -}}
+            </div>
+          {%- endif -%}
+
+          {%- if text_position != 'center' and subcontent != blank -%}
+            <div class="hidden lg:block">
+              {{- subcontent -}}
+            </div>
+          {%- endif -%}
+        </div>
+      </div>
+    {%- endif -%}
+
+    {%- if section.blocks.size > 0 -%}
+      <div class="section-stack__main" >
+        {%- if layout == 'centered_column' -%}
+          <div {% render 'surface', class: 'faq-column', background: section.settings.accordion_background, text_color: section.settings.accordion_text_color, background_fallback: '' %}>
+        {%- else -%}
+          <div {% render 'surface', class: 'accordion-box rounded', background: section.settings.accordion_background, text_color: section.settings.accordion_text_color, background_fallback: 'bg-secondary' %}>
+        {%- endif -%}
+          {%- for block in section.blocks -%}
+            {%- if block.settings.title != blank and block.settings.content != blank -%}
+              {%- capture accordion_content -%}
+                <div class="prose">{{ block.settings.content }}</div>
+              {%- endcapture -%}
+
+              {%- render 'accordion', title: block.settings.title, content: accordion_content, block: block -%}
+            {%- endif -%}
+          {%- endfor -%}
+        </div>
+      </div>
+    {%- endif -%}
+
+    {%- if subcontent != blank -%}
+      <div {% if text_position != 'center' %}class="lg:hidden"{% endif %}>
+        {{- subcontent -}}
+      </div>
+    {%- endif -%}
+  </div>
+</div>
+
+{%- comment -%}On the FAQ page, we also output the content with JSON microdata for SEO{%- endcomment -%}
+
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {%- for block in section.blocks -%}
+        {
+          "@type": "Question",
+          "name": {{ block.settings.title | json }},
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": {{ block.settings.content | json }}
+          }
+        }{% unless forloop.last %},{% endunless %}
+      {%- endfor -%}
+    ]
+  }
+</script>
+
+{% schema %}
+{
+  "name": "FAQ",
+  "class": "shopify-section--faq",
+  "tag": "section",
+  "disabled_on": {
+    "groups": ["header", "custom.overlay"]
+  },
+  "blocks": [
+    {
+      "name": "Item",
+      "type": "item",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Question",
+          "default": "Question"
+        },
+        {
+          "type": "richtext",
+          "id": "content",
+          "label": "Answer",
+          "default": "<p>Write content to answer to common questions your customers may have about your products, shipping policies..</p>"
+        }
+      ]
+    }
+  ],
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Structured data is automatically created on FAQ page to improve SEO. [Learn more](https://developers.google.com/search/docs/advanced/structured-data/faqpage)"
+    },
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "label": "Full width",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Layout",
+      "options": [
+        {
+          "value": "current",
+          "label": "Classic (intro beside accordion box)"
+        },
+        {
+          "value": "centered_column",
+          "label": "Centered column (+ / – accordions)"
+        }
+      ],
+      "default": "current",
+      "info": "The centered column always centers the heading and ignores the text position setting."
+    },
+    {
+      "type": "range",
+      "id": "column_max_width",
+      "min": 400,
+      "max": 1000,
+      "step": 20,
+      "unit": "px",
+      "label": "Column max width",
+      "info": "Centered column layout only.",
+      "default": 600
+    },
+    {
+      "type": "checkbox",
+      "id": "show_support",
+      "label": "Show support block",
+      "info": "Team avatar, support hours, answer time and contact button.",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "FAQ"
+    },
+    {
+      "type": "richtext",
+      "id": "content",
+      "label": "Content",
+      "default": "<p>Use this text to share information about your product or shipping policies.</p>"
+    },
+    {
+      "type": "image_picker",
+      "id": "team_avatar",
+      "label": "Team avatar",
+      "info": "700 x 160px .jpg recommended"
+    },
+    {
+      "type": "range",
+      "id": "team_avatar_width",
+      "min": 50,
+      "max": 350,
+      "step": 10,
+      "unit": "px",
+      "label": "Team avatar width",
+      "default": 160
+    },
+    {
+      "type": "text",
+      "id": "support_hours",
+      "label": "Support operating hours",
+      "default": "Our customer support is available Monday to Friday: 8am-8:30pm."
+    },
+    {
+      "type": "text",
+      "id": "answer_time",
+      "label": "Average answer time",
+      "default": "Average answer time: 24h"
+    },
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Button text"
+    },
+    {
+      "type": "url",
+      "id": "button_url",
+      "label": "Button link"
+    },
+    {
+      "type": "select",
+      "id": "text_position",
+      "label": "Text position",
+      "options": [
+        {
+          "value": "start",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "end",
+          "label": "Right"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "header",
+      "content": "Colors",
+      "info": "Gradient replaces solid colors when set."
+    },
+    {
+      "type": "color",
+      "id": "background",
+      "label": "Background"
+    },
+    {
+      "type": "color_background",
+      "id": "background_gradient",
+      "label": "Background gradient"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading color"
+    },
+    {
+      "type": "color_background",
+      "id": "heading_gradient",
+      "label": "Heading gradient"
+    },
+    {
+      "type": "color",
+      "id": "button_background",
+      "label": "Button background"
+    },
+    {
+      "type": "color",
+      "id": "button_text_color",
+      "label": "Button text"
+    },
+    {
+      "type": "color",
+      "id": "accordion_background",
+      "label": "Accordion background"
+    },
+    {
+      "type": "color",
+      "id": "accordion_text_color",
+      "label": "Accordion text"
+    }
+  ],
+  "presets": [
+    {
+      "name": "FAQ",
+      "blocks": [
+        {
+          "type": "item",
+          "settings": {
+            "title": "Do you ship overseas?",
+            "content": "<p>Yes, we ship all over the world. Shipping costs will apply, and will be added at checkout. We run discounts and promotions all year, so stay tuned for exclusive deals.</p>"
+          }
+        },
+        {
+          "type": "item",
+          "settings": {
+            "title": "How long will it take to get my orders?",
+            "content": "<p>It depends on where you are. Orders processed here will take 5-7 business days to arrive. Overseas deliveries can take anywhere from 7-16 days. Delivery details will be provided in your confirmation email.</p>"
+          }
+        },
+        {
+          "type": "item",
+          "settings": {
+            "title": "Any question?",
+            "content": "<p>You can contact us through our contact page! We will be happy to assist you.</p>"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

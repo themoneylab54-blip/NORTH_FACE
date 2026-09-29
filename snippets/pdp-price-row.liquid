@@ -1,0 +1,116 @@
+{%- comment -%}
+----------------------------------------------------------------------------------------------------------------------
+PDP PRICE ROW (block type "pdp_price_row")
+----------------------------------------------------------------------------------------------------------------------
+
+Buy-box item 3. One inline row, in this exact order:
+  1. compare-at price (struck, 14px 500, #737373 at 50% opacity) — only when the variant is on sale
+  2. current price (23px 700, text colour #121212)
+  3. discount badge "-N%" (red #F04242 background, white text, 10.5px 700, radius 3px, padding 2px 6px)
+If the variant has no compare-at price (or compare-at <= price): current price only, no badge.
+
+Fully Liquid-driven: <product-rerender> re-renders this column on variant change, so no JS is needed.
+
+Accepted variables:
+* block: the section block (settings: show_badge, badge_background, badge_text_color)
+* product: the product
+* product_form_id: id of the main product form (unused here, no inputs)
+* section: the current section
+{%- endcomment -%}
+
+{%- liquid
+  assign pr_variant = product.selected_or_first_available_variant
+  assign pr_on_sale = false
+  assign pr_discount = 0
+
+  if pr_variant != nil and pr_variant.compare_at_price > pr_variant.price and pr_variant.compare_at_price > 0
+    assign pr_on_sale = true
+    assign pr_discount = pr_variant.compare_at_price | minus: pr_variant.price | times: 100.0 | divided_by: pr_variant.compare_at_price | round
+  endif
+
+  assign pr_show_badge = true
+  if block.settings.show_badge == false
+    assign pr_show_badge = false
+  endif
+
+  assign pr_badge_bg = block.settings.badge_background | default: '#f04242'
+  assign pr_badge_color = block.settings.badge_text_color | default: '#ffffff'
+-%}
+
+{%- if pr_variant != nil -%}
+  <style>
+    .pdp-price-row-{{ block.id }} {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 8px;
+      font-family: Inter, -apple-system, "Segoe UI", sans-serif;
+      color: #121212;
+      line-height: 1.2;
+    }
+
+    .pdp-price-row-{{ block.id }} .pdp-price-row__compare {
+      font-size: 14px;
+      font-weight: 500;
+      color: rgba(115, 115, 115, .5);
+      text-decoration: line-through;
+      text-decoration-thickness: 1px;
+    }
+
+    .pdp-price-row-{{ block.id }} .pdp-price-row__price {
+      font-size: 23px;
+      font-weight: 700;
+      letter-spacing: -0.2px;
+      color: #121212;
+    }
+
+    .pdp-price-row-{{ block.id }} .pdp-price-row__badge {
+      display: inline-flex;
+      align-items: center;
+      align-self: center;
+      padding: 2px 6px;
+      border-radius: 3px;
+      background: {{ pr_badge_bg }};
+      color: {{ pr_badge_color }};
+      font-size: 10.5px;
+      font-weight: 700;
+      line-height: 1.3;
+      letter-spacing: 0;
+      white-space: nowrap;
+    }
+  </style>
+
+  <div class="pdp-price-row pdp-price-row-{{ block.id }}"
+    {%- comment -%}
+      theme.js only re-renders blocks whose data-block-type is in its allowlist
+      (sku, badges, price, …). This block replaces the native price block, so it
+      borrows the "price" type to be swapped on every variant change.
+    {%- endcomment -%}
+    data-block-type="price"
+    data-block-id="{{ block.id }}"
+    {{ block.shopify_attributes }}>
+    {%- if pr_on_sale -%}
+      <s class="pdp-price-row__compare">
+        <span class="sr-only">{{ 'product.price.regular_price' | t }}</span>
+        {%- if settings.currency_code_enabled -%}
+          {{- pr_variant.compare_at_price | money_with_currency -}}
+        {%- else -%}
+          {{- pr_variant.compare_at_price | money -}}
+        {%- endif -%}
+      </s>
+    {%- endif -%}
+
+    <span class="pdp-price-row__price">
+      <span class="sr-only">{{ 'product.price.sale_price' | t }}</span>
+      {%- if settings.currency_code_enabled -%}
+        {{- pr_variant.price | money_with_currency -}}
+      {%- else -%}
+        {{- pr_variant.price | money -}}
+      {%- endif -%}
+    </span>
+
+    {%- if pr_on_sale and pr_show_badge and pr_discount > 0 -%}
+      <span class="pdp-price-row__badge" aria-label="{{ pr_discount }}% off">-{{ pr_discount }}%</span>
+    {%- endif -%}
+  </div>
+{%- endif -%}

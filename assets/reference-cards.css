@@ -1,0 +1,101 @@
+/* Product cards aligned to the reference storefront: 10px radius, soft shadow,
+   top-right corner badges, 14px/600 titles, 18px/700 prices, round quick-buy. */
+
+.product-card {
+  border-radius: 10px;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, .08);
+  background: #ffffff;
+}
+
+@media screen and (max-width: 699px) {
+  .product-card {
+    border-radius: 8px;
+  }
+}
+
+.product-card .product-card__figure {
+  border-radius: 10px 10px 0 0;
+  overflow: hidden;
+}
+
+/* Badges sit flush in the top-right corner, bottom-left corner rounded 8px */
+.product-card .product-card__badge-list {
+  top: 0;
+  right: 0;
+  left: auto;
+  gap: 4px;
+  justify-items: end;
+}
+
+.product-card .badge {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  padding: 4px 8px;
+  border-radius: 0 0 0 8px;
+}
+
+.product-card .badge--new {
+  --badge-background: 17 17 17;
+  --badge-color: 243 216 148;
+}
+
+.product-card .badge--on-sale {
+  --badge-background: 240 66 66;
+  --badge-color: 255 255 255;
+}
+
+.product-card .badge--primary {
+  --badge-background: 192 57 43;
+  --badge-color: 255 255 255;
+}
+
+.product-card .badge--sold-out {
+  --badge-background: 17 17 17;
+  --badge-color: 255 255 255;
+}
+
+/* Info block */
+.product-card .product-card__info {
+  padding: 12px 12px 14px;
+  gap: 4px;
+}
+
+.product-card .product-card__title a {
+  font-size: 14px;
+  font-weight: 600;
+  color: #121212;
+  line-height: 1.35;
+}
+
+.product-card .price-list {
+  font-size: 18px;
+  font-weight: 700;
+  color: #121212;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.product-card .price-list .line-through,
+.product-card .price-list [class*="compare"] {
+  font-size: 13px;
+  font-weight: 500;
+  color: #808080;
+}
+
+/* Round white quick-buy button with a dark icon, bottom-right of the image */
+.product-card .product-card__mobile-quick-buy-button {
+  width: 36px;
+  height: 36px;
+  background: #ffffff;
+  color: #121212;
+  border: 1px solid #f0f0f0;
+  border-radius: 9999px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, .12);
+}
+
+/* The reference keeps the current price black even when on sale; only the badge is red */
+.product-card .price-list .text-on-sale {
+  color: #121212;
+}

@@ -1,0 +1,48 @@
+{%- comment -%}
+----------------------------------------------------------------------------------------------------------------------
+PAYMENT ICON LIST
+----------------------------------------------------------------------------------------------------------------------
+
+Prints payment-method logos with Shopify's own artwork (payment_type_svg_tag).
+
+********************************************
+Supported variables
+********************************************
+
+* source: "custom" (default) prints the names given in "list"; "store" prints the methods enabled in the Shopify
+  payment settings (shop.enabled_payment_types).
+* list: comma-separated Shopify payment type names, e.g. "visa, master, american_express, paypal". Empty falls back
+  to the most used methods in the United States.
+* icon_class: class added to every <svg>.
+* wrapper: optional tag name (e.g. "li") wrapped around every icon.
+* wrapper_class: optional class of that wrapper tag.
+
+A name Shopify has no artwork for renders nothing, so a typo never shows an error on the storefront.
+{%- endcomment -%}
+
+{%- liquid
+  assign pil_default = 'visa,master,american_express,discover,paypal,apple_pay,google_pay,shopify_pay,venmo,klarna,afterpay'
+
+  if source == 'store'
+    assign pil_types = shop.enabled_payment_types
+  else
+    assign pil_list = list | default: pil_default | downcase | remove: ' '
+    assign pil_types = pil_list | split: ','
+  endif
+-%}
+
+{%- for pil_type in pil_types -%}
+  {%- if pil_type == blank -%}
+    {%- continue -%}
+  {%- endif -%}
+
+  {%- capture pil_svg -%}{{ pil_type | payment_type_svg_tag: class: icon_class }}{%- endcapture -%}
+
+  {%- if pil_svg contains '<svg' -%}
+    {%- if wrapper != blank -%}
+      <{{ wrapper }}{% if wrapper_class != blank %} class="{{ wrapper_class }}"{% endif %}>{{ pil_svg }}</{{ wrapper }}>
+    {%- else -%}
+      {{- pil_svg -}}
+    {%- endif -%}
+  {%- endif -%}
+{%- endfor -%}

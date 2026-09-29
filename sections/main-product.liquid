@@ -1,0 +1,4430 @@
+{%- render 'section-spacing-collapsing' -%}
+
+<style>
+  #shopify-section-{{ section.id }} {
+    --product-grid: auto / minmax(0, 1fr);
+    --product-gallery-media-list-grid: auto / auto-flow {% if section.settings.mobile_carousel_control == 'free_scroll' %}{% if section.settings.mobile_media_size == 'expanded' %}84vw{% else %}73vw{% endif %}{% else %}100%{% endif %};
+    --product-gallery-media-list-gap: {% if section.settings.mobile_media_size == 'expanded' %}var(--spacing-0-5){% else %}var(--grid-gutter){% endif %};
+  }
+
+  @media screen and (max-width: 999px) {
+    #shopify-section-{{ section.id }} {
+      --section-spacing-block-start: {% if section.settings.mobile_media_size == 'expanded' %}0px{% else %}var(--container-gutter){% endif %};
+    }
+  }
+
+  @media screen and (min-width: 1000px) {
+    #shopify-section-{{ section.id }} {
+      {%- assign media_ratio = section.settings.desktop_media_width | divided_by: 50.0 -%}
+      --product-grid: auto / minmax(0, {{ media_ratio }}fr) minmax(0, {{ 2.0 | minus: media_ratio }}fr);
+      --product-gallery-media-list-grid: {% if section.settings.desktop_media_layout contains 'grid' %}auto-flow dense / repeat({% if section.settings.desktop_media_layout == 'grid_one' %}1{% else %}2{% endif %}, minmax(0, 1fr)){% else %}auto / auto-flow 100%{% endif %};
+      --product-gallery-media-list-gap: calc(var(--grid-gutter) / 2);
+    }
+
+    {%- if section.settings.desktop_media_layout == 'grid_highlight' -%}
+      #shopify-section-{{ section.id }} .product-gallery__media-list > :not([hidden]) {
+        grid-column: span 2;
+      }
+
+      #shopify-section-{{ section.id }} .product-gallery__media-list > :not([hidden]) ~ *:not(.product-gallery__media--expand) {
+        grid-column: span 1;
+      }
+    {%- endif -%}
+  }
+
+  @media screen and (min-width: 1400px) {
+    #shopify-section-{{ section.id }} {
+      --product-gallery-media-list-gap: var(--grid-gutter);
+    }
+  }
+
+  #shopify-section-{{ section.id }} .product__gallery-column {
+    display: grid;
+    align-content: start;
+    gap: var(--spacing-6);
+    min-width: 0;
+  }
+</style>
+
+{%- capture product_form_id -%}product-form-{{ product.id }}-{{ section.id }}{%- endcapture -%}
+
+<div {% render 'section-properties', tight: true %}>
+  <product-rerender id="product-info-{{ product.id }}-{{ section.id }}" observe-form="{{ product_form_id }}" allow-partial-rerender>
+    <div class="product">
+      {%- comment -%}
+        Left column: the gallery, then any block whose place is under it (the reference
+        puts its review list there rather than in the buy box).
+      {%- endcomment -%}
+      <div class="product__gallery-column">
+        {%- if product.media.size > 0 -%}
+          {%- render 'product-gallery', product: product, product_form_id: product_form_id -%}
+        {%- endif -%}
+
+        {%- for block in section.blocks -%}
+          {%- if block.type == 'pdp_gallery_reviews' -%}
+            {%- render 'pdp-gallery-reviews', block: block, product: product, product_form_id: product_form_id, section: section -%}
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+
+      {%- render 'product-info', 
+        product: product, 
+        update_url: true,
+        product_form_id: product_form_id,
+        context: 'main_product'
+      -%}
+    </div>
+  </product-rerender>
+</div>
+
+{%- assign buy_buttons_block = section.blocks | where: 'type', 'buy_buttons' | first -%}
+
+{%- if section.settings.show_fixed_add_to_cart and product.available and buy_buttons_block != blank -%}
+  <product-rerender id="{{ product_form_id }}-sticky-bar" observe-form="{{ product_form_id }}">
+    {%- if product.selected_or_first_available_variant.available -%}
+      <product-quick-add form="{{ product_form_id }}" class="product-quick-add">
+        {%- assign button_label = 'product.general.add_to_cart_button' | t -%}
+
+        <buy-buttons template="{{ product.template_suffix }}" form="{{ product_form_id }}" class="sm:hidden">
+          {%- render 'button', type: 'submit', content: button_label, form: product_form_id, background: buy_buttons_block.settings.atc_button_background, text_color: buy_buttons_block.settings.atc_button_text_color, secondary: true, stretch: true, size: 'lg' -%}
+        </buy-buttons>
+
+        {%- assign image = product.selected_or_first_available_variant.featured_media | default: product.featured_media -%}
+
+        <div class="product-quick-add__variant {% if image == blank %}no-image{% endif %} hidden sm:grid">
+          {%- if image != blank -%}
+            <variant-media widths="80,160" form="{{ product_form_id }}">
+              {{- image | image_url: width: image.width | image_tag: loading: 'lazy', sizes: '80px', widths: '80,160', class: 'rounded-xs' -}}
+            </variant-media>
+          {%- endif -%}
+
+          <div class="v-stack gap-0.5">
+            {%- assign vendor_block = section.blocks | where: 'type', 'vendor' -%}
+
+            {%- if vendor_block != blank -%}
+              {%- render 'vendor' with product.vendor, class: 'text-xs' -%}
+            {%- endif -%}
+
+            <a href="{{ product.url }}" class="bold truncate-text">{{ product.title }}</a>
+            {%- render 'price-list', product: product, variant: product.selected_or_first_available_variant, form_id: product_form_id -%}
+          </div>
+
+          <buy-buttons template="{{ product.template_suffix }}" form="{{ product_form_id }}" force-secondary-button>
+            {%- render 'button', type: 'submit', content: button_label, form: product_form_id, background: buy_buttons_block.settings.atc_button_background, text_color: buy_buttons_block.settings.atc_button_text_color, secondary: true -%}
+          </buy-buttons>
+        </div>
+      </product-quick-add>
+    {%- endif -%}
+  </product-rerender>
+{%- endif -%}
+
+{%- comment -%}
+IMPLEMENTATION NOTE: Shopify does not currently allows to render a given section within the context of a given product. However,
+when rendering the quick buy popovers, we want to be able to re-use the merchant's choices (such as the selector type). This
+is however only possible by rendering the whole product page, and extracting the relevant part. Here, we therefore render the
+quick buy information in a template, that will be extracted in JS, but ensure it is not visible in the main product page
+{%- endcomment -%}
+
+{%- render 'product-quick-buy', product: product -%}
+
+{% schema %}
+{
+  "name": "Product page",
+  "class": "shopify-section--main-product",
+  "tag": "section",
+  "blocks": [
+    {
+      "type": "@app"
+    },
+    {
+      "type": "vendor",
+      "name": "Vendor",
+      "limit": 1
+    },
+    {
+      "type": "title",
+      "name": "Title",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "select",
+          "id": "heading_tag",
+          "label": "Style",
+          "options": [
+            {
+              "value": "h1",
+              "label": "X-Large"
+            },
+            {
+              "value": "h2",
+              "label": "Large"
+            },
+            {
+              "value": "h3",
+              "label": "Medium"
+            },
+            {
+              "value": "h4",
+              "label": "Small"
+            },
+            {
+              "value": "h5",
+              "label": "X-Small"
+            },
+            {
+              "value": "h6",
+              "label": "XX-Small"
+            }
+          ],
+          "default": "h2"
+        }
+      ]
+    },
+    {
+      "type": "sku",
+      "name": "SKU",
+      "limit": 1
+    },
+    {
+      "type": "badges",
+      "name": "Badges",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "Use metafields to add custom badges. [Learn more](https://support.maestrooo.com/article/75-collection-displaying-custom-label)"
+        }
+      ]
+    },
+    {
+      "type": "price",
+      "name": "Price",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "checkbox",
+          "id": "show_taxes_notice",
+          "label": "Show taxes notice",
+          "default": false
+        }
+      ]
+    },
+    {
+      "type": "payment_terms",
+      "name": "Payment installments",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "To display payment installments, your store needs to support Shop Pay Installments. [Learn more](https://help.shopify.com/en/manual/payments/shop-pay-installments)"
+        }
+      ]
+    },
+    {
+      "type": "rating",
+      "name": "Rating",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "To display a rating, add a product rating app. [Learn more](https://apps.shopify.com/categories/store-design-social-proof-product-reviews)"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_empty",
+          "label": "Show if no reviews",
+          "default": false
+        }
+      ]
+    },
+    {
+      "type": "separator",
+      "name": "Separator"
+    },
+    {
+      "type": "description",
+      "name": "Description",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "options": [
+            {
+              "value": "none",
+              "label": "None"
+            },
+            {
+              "value": "picto-coupon",
+              "label": "Coupon",
+              "group": "Shop"
+            },
+            {
+              "value": "picto-percent",
+              "label": "Percent",
+              "group": "Shop"
+            },
+            {
+              "value": "picto-gift",
+              "label": "Gift",
+              "group": "Shop"
+            },
+            {
+              "value": "picto-star",
+              "label": "Star",
+              "group": "Shop"
+            },
+            {
+              "value": "picto-like",
+              "label": "Like",
+              "group": "Shop"
+            },
+            {
+              "value": "picto-building",
+              "label": "Building",
+              "group": "Shop"
+            },
+            {
+              "value": "picto-love",
+              "label": "Love",
+              "group": "Shop"
+            },
+            {
+              "value": "picto-award-gift",
+              "label": "Award gift",
+              "group": "Shop"
+            },
+            {
+              "value": "picto-happy",
+              "label": "Happy",
+              "group": "Shop"
+            },
+            {
+              "value": "picto-box",
+              "label": "Box",
+              "group": "Shipping"
+            },
+            {
+              "value": "picto-pin",
+              "label": "Pin",
+              "group": "Shipping"
+            },
+            {
+              "value": "picto-timer",
+              "label": "Timer",
+              "group": "Shipping"
+            },
+            {
+              "value": "picto-validation",
+              "label": "Validation",
+              "group": "Shipping"
+            },
+            {
+              "value": "picto-truck",
+              "label": "Truck",
+              "group": "Shipping"
+            },
+            {
+              "value": "picto-return",
+              "label": "Return",
+              "group": "Shipping"
+            },
+            {
+              "value": "picto-earth",
+              "label": "Earth",
+              "group": "Shipping"
+            },
+            {
+              "value": "picto-plane",
+              "label": "Plane",
+              "group": "Shipping"
+            },
+            {
+              "value": "picto-credit-card",
+              "label": "Credit card",
+              "group": "Payment & Security"
+            },
+            {
+              "value": "picto-lock",
+              "label": "Lock",
+              "group": "Payment & Security"
+            },
+            {
+              "value": "picto-shield",
+              "label": "Shield",
+              "group": "Payment & Security"
+            },
+            {
+              "value": "picto-secure-profile",
+              "label": "Secure profile",
+              "group": "Payment & Security"
+            },
+            {
+              "value": "picto-money",
+              "label": "Money",
+              "group": "Payment & Security"
+            },
+            {
+              "value": "picto-recycle",
+              "label": "Recycle",
+              "group": "Ecology"
+            },
+            {
+              "value": "picto-leaf",
+              "label": "Leaf",
+              "group": "Ecology"
+            },
+            {
+              "value": "picto-tree",
+              "label": "Tree",
+              "group": "Ecology"
+            },
+            {
+              "value": "picto-mobile-phone",
+              "label": "Mobile phone",
+              "group": "Communication"
+            },
+            {
+              "value": "picto-phone",
+              "label": "Phone",
+              "group": "Communication"
+            },
+            {
+              "value": "picto-chat",
+              "label": "Chat",
+              "group": "Communication"
+            },
+            {
+              "value": "picto-customer-support",
+              "label": "Customer support",
+              "group": "Communication"
+            },
+            {
+              "value": "picto-operator",
+              "label": "Operator",
+              "group": "Communication"
+            },
+            {
+              "value": "picto-mailbox",
+              "label": "Mailbox",
+              "group": "Communication"
+            },
+            {
+              "value": "picto-envelope",
+              "label": "Envelope",
+              "group": "Communication"
+            },
+            {
+              "value": "picto-comment",
+              "label": "Comment",
+              "group": "Communication"
+            },
+            {
+              "value": "picto-question",
+              "label": "Question",
+              "group": "Communication"
+            },
+            {
+              "value": "picto-send",
+              "label": "Send",
+              "group": "Communication"
+            },
+            {
+              "value": "picto-at-sign",
+              "label": "At sign",
+              "group": "Tech"
+            },
+            {
+              "value": "picto-camera",
+              "label": "Camera",
+              "group": "Tech"
+            },
+            {
+              "value": "picto-wifi",
+              "label": "WiFi",
+              "group": "Tech"
+            },
+            {
+              "value": "picto-bluetooth",
+              "label": "Bluetooth",
+              "group": "Tech"
+            },
+            {
+              "value": "picto-printer",
+              "label": "Printer",
+              "group": "Tech"
+            },
+            {
+              "value": "picto-smart-watch",
+              "label": "Smart watch",
+              "group": "Tech"
+            },
+            {
+              "value": "picto-coffee",
+              "label": "Coffee",
+              "group": "Food & Drink"
+            },
+            {
+              "value": "picto-burger",
+              "label": "Burger",
+              "group": "Food & Drink"
+            },
+            {
+              "value": "picto-beer",
+              "label": "Beer",
+              "group": "Food & Drink"
+            },
+            {
+              "value": "picto-target",
+              "label": "Target",
+              "group": "Other"
+            },
+            {
+              "value": "picto-document",
+              "label": "Document",
+              "group": "Other"
+            },
+            {
+              "value": "picto-jewelry",
+              "label": "Jewelry",
+              "group": "Other"
+            },
+            {
+              "value": "picto-music",
+              "label": "Music",
+              "group": "Other"
+            },
+            {
+              "value": "picto-file",
+              "label": "File",
+              "group": "Other"
+            },
+            {
+              "value": "picto-mask",
+              "label": "Mask",
+              "group": "Other"
+            },
+            {
+              "value": "picto-stop",
+              "label": "Stop",
+              "group": "Other"
+            }
+          ],
+          "default": "none"
+        },
+        {
+          "type": "image_picker",
+          "id": "custom_icon",
+          "label": "Custom icon",
+          "info": "96 x 96px .png or .svg recommended. Only used when content is collapsed."
+        },
+        {
+          "type": "range",
+          "id": "icon_width",
+          "min": 16,
+          "max": 48,
+          "step": 2,
+          "unit": "px",
+          "label": "Icon width",
+          "default": 20
+        },
+        {
+          "type": "checkbox",
+          "id": "collapse_content",
+          "label": "Collapse content",
+          "default": false
+        }
+      ]
+    },
+    {
+      "type": "variant_picker",
+      "name": "Variant picker",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "checkbox",
+          "id": "hide_sold_out_variants",
+          "label": "Hide sold out variants",
+          "default": false
+        },
+        {
+          "type": "checkbox",
+          "id": "stack_blocks",
+          "label": "Stack options on mobile",
+          "default": true
+        },
+        {
+          "type": "select",
+          "id": "selector_style",
+          "label": "Selector style",
+          "options": [
+            {
+              "value": "block",
+              "label": "Block"
+            },
+            {
+              "value": "dropdown",
+              "label": "Dropdown"
+            }
+          ],
+          "default": "block"
+        },
+        {
+          "type": "select",
+          "id": "swatch_selector_style",
+          "label": "Swatch selector style",
+          "info": "Enable [swatches](https://help.shopify.com/en/manual/online-store/themes/theme-structure/theme-settings#options-with-swatches) on product options.",
+          "options": [
+            {
+              "value": "swatch",
+              "label": "Swatch"
+            },
+            {
+              "value": "block_swatch",
+              "label": "Block with swatch"
+            },
+            {
+              "value": "none",
+              "label": "None"
+            }
+          ],
+          "default": "swatch"
+        },
+        {
+          "type": "text",
+          "id": "variant_image_options",
+          "label": "Show variant image for options",
+          "info": "List of comma separated option names where option values show the attached variant image. [Learn more](https://impact-theme.helpscoutdocs.com/article/555-variant-images-for-color-option)"
+        },
+        {
+          "type": "page",
+          "id": "size_chart_page",
+          "label": "Size chart page",
+          "info": "Feature a page for size option"
+        }
+      ]
+    },
+    {
+      "type": "product_variations",
+      "name": "Product variations",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "Link products of different colors using swatches. [Learn more](https://support.maestrooo.com/article/307-product-creating-product-variations-that-link-to-different-pages)"
+        },
+        {
+          "type": "text",
+          "id": "option_name",
+          "label": "Option name",
+          "info": "Example: Color, Style..."
+        },
+        {
+          "type": "text",
+          "id": "option_value_metafield",
+          "label": "Option value metafield",
+          "info": "Enter namespace and key of the metafield holding the value. Eg.: custom.color"
+        },
+        {
+          "type": "product_list",
+          "id": "products",
+          "label": "Products",
+          "info": "Select all the variations (including the product itself)."
+        },
+        {
+          "type": "select",
+          "id": "selector_style",
+          "label": "Selector style",
+          "info": "Product image mode requires that all variant have an associated image. [Learn more](https://help.shopify.com/en/manual/products/product-media/add-images-variants#add-images-to-existing-variants)",
+          "options": [
+            {
+              "value": "block",
+              "label": "Block"
+            },
+            {
+              "value": "block_swatch",
+              "label": "Block with swatch"
+            },
+            {
+              "value": "swatch",
+              "label": "Swatch"
+            },
+            {
+              "value": "variant_image",
+              "label": "Variant image"
+            }
+          ],
+          "default": "swatch"
+        }
+      ]
+    },
+    {
+      "type": "line_item_property",
+      "name": "Line item property",
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "Line item properties are used to collect customization information for an item added to the cart."
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "Your label"
+        },
+        {
+          "type": "select",
+          "id": "type",
+          "label": "Type",
+          "options": [
+            {
+              "value": "text",
+              "label": "Text"
+            },
+            {
+              "value": "checkbox",
+              "label": "Checkbox"
+            }
+          ],
+          "default": "text"
+        },
+        {
+          "type": "checkbox",
+          "id": "required",
+          "label": "Required",
+          "info": "For text property, the customer must write a text ; for checkbox, the customer must check it to add to cart.",
+          "default": false
+        },
+        {
+          "type": "header",
+          "content": "Text",
+          "info": "Only applicable for line item property of type Text."
+        },
+        {
+          "type": "checkbox",
+          "id": "allow_long_text",
+          "label": "Allow long text",
+          "default": false
+        },
+        {
+          "type": "number",
+          "id": "max_length",
+          "label": "Maximum number of characters"
+        }
+      ]
+    },
+    {
+      "type": "quantity_selector",
+      "name": "Quantity selector",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "The selector is automatically hidden if all variants are sold out. When at least one variant is available, the selector is always visible to prevent the page from moving when switching variants. To show a volume pricing table, add the dedicatd Volume pricing block."
+        }
+      ]
+    },
+    {
+      "type": "volume_pricing",
+      "name": "Volume pricing table",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "Volume pricing is only available to Shopify Plus merchants. [Learn more](https://help.shopify.com/en/manual/b2b/catalogs/quantity-pricing#volume-pricing)"
+        }
+      ]
+    },
+    {
+      "type": "inventory",
+      "name": "Inventory",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "range",
+          "id": "low_inventory_threshold",
+          "label": "Low inventory threshold",
+          "info": "Use low stock color when quantity is below the threshold. Choose 0 to always show in stock.",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "default": 0
+        }
+      ]
+    },
+    {
+      "type": "size_guide",
+      "name": "Guide des tailles",
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "Le bouton ouvre un tiroir latéral avec la page et/ou l'image renseignée."
+        },
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Texte du bouton",
+          "default": "Guide des tailles"
+        },
+        {
+          "type": "checkbox",
+          "id": "use_integrated_guide",
+          "label": "Utiliser le guide interactif intégré",
+          "info": "Affiche le guide des tailles interactif (tableau soutien-gorge, sélection au clic) à la place d'une page ou d'une image.",
+          "default": true
+        },
+        {
+          "type": "text",
+          "id": "reassurance_text",
+          "label": "Phrase de réassurance",
+          "info": "Reprenez la formulation exacte de votre politique de retour — ne promettez rien qu'elle ne couvre pas.",
+          "default": "Mauvaise taille ? L'échange est simple."
+        },
+        {
+          "type": "page",
+          "id": "page",
+          "label": "Page du guide des tailles",
+          "info": "Utilisée seulement si le guide interactif est désactivé."
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image du guide des tailles",
+          "info": "Utilisée seulement si le guide interactif est désactivé."
+        },
+        {
+          "type": "select",
+          "id": "style",
+          "label": "Style du bouton",
+          "options": [
+            {
+              "value": "outline",
+              "label": "Contour"
+            },
+            {
+              "value": "fill",
+              "label": "Plein"
+            }
+          ],
+          "default": "outline"
+        },
+        {
+          "type": "checkbox",
+          "id": "stretch",
+          "label": "Pleine largeur",
+          "default": true
+        },
+        {
+          "type": "select",
+          "id": "size",
+          "label": "Taille du bouton",
+          "options": [
+            {
+              "value": "sm",
+              "label": "Petit"
+            },
+            {
+              "value": "base",
+              "label": "Normal"
+            },
+            {
+              "value": "lg",
+              "label": "Grand"
+            },
+            {
+              "value": "xl",
+              "label": "Très grand"
+            }
+          ],
+          "default": "base"
+        },
+        {
+          "type": "color",
+          "id": "border_color",
+          "label": "Couleur de la bordure"
+        },
+        {
+          "type": "range",
+          "id": "border_width",
+          "label": "Épaisseur de la bordure",
+          "min": 1,
+          "max": 4,
+          "step": 1,
+          "unit": "px",
+          "default": 1
+        },
+        {
+          "type": "range",
+          "id": "border_radius",
+          "label": "Arrondi du bouton",
+          "min": 0,
+          "max": 60,
+          "step": 2,
+          "unit": "px",
+          "default": 8
+        },
+        {
+          "type": "color",
+          "id": "background",
+          "label": "Fond du bouton"
+        },
+        {
+          "type": "color",
+          "id": "text_color",
+          "label": "Texte du bouton"
+        }
+      ]
+    },
+    {
+      "type": "icon_benefit",
+      "name": "Bénéfice avec icône",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icône",
+          "options": [
+            {
+              "value": "none",
+              "label": "Aucune"
+            },
+            {
+              "value": "picto-love",
+              "label": "Cœur"
+            },
+            {
+              "value": "picto-happy",
+              "label": "Sourire"
+            },
+            {
+              "value": "picto-like",
+              "label": "Pouce levé"
+            },
+            {
+              "value": "picto-leaf",
+              "label": "Feuille"
+            },
+            {
+              "value": "picto-gift",
+              "label": "Cadeau"
+            },
+            {
+              "value": "picto-award-gift",
+              "label": "Récompense"
+            },
+            {
+              "value": "picto-lock",
+              "label": "Cadenas"
+            },
+            {
+              "value": "picto-secure-profile",
+              "label": "Profil sécurisé"
+            },
+            {
+              "value": "picto-return",
+              "label": "Retours"
+            },
+            {
+              "value": "picto-box",
+              "label": "Colis"
+            },
+            {
+              "value": "picto-plane",
+              "label": "Avion"
+            },
+            {
+              "value": "picto-customer-support",
+              "label": "Support client"
+            },
+            {
+              "value": "picto-percent",
+              "label": "Pourcentage"
+            },
+            {
+              "value": "picto-money",
+              "label": "Argent"
+            },
+            {
+              "value": "picto-credit-card",
+              "label": "Carte bancaire"
+            },
+            {
+              "value": "picto-question",
+              "label": "Question"
+            }
+          ],
+          "default": "picto-love"
+        },
+        {
+          "type": "image_picker",
+          "id": "custom_icon",
+          "label": "Icône personnalisée",
+          "info": "Remplace l'icône ci-dessus. 48 x 48px recommandé."
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Texte",
+          "default": "<p><strong>Bénéfice clé</strong> — précisez ici ce que le produit apporte concrètement.</p>"
+        },
+        {
+          "type": "range",
+          "id": "icon_size",
+          "min": 24,
+          "max": 96,
+          "step": 2,
+          "unit": "px",
+          "label": "Taille de l'icône",
+          "default": 44
+        },
+        {
+          "type": "range",
+          "id": "icon_gap",
+          "min": 0,
+          "max": 32,
+          "step": 2,
+          "unit": "px",
+          "label": "Espace entre l'icône et le texte",
+          "default": 12
+        },
+        {
+          "type": "select",
+          "id": "text_size",
+          "label": "Taille du texte",
+          "options": [
+            {
+              "value": "text-xs",
+              "label": "Petit"
+            },
+            {
+              "value": "text-sm",
+              "label": "Normal"
+            },
+            {
+              "value": "text-base",
+              "label": "Grand"
+            },
+            {
+              "value": "text-lg",
+              "label": "Très grand"
+            }
+          ],
+          "default": "text-sm"
+        },
+        {
+          "type": "select",
+          "id": "vertical_alignment",
+          "label": "Alignement du texte",
+          "info": "« Centré » aligne le texte sur le milieu de l'icône.",
+          "options": [
+            {
+              "value": "center",
+              "label": "Centré sur l'icône"
+            },
+            {
+              "value": "start",
+              "label": "En haut"
+            }
+          ],
+          "default": "center"
+        },
+        {
+          "type": "color",
+          "id": "icon_background",
+          "label": "Fond de l'icône"
+        },
+        {
+          "type": "color",
+          "id": "icon_color",
+          "label": "Couleur de l'icône"
+        }
+      ]
+    },
+    {
+      "type": "stock_alert",
+      "name": "Alerte stock",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Texte",
+          "default": "Dernières pièces disponibles"
+        },
+        {
+          "type": "color",
+          "id": "color",
+          "label": "Couleur",
+          "default": "#c62828"
+        },
+        {
+          "type": "header",
+          "content": "Live viewer count"
+        },
+        {
+          "type": "checkbox",
+          "id": "dynamic_count",
+          "label": "Show a live viewer count",
+          "default": false,
+          "info": "Put [count] in the text above. The figure is generated in the browser, not measured — say only what you can stand behind."
+        },
+        {
+          "type": "range",
+          "id": "count_min",
+          "label": "Lowest figure",
+          "min": 1,
+          "max": 100,
+          "step": 1,
+          "default": 12
+        },
+        {
+          "type": "range",
+          "id": "count_max",
+          "label": "Highest figure",
+          "min": 5,
+          "max": 105,
+          "step": 1,
+          "default": 41
+        },
+        {
+          "type": "range",
+          "id": "count_interval",
+          "label": "Change every",
+          "min": 5,
+          "max": 100,
+          "step": 1,
+          "unit": "s",
+          "default": 18
+        }
+      ]
+    },
+    {
+      "type": "quantity_breaks",
+      "name": "Paliers de prix",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "Affiche des offres par quantité. Important : créez la réduction automatique correspondante dans Admin → Réductions (ex. « -15% dès 2 articles ») pour que la remise s'applique réellement au paiement. Prix calculés sur la variante par défaut."
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Titre",
+          "default": "Économisez en lot"
+        },
+        {
+          "type": "select",
+          "id": "default_tier",
+          "label": "Palier sélectionné par défaut",
+          "options": [
+            {
+              "value": "1",
+              "label": "Palier 1"
+            },
+            {
+              "value": "2",
+              "label": "Palier 2"
+            },
+            {
+              "value": "3",
+              "label": "Palier 3"
+            }
+          ],
+          "default": "1"
+        },
+        {
+          "type": "header",
+          "content": "Palier 1"
+        },
+        {
+          "type": "number",
+          "id": "tier1_quantity",
+          "label": "Quantité",
+          "default": 1
+        },
+        {
+          "type": "text",
+          "id": "tier1_label",
+          "label": "Libellé",
+          "default": "1 unité"
+        },
+        {
+          "type": "text",
+          "id": "tier1_badge",
+          "label": "Badge"
+        },
+        {
+          "type": "number",
+          "id": "tier1_discount",
+          "label": "Remise (%)",
+          "default": 0
+        },
+        {
+          "type": "header",
+          "content": "Palier 2"
+        },
+        {
+          "type": "number",
+          "id": "tier2_quantity",
+          "label": "Quantité",
+          "default": 2
+        },
+        {
+          "type": "text",
+          "id": "tier2_label",
+          "label": "Libellé",
+          "default": "2 unités"
+        },
+        {
+          "type": "text",
+          "id": "tier2_badge",
+          "label": "Badge",
+          "default": "Le plus populaire"
+        },
+        {
+          "type": "number",
+          "id": "tier2_discount",
+          "label": "Remise (%)",
+          "default": 15
+        },
+        {
+          "type": "header",
+          "content": "Palier 3"
+        },
+        {
+          "type": "number",
+          "id": "tier3_quantity",
+          "label": "Quantité",
+          "default": 3
+        },
+        {
+          "type": "text",
+          "id": "tier3_label",
+          "label": "Libellé",
+          "default": "3 unités"
+        },
+        {
+          "type": "text",
+          "id": "tier3_badge",
+          "label": "Badge",
+          "default": "Meilleure offre"
+        },
+        {
+          "type": "number",
+          "id": "tier3_discount",
+          "label": "Remise (%)",
+          "default": 30
+        },
+        {
+          "type": "header",
+          "content": "Couleurs"
+        },
+        {
+          "type": "color",
+          "id": "accent_color",
+          "label": "Couleur d'accent"
+        },
+        {
+          "type": "color",
+          "id": "accent_text_color",
+          "label": "Texte du badge"
+        }
+      ]
+    },
+    {
+      "type": "sticky_atc",
+      "name": "Barre d'achat collante",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "Barre fixée en bas de l'écran, visible dès que le bouton d'achat principal sort de l'écran."
+        },
+        {
+          "type": "text",
+          "id": "button_text",
+          "label": "Texte du bouton",
+          "default": "Ajouter au panier"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_image",
+          "label": "Afficher la miniature produit",
+          "default": true
+        },
+        {
+          "type": "checkbox",
+          "id": "mobile_only",
+          "label": "Mobile uniquement",
+          "default": false
+        },
+        {
+          "type": "color",
+          "id": "background",
+          "label": "Fond de la barre"
+        },
+        {
+          "type": "color",
+          "id": "text_color",
+          "label": "Texte de la barre"
+        },
+        {
+          "type": "color",
+          "id": "button_background",
+          "label": "Fond du bouton"
+        },
+        {
+          "type": "color",
+          "id": "button_text_color",
+          "label": "Texte du bouton"
+        }
+      ]
+    },
+    {
+      "type": "delivery_estimate",
+      "name": "Estimation de livraison",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icône",
+          "options": [
+            {
+              "value": "none",
+              "label": "Aucune"
+            },
+            {
+              "value": "picto-box",
+              "label": "Colis"
+            },
+            {
+              "value": "picto-plane",
+              "label": "Avion"
+            },
+            {
+              "value": "picto-pin",
+              "label": "Épingle"
+            }
+          ],
+          "default": "picto-box"
+        },
+        {
+          "type": "number",
+          "id": "min_days",
+          "label": "Délai minimum (jours)",
+          "default": 3
+        },
+        {
+          "type": "number",
+          "id": "max_days",
+          "label": "Délai maximum (jours)",
+          "default": 6
+        },
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Texte",
+          "info": "[date_min] et [date_max] sont remplacés par les dates calculées.",
+          "default": "Commandé aujourd'hui, livré entre le [date_min] et le [date_max]"
+        }
+      ]
+    },
+    {
+      "type": "rating_line",
+      "name": "Ligne de notation",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "range",
+          "id": "rating",
+          "label": "Note (étoiles)",
+          "min": 1,
+          "max": 5,
+          "step": 0.5,
+          "default": 5
+        },
+        {
+          "type": "color",
+          "id": "stars_color",
+          "label": "Couleur des étoiles"
+        },
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Texte",
+          "default": "4,8/5 — plus de 300 avis vérifiés"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Lien (optionnel)",
+          "info": "Ex. l'ancre d'une section d'avis plus bas dans la page."
+        }
+      ]
+    },
+    {
+      "type": "buy_buttons",
+      "name": "Buy buttons",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "checkbox",
+          "id": "show_payment_button",
+          "label": "Show dynamic checkout button",
+          "info": "Each customer will see their preferred payment method from those available on your store, such as PayPal or Apple Pay. [Learn more](https://help.shopify.com/manual/using-themes/change-the-layout/dynamic-checkout)",
+          "default": true
+        },
+        {
+          "type": "checkbox",
+          "id": "show_gift_card_recipient",
+          "label": "Show recipient information form for gift cards",
+          "info": "Allow buyers to send gift cards along with a personal message. [Learn more](https://help.shopify.com/manual/online-store/themes/customizing-themes/add-gift-card-recipient-fields)",
+          "default": true
+        },
+        {
+          "type": "color",
+          "id": "atc_button_background",
+          "label": "Add to cart background"
+        },
+        {
+          "type": "color",
+          "id": "atc_button_text_color",
+          "label": "Add to cart color"
+        },
+        {
+          "type": "color",
+          "id": "payment_button_background",
+          "label": "Buy now button background"
+        },
+        {
+          "type": "color",
+          "id": "payment_button_text_color",
+          "label": "Buy now button color"
+        }
+      ]
+    },
+    {
+      "type": "pickup_availability",
+      "name": "Pickup availability",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "Allow your customers to see availability in retail stores by [setting up local pickup](https://help.shopify.com/en/manual/sell-in-person/shopify-pos/order-management/local-pickup-for-online-orders)."
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "name": "Text",
+      "settings": [
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Text",
+          "default": "<p>Share some content to your customers about your products.</p>"
+        }
+      ]
+    },
+    {
+      "type": "collapsible_text",
+      "name": "Collapsible text",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "options": [
+            {
+              "value": "none",
+              "label": "None"
+            },
+            {
+              "value": "picto-coupon",
+              "label": "Coupon",
+              "group": "Shop"
+            },
+            {
+              "value": "picto-percent",
+              "label": "Percent",
+              "group": "Shop"
+            },
+            {
+              "value": "picto-gift",
+              "label": "Gift",
+              "group": "Shop"
+            },
+            {
+              "value": "picto-star",
+              "label": "Star",
+              "group": "Shop"
+            },
+            {
+              "value": "picto-like",
+              "label": "Like",
+              "group": "Shop"
+            },
+            {
+              "value": "picto-building",
+              "label": "Building",
+              "group": "Shop"
+            },
+            {
+              "value": "picto-love",
+              "label": "Love",
+              "group": "Shop"
+            },
+            {
+              "value": "picto-award-gift",
+              "label": "Award gift",
+              "group": "Shop"
+            },
+            {
+              "value": "picto-happy",
+              "label": "Happy",
+              "group": "Shop"
+            },
+            {
+              "value": "picto-box",
+              "label": "Box",
+              "group": "Shipping"
+            },
+            {
+              "value": "picto-pin",
+              "label": "Pin",
+              "group": "Shipping"
+            },
+            {
+              "value": "picto-timer",
+              "label": "Timer",
+              "group": "Shipping"
+            },
+            {
+              "value": "picto-validation",
+              "label": "Validation",
+              "group": "Shipping"
+            },
+            {
+              "value": "picto-truck",
+              "label": "Truck",
+              "group": "Shipping"
+            },
+            {
+              "value": "picto-return",
+              "label": "Return",
+              "group": "Shipping"
+            },
+            {
+              "value": "picto-earth",
+              "label": "Earth",
+              "group": "Shipping"
+            },
+            {
+              "value": "picto-plane",
+              "label": "Plane",
+              "group": "Shipping"
+            },
+            {
+              "value": "picto-credit-card",
+              "label": "Credit card",
+              "group": "Payment & Security"
+            },
+            {
+              "value": "picto-lock",
+              "label": "Lock",
+              "group": "Payment & Security"
+            },
+            {
+              "value": "picto-shield",
+              "label": "Shield",
+              "group": "Payment & Security"
+            },
+            {
+              "value": "picto-secure-profile",
+              "label": "Secure profile",
+              "group": "Payment & Security"
+            },
+            {
+              "value": "picto-money",
+              "label": "Money",
+              "group": "Payment & Security"
+            },
+            {
+              "value": "picto-recycle",
+              "label": "Recycle",
+              "group": "Ecology"
+            },
+            {
+              "value": "picto-leaf",
+              "label": "Leaf",
+              "group": "Ecology"
+            },
+            {
+              "value": "picto-tree",
+              "label": "Tree",
+              "group": "Ecology"
+            },
+            {
+              "value": "picto-mobile-phone",
+              "label": "Mobile phone",
+              "group": "Communication"
+            },
+            {
+              "value": "picto-phone",
+              "label": "Phone",
+              "group": "Communication"
+            },
+            {
+              "value": "picto-chat",
+              "label": "Chat",
+              "group": "Communication"
+            },
+            {
+              "value": "picto-customer-support",
+              "label": "Customer support",
+              "group": "Communication"
+            },
+            {
+              "value": "picto-operator",
+              "label": "Operator",
+              "group": "Communication"
+            },
+            {
+              "value": "picto-mailbox",
+              "label": "Mailbox",
+              "group": "Communication"
+            },
+            {
+              "value": "picto-envelope",
+              "label": "Envelope",
+              "group": "Communication"
+            },
+            {
+              "value": "picto-comment",
+              "label": "Comment",
+              "group": "Communication"
+            },
+            {
+              "value": "picto-question",
+              "label": "Question",
+              "group": "Communication"
+            },
+            {
+              "value": "picto-send",
+              "label": "Send",
+              "group": "Communication"
+            },
+            {
+              "value": "picto-at-sign",
+              "label": "At sign",
+              "group": "Tech"
+            },
+            {
+              "value": "picto-camera",
+              "label": "Camera",
+              "group": "Tech"
+            },
+            {
+              "value": "picto-wifi",
+              "label": "WiFi",
+              "group": "Tech"
+            },
+            {
+              "value": "picto-bluetooth",
+              "label": "Bluetooth",
+              "group": "Tech"
+            },
+            {
+              "value": "picto-printer",
+              "label": "Printer",
+              "group": "Tech"
+            },
+            {
+              "value": "picto-smart-watch",
+              "label": "Smart watch",
+              "group": "Tech"
+            },
+            {
+              "value": "picto-coffee",
+              "label": "Coffee",
+              "group": "Food & Drink"
+            },
+            {
+              "value": "picto-burger",
+              "label": "Burger",
+              "group": "Food & Drink"
+            },
+            {
+              "value": "picto-beer",
+              "label": "Beer",
+              "group": "Food & Drink"
+            },
+            {
+              "value": "picto-target",
+              "label": "Target",
+              "group": "Other"
+            },
+            {
+              "value": "picto-document",
+              "label": "Document",
+              "group": "Other"
+            },
+            {
+              "value": "picto-jewelry",
+              "label": "Jewelry",
+              "group": "Other"
+            },
+            {
+              "value": "picto-music",
+              "label": "Music",
+              "group": "Other"
+            },
+            {
+              "value": "picto-file",
+              "label": "File",
+              "group": "Other"
+            },
+            {
+              "value": "picto-mask",
+              "label": "Mask",
+              "group": "Other"
+            },
+            {
+              "value": "picto-stop",
+              "label": "Stop",
+              "group": "Other"
+            }
+          ],
+          "default": "none"
+        },
+        {
+          "type": "image_picker",
+          "id": "custom_icon",
+          "label": "Custom icon",
+          "info": "96 x 96px .png or .svg recommended"
+        },
+        {
+          "type": "range",
+          "id": "icon_width",
+          "min": 16,
+          "max": 48,
+          "step": 2,
+          "unit": "px",
+          "label": "Icon width",
+          "default": 20
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Title"
+        },
+        {
+          "type": "richtext",
+          "id": "content",
+          "label": "Content",
+          "default": "<p>Share some content to your customers about your products.</p>"
+        },
+        {
+          "type": "page",
+          "id": "page",
+          "label": "Page",
+          "info": "Replaces inline content if specified."
+        }
+      ]
+    },
+    {
+      "type": "image",
+      "name": "Image",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "select",
+          "id": "alignment",
+          "label": "Alignment",
+          "options": [
+            {
+              "value": "start",
+              "label": "Left"
+            },
+            {
+              "value": "center",
+              "label": "Center"
+            },
+            {
+              "value": "end",
+              "label": "Right"
+            }
+          ],
+          "default": "start"
+        },
+        {
+          "type": "range",
+          "id": "max_width",
+          "min": 50,
+          "max": 500,
+          "step": 10,
+          "unit": "px",
+          "label": "Width",
+          "default": 150
+        }
+      ]
+    },
+    {
+      "type": "button",
+      "name": "Button",
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "Create link to your contact page, external marketplace..."
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        },
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text",
+          "default": "Button"
+        },
+        {
+          "type": "select",
+          "id": "size",
+          "label": "Size",
+          "options": [
+            {
+              "value": "sm",
+              "label": "Small"
+            },
+            {
+              "value": "base",
+              "label": "Medium"
+            },
+            {
+              "value": "lg",
+              "label": "Large"
+            },
+            {
+              "value": "xl",
+              "label": "X-Large"
+            }
+          ],
+          "default": "xl"
+        },
+        {
+          "type": "select",
+          "id": "style",
+          "label": "Style",
+          "options": [
+            {
+              "value": "outline",
+              "label": "Outline"
+            },
+            {
+              "value": "fill",
+              "label": "Fill"
+            }
+          ],
+          "default": "fill"
+        },
+        {
+          "type": "checkbox",
+          "id": "stretch",
+          "label": "Stretch",
+          "default": true
+        },
+        {
+          "type": "color",
+          "id": "background",
+          "label": "Background"
+        },
+        {
+          "type": "color",
+          "id": "text_color",
+          "label": "Text"
+        }
+      ]
+    },
+    {
+      "type": "liquid",
+      "name": "Custom Liquid",
+      "settings": [
+        {
+          "type": "liquid",
+          "id": "liquid",
+          "label": "Liquid",
+          "info": "Add app snippets or other Liquid code to create advanced customizations."
+        }
+      ]
+    },
+    {
+      "type": "associated_products",
+      "name": "Complementary products",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "To select complementary products, use the Search & Discovery app. [Learn more](https://help.shopify.com/en/manual/online-store/search-and-discovery/product-recommendations#complementary-products)"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Heading",
+          "default": "Buy it with"
+        },
+        {
+          "type": "checkbox",
+          "id": "stack_products",
+          "label": "Stack products",
+          "default": true
+        },
+        {
+          "type": "range",
+          "id": "products_count",
+          "min": 1,
+          "max": 10,
+          "label": "Products to show",
+          "default": 5
+        },
+        {
+          "type": "header",
+          "content": "Colors",
+          "info": "Cards are bordered when background matches section background."
+        },
+        {
+          "type": "color",
+          "id": "background",
+          "label": "Background"
+        },
+        {
+          "type": "color",
+          "id": "text_color",
+          "label": "Text"
+        }
+      ]
+    },
+    {
+      "type": "offer",
+      "name": "Offer",
+      "settings": [
+        {
+          "type": "select",
+          "id": "text_alignment",
+          "label": "Text alignment",
+          "options": [
+            {
+              "value": "start",
+              "label": "Left"
+            },
+            {
+              "value": "center",
+              "label": "Center"
+            }
+          ],
+          "default": "start"
+        },
+        {
+          "type": "select",
+          "id": "icon_position",
+          "label": "Icon position",
+          "options": [
+            {
+              "value": "aligned",
+              "label": "Aligned horizontally"
+            },
+            {
+              "value": "stacked",
+              "label": "Stacked"
+            }
+          ],
+          "default": "aligned"
+        },
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "options": [
+            {
+              "value": "none",
+              "label": "None"
+            },
+            {
+              "value": "picto-coupon",
+              "label": "Coupon",
+              "group": "Shop"
+            },
+            {
+              "value": "picto-percent",
+              "label": "Percent",
+              "group": "Shop"
+            },
+            {
+              "value": "picto-gift",
+              "label": "Gift",
+              "group": "Shop"
+            },
+            {
+              "value": "picto-star",
+              "label": "Star",
+              "group": "Shop"
+            },
+            {
+              "value": "picto-like",
+              "label": "Like",
+              "group": "Shop"
+            },
+            {
+              "value": "picto-building",
+              "label": "Building",
+              "group": "Shop"
+            },
+            {
+              "value": "picto-love",
+              "label": "Love",
+              "group": "Shop"
+            },
+            {
+              "value": "picto-award-gift",
+              "label": "Award gift",
+              "group": "Shop"
+            },
+            {
+              "value": "picto-happy",
+              "label": "Happy",
+              "group": "Shop"
+            },
+            {
+              "value": "picto-box",
+              "label": "Box",
+              "group": "Shipping"
+            },
+            {
+              "value": "picto-pin",
+              "label": "Pin",
+              "group": "Shipping"
+            },
+            {
+              "value": "picto-timer",
+              "label": "Timer",
+              "group": "Shipping"
+            },
+            {
+              "value": "picto-validation",
+              "label": "Validation",
+              "group": "Shipping"
+            },
+            {
+              "value": "picto-truck",
+              "label": "Truck",
+              "group": "Shipping"
+            },
+            {
+              "value": "picto-return",
+              "label": "Return",
+              "group": "Shipping"
+            },
+            {
+              "value": "picto-earth",
+              "label": "Earth",
+              "group": "Shipping"
+            },
+            {
+              "value": "picto-plane",
+              "label": "Plane",
+              "group": "Shipping"
+            },
+            {
+              "value": "picto-credit-card",
+              "label": "Credit card",
+              "group": "Payment & Security"
+            },
+            {
+              "value": "picto-lock",
+              "label": "Lock",
+              "group": "Payment & Security"
+            },
+            {
+              "value": "picto-shield",
+              "label": "Shield",
+              "group": "Payment & Security"
+            },
+            {
+              "value": "picto-secure-profile",
+              "label": "Secure profile",
+              "group": "Payment & Security"
+            },
+            {
+              "value": "picto-money",
+              "label": "Money",
+              "group": "Payment & Security"
+            },
+            {
+              "value": "picto-recycle",
+              "label": "Recycle",
+              "group": "Ecology"
+            },
+            {
+              "value": "picto-leaf",
+              "label": "Leaf",
+              "group": "Ecology"
+            },
+            {
+              "value": "picto-tree",
+              "label": "Tree",
+              "group": "Ecology"
+            },
+            {
+              "value": "picto-mobile-phone",
+              "label": "Mobile phone",
+              "group": "Communication"
+            },
+            {
+              "value": "picto-phone",
+              "label": "Phone",
+              "group": "Communication"
+            },
+            {
+              "value": "picto-chat",
+              "label": "Chat",
+              "group": "Communication"
+            },
+            {
+              "value": "picto-customer-support",
+              "label": "Customer support",
+              "group": "Communication"
+            },
+            {
+              "value": "picto-operator",
+              "label": "Operator",
+              "group": "Communication"
+            },
+            {
+              "value": "picto-mailbox",
+              "label": "Mailbox",
+              "group": "Communication"
+            },
+            {
+              "value": "picto-envelope",
+              "label": "Envelope",
+              "group": "Communication"
+            },
+            {
+              "value": "picto-comment",
+              "label": "Comment",
+              "group": "Communication"
+            },
+            {
+              "value": "picto-question",
+              "label": "Question",
+              "group": "Communication"
+            },
+            {
+              "value": "picto-send",
+              "label": "Send",
+              "group": "Communication"
+            },
+            {
+              "value": "picto-at-sign",
+              "label": "At sign",
+              "group": "Tech"
+            },
+            {
+              "value": "picto-camera",
+              "label": "Camera",
+              "group": "Tech"
+            },
+            {
+              "value": "picto-wifi",
+              "label": "WiFi",
+              "group": "Tech"
+            },
+            {
+              "value": "picto-bluetooth",
+              "label": "Bluetooth",
+              "group": "Tech"
+            },
+            {
+              "value": "picto-printer",
+              "label": "Printer",
+              "group": "Tech"
+            },
+            {
+              "value": "picto-smart-watch",
+              "label": "Smart watch",
+              "group": "Tech"
+            },
+            {
+              "value": "picto-coffee",
+              "label": "Coffee",
+              "group": "Food & Drink"
+            },
+            {
+              "value": "picto-burger",
+              "label": "Burger",
+              "group": "Food & Drink"
+            },
+            {
+              "value": "picto-beer",
+              "label": "Beer",
+              "group": "Food & Drink"
+            },
+            {
+              "value": "picto-target",
+              "label": "Target",
+              "group": "Other"
+            },
+            {
+              "value": "picto-document",
+              "label": "Document",
+              "group": "Other"
+            },
+            {
+              "value": "picto-jewelry",
+              "label": "Jewelry",
+              "group": "Other"
+            },
+            {
+              "value": "picto-music",
+              "label": "Music",
+              "group": "Other"
+            },
+            {
+              "value": "picto-file",
+              "label": "File",
+              "group": "Other"
+            },
+            {
+              "value": "picto-mask",
+              "label": "Mask",
+              "group": "Other"
+            },
+            {
+              "value": "picto-stop",
+              "label": "Stop",
+              "group": "Other"
+            }
+          ],
+          "default": "picto-coupon"
+        },
+        {
+          "type": "image_picker",
+          "id": "custom_icon",
+          "label": "Custom icon",
+          "info": "240 x 240px .png recommended"
+        },
+        {
+          "type": "range",
+          "id": "icon_width",
+          "min": 20,
+          "max": 100,
+          "step": 4,
+          "unit": "px",
+          "label": "Icon width",
+          "default": 20
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Heading",
+          "default": "Shipping"
+        },
+        {
+          "type": "richtext",
+          "id": "content",
+          "label": "Content",
+          "default": "<p>Short content about your shipping rates or discounts.</p>"
+        },
+        {
+          "type": "color",
+          "id": "background",
+          "label": "Background",
+          "default": "#eaf2ed"
+        },
+        {
+          "type": "color",
+          "id": "text_color",
+          "label": "Text",
+          "default": "#00a341"
+        }
+      ]
+    },
+    {
+      "type": "share_buttons",
+      "name": "Share buttons",
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "To improve user experience and performance, native share buttons are used when supported."
+        },
+        {
+          "type": "select",
+          "id": "alignment",
+          "label": "Alignment",
+          "options": [
+            {
+              "value": "start",
+              "label": "Left"
+            },
+            {
+              "value": "center",
+              "label": "Center"
+            },
+            {
+              "value": "end",
+              "label": "Right"
+            }
+          ],
+          "default": "start"
+        }
+      ]
+    },
+    {
+      "type": "pdp_badge_addon",
+      "name": "Patch add-on",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "Two side-by-side outline buttons acting as a radio group. The choice is sent to the cart as a line-item property. The surcharge shown on the right is INFORMATIONAL ONLY: this block does not change the price charged. Wire a variant, a bundle/add-on app or a Shopify Function to the property if the surcharge must be billed."
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "Choose a patch"
+        },
+        {
+          "type": "number",
+          "id": "patch_price",
+          "label": "Patch surcharge (store currency, e.g. 500 for 500 DZD)",
+          "info": "Displayed as \"+ price\" using the store currency format. Leave 0 to hide it. Not charged automatically.",
+          "default": 500
+        },
+        {
+          "type": "text",
+          "id": "option_1",
+          "label": "Option 1",
+          "default": "Playoffs 2026"
+        },
+        {
+          "type": "text",
+          "id": "option_2",
+          "label": "Option 2",
+          "default": "Champions"
+        },
+        {
+          "type": "checkbox",
+          "id": "required",
+          "label": "Require a choice before adding to cart",
+          "default": false
+        },
+        {
+          "type": "text",
+          "id": "property_name",
+          "label": "Line-item property name",
+          "info": "Appears in the cart and on the order as \"Name: value\".",
+          "default": "Patch"
+        },
+        {
+          "type": "text",
+          "id": "required_message",
+          "label": "Error message when required and empty",
+          "default": "Please choose a patch before adding to cart."
+        }
+      ]
+    },
+    {
+      "type": "pdp_bundle_builder",
+      "name": "Bundle builder",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "Tabs (3 / 6 / 9 items), then a card with the current product in slot 1 and empty slots to fill from a collection. The bundle is added to the cart as separate lines; the free items are granted at checkout by your automatic \"Buy X get Y\" discount, so configure that discount in Shopify admin to match these tabs."
+        },
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Collection to pick jerseys from",
+          "info": "First 24 available products are listed in the picker drawer. Leave empty to use the product's first collection, then all products."
+        },
+        {
+          "type": "checkbox",
+          "id": "hide_current_product",
+          "label": "Hide the current product from the picker",
+          "default": false
+        },
+        {
+          "type": "select",
+          "id": "default_tab",
+          "label": "Tab open by default",
+          "options": [
+            {
+              "value": "1",
+              "label": "Tab 1"
+            },
+            {
+              "value": "2",
+              "label": "Tab 2"
+            },
+            {
+              "value": "3",
+              "label": "Tab 3"
+            }
+          ],
+          "default": "1"
+        },
+        {
+          "type": "header",
+          "content": "Tab 1"
+        },
+        {
+          "type": "range",
+          "id": "tab1_quantity",
+          "label": "Items in the bundle",
+          "info": "0 hides the tab.",
+          "min": 0,
+          "max": 12,
+          "step": 1,
+          "default": 4
+        },
+        {
+          "type": "range",
+          "id": "tab1_free",
+          "label": "Free items",
+          "min": 0,
+          "max": 11,
+          "step": 1,
+          "default": 1
+        },
+        {
+          "type": "range",
+          "id": "tab1_percent",
+          "label": "Badge percentage",
+          "info": "0 computes it from the free items (4 for 3 = 25%).",
+          "min": 0,
+          "max": 90,
+          "step": 1,
+          "unit": "%",
+          "default": 0
+        },
+        {
+          "type": "header",
+          "content": "Tab 2"
+        },
+        {
+          "type": "range",
+          "id": "tab2_quantity",
+          "label": "Items in the bundle",
+          "info": "0 hides the tab.",
+          "min": 0,
+          "max": 12,
+          "step": 1,
+          "default": 8
+        },
+        {
+          "type": "range",
+          "id": "tab2_free",
+          "label": "Free items",
+          "min": 0,
+          "max": 11,
+          "step": 1,
+          "default": 2
+        },
+        {
+          "type": "range",
+          "id": "tab2_percent",
+          "label": "Badge percentage",
+          "info": "0 computes it from the free items.",
+          "min": 0,
+          "max": 90,
+          "step": 1,
+          "unit": "%",
+          "default": 0
+        },
+        {
+          "type": "header",
+          "content": "Tab 3"
+        },
+        {
+          "type": "range",
+          "id": "tab3_quantity",
+          "label": "Items in the bundle",
+          "info": "0 hides the tab.",
+          "min": 0,
+          "max": 12,
+          "step": 1,
+          "default": 12
+        },
+        {
+          "type": "range",
+          "id": "tab3_free",
+          "label": "Free items",
+          "min": 0,
+          "max": 11,
+          "step": 1,
+          "default": 3
+        },
+        {
+          "type": "range",
+          "id": "tab3_percent",
+          "label": "Badge percentage",
+          "info": "0 computes it from the free items.",
+          "min": 0,
+          "max": 90,
+          "step": 1,
+          "unit": "%",
+          "default": 0
+        },
+        {
+          "type": "header",
+          "content": "Text"
+        },
+        {
+          "type": "text",
+          "id": "tabs_label",
+          "label": "Tabs accessibility label",
+          "default": "Bundle size"
+        },
+        {
+          "type": "text",
+          "id": "tab_items_label",
+          "label": "Tab first line",
+          "info": "[count] is replaced by the number of items.",
+          "default": "[count] items"
+        },
+        {
+          "type": "text",
+          "id": "tab_free_label",
+          "label": "Tab second line",
+          "info": "[count] is replaced by the number of free items.",
+          "default": "Get [count] free!"
+        },
+        {
+          "type": "text",
+          "id": "card_title",
+          "label": "Card title",
+          "info": "[quantity], [pay] and [free] are replaced (shown uppercase).",
+          "default": "Buy [pay], get [free] free"
+        },
+        {
+          "type": "text",
+          "id": "this_item_label",
+          "label": "Caption under the current product",
+          "default": "This item"
+        },
+        {
+          "type": "text",
+          "id": "size_label",
+          "label": "Size label",
+          "default": "Size"
+        },
+        {
+          "type": "text",
+          "id": "one_size_label",
+          "label": "Label for products without sizes",
+          "default": "One size"
+        },
+        {
+          "type": "text",
+          "id": "sold_out_label",
+          "label": "Sold out label",
+          "default": "Sold out"
+        },
+        {
+          "type": "text",
+          "id": "personalise_text",
+          "label": "Personalise link text",
+          "default": "Personalise"
+        },
+        {
+          "type": "text",
+          "id": "personalise_target",
+          "label": "Personalise link target (CSS selector)",
+          "info": "The block the link scrolls to.",
+          "default": "pdp-personalisation, .product-info__personalisation"
+        },
+        {
+          "type": "text",
+          "id": "placeholder_text",
+          "label": "Empty slot text",
+          "default": "Choose a jersey"
+        },
+        {
+          "type": "text",
+          "id": "change_label",
+          "label": "Filled slot accessibility label",
+          "default": "Change this jersey"
+        },
+        {
+          "type": "text",
+          "id": "remove_label",
+          "label": "Remove button accessibility label",
+          "default": "Remove from bundle"
+        },
+        {
+          "type": "text",
+          "id": "button_incomplete_text",
+          "label": "Button text while slots are missing",
+          "info": "[count] is replaced by the number of slots left.",
+          "default": "[count] more to choose"
+        },
+        {
+          "type": "text",
+          "id": "button_ready_text",
+          "label": "Button text when the bundle is complete",
+          "info": "[count] is replaced by the number of items.",
+          "default": "Add [count] to cart"
+        },
+        {
+          "type": "text",
+          "id": "button_adding_text",
+          "label": "Button text while adding",
+          "default": "Adding to cart…"
+        },
+        {
+          "type": "text",
+          "id": "error_text",
+          "label": "Generic error message",
+          "default": "Something went wrong. Please try again."
+        },
+        {
+          "type": "header",
+          "content": "Picker drawer"
+        },
+        {
+          "type": "text",
+          "id": "drawer_title",
+          "label": "Drawer title",
+          "default": "Choose a jersey"
+        },
+        {
+          "type": "text",
+          "id": "drawer_subtitle",
+          "label": "Drawer hint",
+          "default": "Pick any jersey and its size. It is added to your bundle right away."
+        },
+        {
+          "type": "text",
+          "id": "drawer_add_text",
+          "label": "Add button text",
+          "default": "Add to bundle"
+        },
+        {
+          "type": "text",
+          "id": "empty_collection_text",
+          "label": "Empty collection message",
+          "default": "No jerseys are available right now."
+        },
+        {
+          "type": "header",
+          "content": "Colours"
+        },
+        {
+          "type": "color",
+          "id": "button_background",
+          "label": "Add button background",
+          "default": "#FFCC00"
+        },
+        {
+          "type": "color",
+          "id": "button_text_color",
+          "label": "Add button text",
+          "default": "#000000"
+        },
+        {
+          "type": "color",
+          "id": "badge_color",
+          "label": "Discount badge / sale price colour",
+          "default": "#F04242"
+        }
+      ]
+    },
+    {
+      "type": "pdp_credit_line",
+      "name": "Store credit line",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "Small pill shown at the very top of the buy box: coin icon + \"Earn {amount} in store credit\". The amount is the current variant price multiplied by the percentage below and is formatted in the store currency."
+        },
+        {
+          "type": "range",
+          "id": "credit_percent",
+          "label": "Store credit percentage",
+          "min": 0,
+          "max": 20,
+          "step": 1,
+          "unit": "%",
+          "default": 5
+        },
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text",
+          "info": "Use [amount] where the credit amount should appear.",
+          "default": "Earn [amount] in store credit"
+        },
+        {
+          "type": "color",
+          "id": "icon_color",
+          "label": "Coin icon colour",
+          "default": "#FFD014"
+        },
+        {
+          "type": "color",
+          "id": "background",
+          "label": "Background",
+          "default": "#F5F5F5"
+        },
+        {
+          "type": "color",
+          "id": "text_color",
+          "label": "Text colour",
+          "default": "#121212"
+        }
+      ]
+    },
+    {
+      "type": "pdp_gallery_reviews",
+      "name": "Gallery reviews",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "header",
+          "content": "Header"
+        },
+        {
+          "type": "text",
+          "id": "rating",
+          "label": "Average rating",
+          "default": "4.6",
+          "info": "Shown big next to the stars, e.g. 4.6"
+        },
+        {
+          "type": "number",
+          "id": "count",
+          "label": "Number of reviews",
+          "default": 20
+        },
+        {
+          "type": "text",
+          "id": "banner_text",
+          "label": "Green banner text",
+          "default": "All reviews are from verified purchases"
+        },
+        {
+          "type": "url",
+          "id": "reviews_url",
+          "label": "See all reviews link"
+        },
+        {
+          "type": "text",
+          "id": "see_all_text",
+          "label": "See all button text",
+          "default": "See all [count] reviews",
+          "info": "[count] is replaced by the number of reviews"
+        },
+        {
+          "type": "header",
+          "content": "Labels"
+        },
+        {
+          "type": "text",
+          "id": "tab_recommended_label",
+          "label": "Tab 1 label (merchant order)",
+          "default": "Recommended"
+        },
+        {
+          "type": "text",
+          "id": "tab_recent_label",
+          "label": "Tab 2 label (newest first)",
+          "default": "Most recent"
+        },
+        {
+          "type": "text",
+          "id": "bought_label",
+          "label": "Size chip prefix",
+          "default": "Bought:"
+        },
+        {
+          "type": "text",
+          "id": "helpful_label",
+          "label": "Helpful label",
+          "default": "Helpful"
+        },
+        {
+          "type": "header",
+          "content": "Review 1"
+        },
+        {
+          "type": "text",
+          "id": "review_1_author",
+          "label": "Author",
+          "default": "Sofiane B."
+        },
+        {
+          "type": "text",
+          "id": "review_1_city",
+          "label": "City",
+          "default": "Algiers"
+        },
+        {
+          "type": "text",
+          "id": "review_1_flag",
+          "label": "Country flag (emoji)",
+          "default": "🇩🇿"
+        },
+        {
+          "type": "text",
+          "id": "review_1_date",
+          "label": "Date",
+          "default": "12/09/2026",
+          "info": "Day/month/year or ISO date, used by the Most recent tab"
+        },
+        {
+          "type": "range",
+          "id": "review_1_rating",
+          "label": "Rating",
+          "min": 1,
+          "max": 5,
+          "step": 1,
+          "default": 5
+        },
+        {
+          "type": "text",
+          "id": "review_1_size",
+          "label": "Size bought",
+          "default": "L"
+        },
+        {
+          "type": "text",
+          "id": "review_1_fit",
+          "label": "Fit",
+          "default": "True to size"
+        },
+        {
+          "type": "richtext",
+          "id": "review_1_body",
+          "label": "Review text",
+          "default": "<p>Wore it to a pickup game the same week it arrived. The mesh breathes well and the stitching on the numbers has held up after several washes.</p>"
+        },
+        {
+          "type": "number",
+          "id": "review_1_helpful",
+          "label": "Helpful votes",
+          "default": 14
+        },
+        {
+          "type": "header",
+          "content": "Review 2"
+        },
+        {
+          "type": "text",
+          "id": "review_2_author",
+          "label": "Author",
+          "default": "Lina K."
+        },
+        {
+          "type": "text",
+          "id": "review_2_city",
+          "label": "City",
+          "default": "Oran"
+        },
+        {
+          "type": "text",
+          "id": "review_2_flag",
+          "label": "Country flag (emoji)",
+          "default": "🇩🇿"
+        },
+        {
+          "type": "text",
+          "id": "review_2_date",
+          "label": "Date",
+          "default": "05/09/2026"
+        },
+        {
+          "type": "range",
+          "id": "review_2_rating",
+          "label": "Rating",
+          "min": 1,
+          "max": 5,
+          "step": 1,
+          "default": 5
+        },
+        {
+          "type": "text",
+          "id": "review_2_size",
+          "label": "Size bought",
+          "default": "M"
+        },
+        {
+          "type": "text",
+          "id": "review_2_fit",
+          "label": "Fit",
+          "default": "True to size"
+        },
+        {
+          "type": "richtext",
+          "id": "review_2_body",
+          "label": "Review text",
+          "default": "<p>Ordered it as a gift and the print on the name and number came out crisp. Fits exactly like the size chart says.</p>"
+        },
+        {
+          "type": "number",
+          "id": "review_2_helpful",
+          "label": "Helpful votes",
+          "default": 9
+        },
+        {
+          "type": "header",
+          "content": "Review 3"
+        },
+        {
+          "type": "text",
+          "id": "review_3_author",
+          "label": "Author",
+          "default": "Yacine M."
+        },
+        {
+          "type": "text",
+          "id": "review_3_city",
+          "label": "City",
+          "default": "Constantine"
+        },
+        {
+          "type": "text",
+          "id": "review_3_flag",
+          "label": "Country flag (emoji)",
+          "default": "🇩🇿"
+        },
+        {
+          "type": "text",
+          "id": "review_3_date",
+          "label": "Date",
+          "default": "28/08/2026"
+        },
+        {
+          "type": "range",
+          "id": "review_3_rating",
+          "label": "Rating",
+          "min": 1,
+          "max": 5,
+          "step": 1,
+          "default": 4
+        },
+        {
+          "type": "text",
+          "id": "review_3_size",
+          "label": "Size bought",
+          "default": "XL"
+        },
+        {
+          "type": "text",
+          "id": "review_3_fit",
+          "label": "Fit",
+          "default": "Slightly loose"
+        },
+        {
+          "type": "richtext",
+          "id": "review_3_body",
+          "label": "Review text",
+          "default": "<p>Great colours and the fabric feels like a real game jersey. I would go one size down if you like a snug fit.</p>"
+        },
+        {
+          "type": "number",
+          "id": "review_3_helpful",
+          "label": "Helpful votes",
+          "default": 6
+        },
+        {
+          "type": "header",
+          "content": "Review 4"
+        },
+        {
+          "type": "text",
+          "id": "review_4_author",
+          "label": "Author"
+        },
+        {
+          "type": "text",
+          "id": "review_4_city",
+          "label": "City"
+        },
+        {
+          "type": "text",
+          "id": "review_4_flag",
+          "label": "Country flag (emoji)"
+        },
+        {
+          "type": "text",
+          "id": "review_4_date",
+          "label": "Date",
+          "info": "Day/month/year or ISO date, used by the Most recent tab"
+        },
+        {
+          "type": "range",
+          "id": "review_4_rating",
+          "label": "Rating",
+          "min": 1,
+          "max": 5,
+          "step": 1,
+              "default": 5
+        },
+        {
+          "type": "text",
+          "id": "review_4_size",
+          "label": "Size bought"
+        },
+        {
+          "type": "text",
+          "id": "review_4_fit",
+          "label": "Fit"
+        },
+        {
+          "type": "richtext",
+          "id": "review_4_body",
+          "label": "Review text"
+        },
+        {
+          "type": "number",
+          "id": "review_4_helpful",
+          "label": "Helpful votes"
+        },
+        {
+          "type": "header",
+          "content": "Review 5"
+        },
+        {
+          "type": "text",
+          "id": "review_5_author",
+          "label": "Author"
+        },
+        {
+          "type": "text",
+          "id": "review_5_city",
+          "label": "City"
+        },
+        {
+          "type": "text",
+          "id": "review_5_flag",
+          "label": "Country flag (emoji)"
+        },
+        {
+          "type": "text",
+          "id": "review_5_date",
+          "label": "Date",
+          "info": "Day/month/year or ISO date, used by the Most recent tab"
+        },
+        {
+          "type": "range",
+          "id": "review_5_rating",
+          "label": "Rating",
+          "min": 1,
+          "max": 5,
+          "step": 1,
+              "default": 5
+        },
+        {
+          "type": "text",
+          "id": "review_5_size",
+          "label": "Size bought"
+        },
+        {
+          "type": "text",
+          "id": "review_5_fit",
+          "label": "Fit"
+        },
+        {
+          "type": "richtext",
+          "id": "review_5_body",
+          "label": "Review text"
+        },
+        {
+          "type": "number",
+          "id": "review_5_helpful",
+          "label": "Helpful votes"
+        },
+        {
+          "type": "header",
+          "content": "Review 6"
+        },
+        {
+          "type": "text",
+          "id": "review_6_author",
+          "label": "Author"
+        },
+        {
+          "type": "text",
+          "id": "review_6_city",
+          "label": "City"
+        },
+        {
+          "type": "text",
+          "id": "review_6_flag",
+          "label": "Country flag (emoji)"
+        },
+        {
+          "type": "text",
+          "id": "review_6_date",
+          "label": "Date",
+          "info": "Day/month/year or ISO date, used by the Most recent tab"
+        },
+        {
+          "type": "range",
+          "id": "review_6_rating",
+          "label": "Rating",
+          "min": 1,
+          "max": 5,
+          "step": 1,
+              "default": 5
+        },
+        {
+          "type": "text",
+          "id": "review_6_size",
+          "label": "Size bought"
+        },
+        {
+          "type": "text",
+          "id": "review_6_fit",
+          "label": "Fit"
+        },
+        {
+          "type": "richtext",
+          "id": "review_6_body",
+          "label": "Review text"
+        },
+        {
+          "type": "number",
+          "id": "review_6_helpful",
+          "label": "Helpful votes"
+        },
+        {
+          "type": "header",
+          "content": "Review 7"
+        },
+        {
+          "type": "text",
+          "id": "review_7_author",
+          "label": "Author"
+        },
+        {
+          "type": "text",
+          "id": "review_7_city",
+          "label": "City"
+        },
+        {
+          "type": "text",
+          "id": "review_7_flag",
+          "label": "Country flag (emoji)"
+        },
+        {
+          "type": "text",
+          "id": "review_7_date",
+          "label": "Date",
+          "info": "Day/month/year or ISO date, used by the Most recent tab"
+        },
+        {
+          "type": "range",
+          "id": "review_7_rating",
+          "label": "Rating",
+          "min": 1,
+          "max": 5,
+          "step": 1,
+              "default": 5
+        },
+        {
+          "type": "text",
+          "id": "review_7_size",
+          "label": "Size bought"
+        },
+        {
+          "type": "text",
+          "id": "review_7_fit",
+          "label": "Fit"
+        },
+        {
+          "type": "richtext",
+          "id": "review_7_body",
+          "label": "Review text"
+        },
+        {
+          "type": "number",
+          "id": "review_7_helpful",
+          "label": "Helpful votes"
+        },
+        {
+          "type": "header",
+          "content": "Review 8"
+        },
+        {
+          "type": "text",
+          "id": "review_8_author",
+          "label": "Author"
+        },
+        {
+          "type": "text",
+          "id": "review_8_city",
+          "label": "City"
+        },
+        {
+          "type": "text",
+          "id": "review_8_flag",
+          "label": "Country flag (emoji)"
+        },
+        {
+          "type": "text",
+          "id": "review_8_date",
+          "label": "Date",
+          "info": "Day/month/year or ISO date, used by the Most recent tab"
+        },
+        {
+          "type": "range",
+          "id": "review_8_rating",
+          "label": "Rating",
+          "min": 1,
+          "max": 5,
+          "step": 1,
+              "default": 5
+        },
+        {
+          "type": "text",
+          "id": "review_8_size",
+          "label": "Size bought"
+        },
+        {
+          "type": "text",
+          "id": "review_8_fit",
+          "label": "Fit"
+        },
+        {
+          "type": "richtext",
+          "id": "review_8_body",
+          "label": "Review text"
+        },
+        {
+          "type": "number",
+          "id": "review_8_helpful",
+          "label": "Helpful votes"
+        },
+        {
+          "type": "header",
+          "content": "Review 9"
+        },
+        {
+          "type": "text",
+          "id": "review_9_author",
+          "label": "Author"
+        },
+        {
+          "type": "text",
+          "id": "review_9_city",
+          "label": "City"
+        },
+        {
+          "type": "text",
+          "id": "review_9_flag",
+          "label": "Country flag (emoji)"
+        },
+        {
+          "type": "text",
+          "id": "review_9_date",
+          "label": "Date",
+          "info": "Day/month/year or ISO date, used by the Most recent tab"
+        },
+        {
+          "type": "range",
+          "id": "review_9_rating",
+          "label": "Rating",
+          "min": 1,
+          "max": 5,
+          "step": 1,
+              "default": 5
+        },
+        {
+          "type": "text",
+          "id": "review_9_size",
+          "label": "Size bought"
+        },
+        {
+          "type": "text",
+          "id": "review_9_fit",
+          "label": "Fit"
+        },
+        {
+          "type": "richtext",
+          "id": "review_9_body",
+          "label": "Review text"
+        },
+        {
+          "type": "number",
+          "id": "review_9_helpful",
+          "label": "Helpful votes"
+        },
+        {
+          "type": "header",
+          "content": "Review 10"
+        },
+        {
+          "type": "text",
+          "id": "review_10_author",
+          "label": "Author"
+        },
+        {
+          "type": "text",
+          "id": "review_10_city",
+          "label": "City"
+        },
+        {
+          "type": "text",
+          "id": "review_10_flag",
+          "label": "Country flag (emoji)"
+        },
+        {
+          "type": "text",
+          "id": "review_10_date",
+          "label": "Date",
+          "info": "Day/month/year or ISO date, used by the Most recent tab"
+        },
+        {
+          "type": "range",
+          "id": "review_10_rating",
+          "label": "Rating",
+          "min": 1,
+          "max": 5,
+          "step": 1,
+              "default": 5
+        },
+        {
+          "type": "text",
+          "id": "review_10_size",
+          "label": "Size bought"
+        },
+        {
+          "type": "text",
+          "id": "review_10_fit",
+          "label": "Fit"
+        },
+        {
+          "type": "richtext",
+          "id": "review_10_body",
+          "label": "Review text"
+        },
+        {
+          "type": "number",
+          "id": "review_10_helpful",
+          "label": "Helpful votes"
+        }
+      ]
+    },
+    {
+      "type": "pdp_payment_icons",
+      "name": "Payment icons",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "Row of payment logos under the add to cart button (38x24px, 8px gap)."
+        },
+        {
+          "type": "select",
+          "id": "icons_source",
+          "label": "Logos shown",
+          "options": [
+            {
+              "value": "custom",
+              "label": "My list below"
+            },
+            {
+              "value": "store",
+              "label": "Methods enabled in Shopify payments"
+            }
+          ],
+          "default": "custom"
+        },
+        {
+          "type": "text",
+          "id": "icons_list",
+          "label": "Logo list",
+          "default": "visa, master, american_express, discover, paypal, apple_pay, google_pay, shopify_pay, venmo, klarna, afterpay",
+          "info": "Comma-separated, in display order. Names: visa, master, american_express, discover, diners_club, jcb, paypal, apple_pay, google_pay, shopify_pay, venmo, klarna, afterpay, amazon, unionpay, maestro."
+        },
+        {
+          "type": "select",
+          "id": "alignment",
+          "label": "Alignment",
+          "options": [
+            {
+              "value": "start",
+              "label": "Left"
+            },
+            {
+              "value": "center",
+              "label": "Center"
+            }
+          ],
+          "default": "center"
+        }
+      ]
+    },
+    {
+      "type": "pdp_personalisation",
+      "name": "Personalisation",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "Buy-box item 6. A two-button switch lets the customer either pick a player from a list or type their own name and number. Only the active choice is sent to the cart, as line item properties \"Player\" or \"Name\" + \"Number\"."
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "Personalise your jersey"
+        },
+        {
+          "type": "header",
+          "content": "Segmented control"
+        },
+        {
+          "type": "text",
+          "id": "tab_player_label",
+          "label": "Player tab",
+          "default": "Choose a player"
+        },
+        {
+          "type": "text",
+          "id": "tab_name_label",
+          "label": "Custom name tab",
+          "default": "Add your name"
+        },
+        {
+          "type": "select",
+          "id": "default_tab",
+          "label": "Tab open by default",
+          "options": [
+            {
+              "value": "player",
+              "label": "Choose a player"
+            },
+            {
+              "value": "name",
+              "label": "Add your name"
+            }
+          ],
+          "default": "player",
+          "info": "The customer's last choice is remembered per product and takes priority."
+        },
+        {
+          "type": "color",
+          "id": "accent_color",
+          "label": "Active tab text colour",
+          "default": "#121212"
+        },
+        {
+          "type": "header",
+          "content": "Player list"
+        },
+        {
+          "type": "textarea",
+          "id": "players",
+          "label": "Players (one per line)",
+          "info": "Format: Name · 23. Leave empty to build the list from the product tags starting with \"joueur-\" (joueur-jalen-brunson becomes \"Jalen Brunson\", joueur-jalen-brunson-11 becomes \"Jalen Brunson · 11\"). If neither exists, only the name panel is shown."
+        },
+        {
+          "type": "text",
+          "id": "player_placeholder",
+          "label": "Select placeholder",
+          "default": "Choose a player (optional)"
+        },
+        {
+          "type": "header",
+          "content": "Custom name"
+        },
+        {
+          "type": "text",
+          "id": "name_label",
+          "label": "Name field label",
+          "default": "Name"
+        },
+        {
+          "type": "text",
+          "id": "name_placeholder",
+          "label": "Name field placeholder",
+          "default": "YOUR NAME"
+        },
+        {
+          "type": "range",
+          "id": "name_max_length",
+          "label": "Name max characters",
+          "min": 4,
+          "max": 16,
+          "step": 1,
+          "default": 12
+        },
+        {
+          "type": "text",
+          "id": "number_label",
+          "label": "Number field label",
+          "default": "Number"
+        },
+        {
+          "type": "text",
+          "id": "number_placeholder",
+          "label": "Number field placeholder",
+          "default": "00"
+        },
+        {
+          "type": "text",
+          "id": "helper_text",
+          "label": "Helper text",
+          "default": "Printed on the back exactly as entered. Numbers: 2 digits max."
+        }
+      ]
+    },
+    {
+      "type": "pdp_price_row",
+      "name": "Price row",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "Shows the compare-at price (struck through), the current price, then a \"-N%\" discount badge computed from the compare-at price. Without a compare-at price only the current price is shown."
+        },
+        {
+          "type": "checkbox",
+          "id": "show_badge",
+          "label": "Show discount badge",
+          "default": true
+        },
+        {
+          "type": "color",
+          "id": "badge_background",
+          "label": "Badge background",
+          "default": "#F04242"
+        },
+        {
+          "type": "color",
+          "id": "badge_text_color",
+          "label": "Badge text color",
+          "default": "#FFFFFF"
+        }
+      ]
+    },
+    {
+      "type": "pdp_size_selector",
+      "name": "PDP size selector",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "Replaces the theme's \"Variant picker\" block: renders the size option as rectangular buttons with a \"Choose your size\" header and an underlined size guide link. Remove the standard Variant picker block when using this one."
+        },
+        {
+          "type": "text",
+          "id": "label_text",
+          "label": "Label",
+          "info": "Shown in uppercase, followed by the selected size.",
+          "default": "Choose your size"
+        },
+        {
+          "type": "text",
+          "id": "size_option_name",
+          "label": "Size option name",
+          "info": "Name of the product option that holds the sizes.",
+          "default": "Size"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_size_guide",
+          "label": "Show size guide link",
+          "default": true
+        },
+        {
+          "type": "text",
+          "id": "size_guide_text",
+          "label": "Size guide link text",
+          "default": "Size guide"
+        },
+        {
+          "type": "select",
+          "id": "other_options",
+          "label": "Other product options",
+          "info": "How to render options that are not the size (for example Colour).",
+          "options": [
+            {
+              "value": "show",
+              "label": "Show as buttons"
+            },
+            {
+              "value": "hide",
+              "label": "Hide (first value stays selected)"
+            }
+          ],
+          "default": "show"
+        },
+        {
+          "type": "checkbox",
+          "id": "hide_sold_out_variants",
+          "label": "Hide sold out sizes",
+          "default": false
+        }
+      ]
+    },
+    {
+      "type": "pdp_social_videos",
+      "name": "Social proof videos",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "Three vertical (9:16) customer video tiles with a \"Verified\" tag and a play button. Videos play muted inline on click. A tile with no video shows its poster, or a neutral placeholder."
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "Loved on socials"
+        },
+        {
+          "type": "text",
+          "id": "verified_text",
+          "label": "Tag text",
+          "default": "Verified"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_verified",
+          "label": "Show verified tag",
+          "default": true
+        },
+        {
+          "type": "header",
+          "content": "Video 1"
+        },
+        {
+          "type": "video",
+          "id": "video_1",
+          "label": "Video",
+          "info": "Shopify-hosted video. Takes priority over the external URL."
+        },
+        {
+          "type": "video_url",
+          "id": "video_url_1",
+          "label": "External video URL",
+          "accept": [
+            "youtube",
+            "vimeo"
+          ]
+        },
+        {
+          "type": "image_picker",
+          "id": "poster_1",
+          "label": "Poster image",
+          "info": "Vertical 9:16 recommended. Shown before play, or on its own when no video is set."
+        },
+        {
+          "type": "header",
+          "content": "Video 2"
+        },
+        {
+          "type": "video",
+          "id": "video_2",
+          "label": "Video",
+          "info": "Shopify-hosted video. Takes priority over the external URL."
+        },
+        {
+          "type": "video_url",
+          "id": "video_url_2",
+          "label": "External video URL",
+          "accept": [
+            "youtube",
+            "vimeo"
+          ]
+        },
+        {
+          "type": "image_picker",
+          "id": "poster_2",
+          "label": "Poster image",
+          "info": "Vertical 9:16 recommended. Shown before play, or on its own when no video is set."
+        },
+        {
+          "type": "header",
+          "content": "Video 3"
+        },
+        {
+          "type": "video",
+          "id": "video_3",
+          "label": "Video",
+          "info": "Shopify-hosted video. Takes priority over the external URL."
+        },
+        {
+          "type": "video_url",
+          "id": "video_url_3",
+          "label": "External video URL",
+          "accept": [
+            "youtube",
+            "vimeo"
+          ]
+        },
+        {
+          "type": "image_picker",
+          "id": "poster_3",
+          "label": "Poster image",
+          "info": "Vertical 9:16 recommended. Shown before play, or on its own when no video is set."
+        }
+      ]
+    },
+    {
+      "type": "pdp_sticky_bar",
+      "name": "PDP sticky bar",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "Fixed bottom bar (thumbnail, title, price, delivery window, size menu and yellow \"Add to cart\" pill) that slides in once the main add-to-cart button scrolls out of view. Replaces the theme's \"Sticky add to cart\" block and the section's \"Show fixed add to cart\" bar: turn those off to avoid two bars."
+        },
+        {
+          "type": "text",
+          "id": "button_text",
+          "label": "Button text",
+          "default": "Add to cart"
+        },
+        {
+          "type": "header",
+          "content": "Delivery estimate"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_delivery",
+          "label": "Show delivery window",
+          "info": "Shown under the price as \"Delivery 9–16/10\" (hidden on mobile).",
+          "default": true
+        },
+        {
+          "type": "range",
+          "id": "min_days",
+          "label": "Earliest delivery (days from today)",
+          "min": 0,
+          "max": 60,
+          "step": 1,
+          "default": 5
+        },
+        {
+          "type": "range",
+          "id": "max_days",
+          "label": "Latest delivery (days from today)",
+          "min": 0,
+          "max": 60,
+          "step": 1,
+          "default": 12
+        },
+        {
+          "type": "header",
+          "content": "Visibility"
+        },
+        {
+          "type": "checkbox",
+          "id": "mobile_only",
+          "label": "Show on mobile only",
+          "info": "When checked the bar is hidden on screens 700px and wider.",
+          "default": false
+        }
+      ]
+    },
+    {
+      "type": "pdp_tiers",
+      "name": "Volume savings tiers",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "Display-only panel showing the bundle savings ladder (Take N / Pay M / -P%). Create the matching automatic discounts in Admin > Discounts so the savings actually apply at checkout. Leave a percentage at 0 to compute it from quantity and pay (e.g. 3/2 = 33%). Set a quantity to 0 to hide that tier."
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "The more you take, the more you save"
+        },
+        {
+          "type": "text",
+          "id": "take_label",
+          "label": "Quantity label",
+          "default": "Take"
+        },
+        {
+          "type": "text",
+          "id": "pay_label",
+          "label": "Pay label",
+          "default": "Pay"
+        },
+        {
+          "type": "header",
+          "content": "Tier 1"
+        },
+        {
+          "type": "number",
+          "id": "tier1_quantity",
+          "label": "Take (quantity)",
+          "default": 3
+        },
+        {
+          "type": "number",
+          "id": "tier1_pay",
+          "label": "Pay (quantity)",
+          "default": 2
+        },
+        {
+          "type": "number",
+          "id": "tier1_percent",
+          "label": "Discount (%)",
+          "default": 33
+        },
+        {
+          "type": "header",
+          "content": "Tier 2"
+        },
+        {
+          "type": "number",
+          "id": "tier2_quantity",
+          "label": "Take (quantity)",
+          "default": 6
+        },
+        {
+          "type": "number",
+          "id": "tier2_pay",
+          "label": "Pay (quantity)",
+          "default": 3
+        },
+        {
+          "type": "number",
+          "id": "tier2_percent",
+          "label": "Discount (%)",
+          "default": 50
+        },
+        {
+          "type": "header",
+          "content": "Tier 3"
+        },
+        {
+          "type": "number",
+          "id": "tier3_quantity",
+          "label": "Take (quantity)",
+          "default": 9
+        },
+        {
+          "type": "number",
+          "id": "tier3_pay",
+          "label": "Pay (quantity)",
+          "default": 4
+        },
+        {
+          "type": "number",
+          "id": "tier3_percent",
+          "label": "Discount (%)",
+          "default": 56
+        },
+        {
+          "type": "header",
+          "content": "Tier 4"
+        },
+        {
+          "type": "number",
+          "id": "tier4_quantity",
+          "label": "Take (quantity)",
+          "default": 12
+        },
+        {
+          "type": "number",
+          "id": "tier4_pay",
+          "label": "Pay (quantity)",
+          "default": 5
+        },
+        {
+          "type": "number",
+          "id": "tier4_percent",
+          "label": "Discount (%)",
+          "default": 58
+        },
+        {
+          "type": "header",
+          "content": "Tier 5"
+        },
+        {
+          "type": "number",
+          "id": "tier5_quantity",
+          "label": "Take (quantity)",
+          "default": 15
+        },
+        {
+          "type": "number",
+          "id": "tier5_pay",
+          "label": "Pay (quantity)",
+          "default": 6
+        },
+        {
+          "type": "number",
+          "id": "tier5_percent",
+          "label": "Discount (%)",
+          "default": 60
+        }
+      ]
+    },
+    {
+      "type": "pdp_trust_icons",
+      "name": "Trust icons",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "Three centred reassurance columns under the bundle builder. Each column shows a custom image (40px tall) or a theme icon, then a short uppercase label."
+        },
+        {
+          "type": "color",
+          "id": "text_color",
+          "label": "Label colour",
+          "default": "#121212"
+        },
+        {
+          "type": "color",
+          "id": "border_color",
+          "label": "Top border colour",
+          "default": "#F0F0F0"
+        },
+        {
+          "type": "header",
+          "content": "Column 1"
+        },
+        {
+          "type": "image_picker",
+          "id": "image_1",
+          "label": "Image",
+          "info": "Overrides the icon. Rendered 40px tall, width auto (e.g. a carrier logo)."
+        },
+        {
+          "type": "select",
+          "id": "icon_1",
+          "label": "Icon",
+          "options": [
+            {
+              "value": "none",
+              "label": "None"
+            },
+            {
+              "value": "picto-truck",
+              "label": "Truck"
+            },
+            {
+              "value": "picto-gift",
+              "label": "Gift"
+            },
+            {
+              "value": "picto-star",
+              "label": "Star"
+            },
+            {
+              "value": "picto-box",
+              "label": "Parcel"
+            },
+            {
+              "value": "picto-plane",
+              "label": "Plane"
+            },
+            {
+              "value": "picto-return",
+              "label": "Returns"
+            },
+            {
+              "value": "picto-shield",
+              "label": "Shield"
+            },
+            {
+              "value": "picto-lock",
+              "label": "Padlock"
+            },
+            {
+              "value": "picto-secure-profile",
+              "label": "Secure profile"
+            },
+            {
+              "value": "picto-credit-card",
+              "label": "Credit card"
+            },
+            {
+              "value": "picto-money",
+              "label": "Money"
+            },
+            {
+              "value": "picto-percent",
+              "label": "Percent"
+            },
+            {
+              "value": "picto-award-gift",
+              "label": "Award"
+            },
+            {
+              "value": "picto-validation",
+              "label": "Checkmark"
+            },
+            {
+              "value": "picto-like",
+              "label": "Thumbs up"
+            },
+            {
+              "value": "picto-love",
+              "label": "Heart"
+            },
+            {
+              "value": "picto-happy",
+              "label": "Smile"
+            },
+            {
+              "value": "picto-customer-support",
+              "label": "Customer support"
+            },
+            {
+              "value": "picto-timer",
+              "label": "Timer"
+            },
+            {
+              "value": "picto-leaf",
+              "label": "Leaf"
+            },
+            {
+              "value": "picto-question",
+              "label": "Question"
+            }
+          ],
+          "default": "picto-truck"
+        },
+        {
+          "type": "color",
+          "id": "icon_color_1",
+          "label": "Icon colour",
+          "default": "#121212"
+        },
+        {
+          "type": "text",
+          "id": "text_1",
+          "label": "Label",
+          "default": "Free delivery"
+        },
+        {
+          "type": "header",
+          "content": "Column 2"
+        },
+        {
+          "type": "image_picker",
+          "id": "image_2",
+          "label": "Image",
+          "info": "Overrides the icon. Rendered 40px tall."
+        },
+        {
+          "type": "select",
+          "id": "icon_2",
+          "label": "Icon",
+          "options": [
+            {
+              "value": "none",
+              "label": "None"
+            },
+            {
+              "value": "picto-truck",
+              "label": "Truck"
+            },
+            {
+              "value": "picto-gift",
+              "label": "Gift"
+            },
+            {
+              "value": "picto-star",
+              "label": "Star"
+            },
+            {
+              "value": "picto-box",
+              "label": "Parcel"
+            },
+            {
+              "value": "picto-plane",
+              "label": "Plane"
+            },
+            {
+              "value": "picto-return",
+              "label": "Returns"
+            },
+            {
+              "value": "picto-shield",
+              "label": "Shield"
+            },
+            {
+              "value": "picto-lock",
+              "label": "Padlock"
+            },
+            {
+              "value": "picto-secure-profile",
+              "label": "Secure profile"
+            },
+            {
+              "value": "picto-credit-card",
+              "label": "Credit card"
+            },
+            {
+              "value": "picto-money",
+              "label": "Money"
+            },
+            {
+              "value": "picto-percent",
+              "label": "Percent"
+            },
+            {
+              "value": "picto-award-gift",
+              "label": "Award"
+            },
+            {
+              "value": "picto-validation",
+              "label": "Checkmark"
+            },
+            {
+              "value": "picto-like",
+              "label": "Thumbs up"
+            },
+            {
+              "value": "picto-love",
+              "label": "Heart"
+            },
+            {
+              "value": "picto-happy",
+              "label": "Smile"
+            },
+            {
+              "value": "picto-customer-support",
+              "label": "Customer support"
+            },
+            {
+              "value": "picto-timer",
+              "label": "Timer"
+            },
+            {
+              "value": "picto-leaf",
+              "label": "Leaf"
+            },
+            {
+              "value": "picto-question",
+              "label": "Question"
+            }
+          ],
+          "default": "picto-gift"
+        },
+        {
+          "type": "color",
+          "id": "icon_color_2",
+          "label": "Icon colour",
+          "default": "#00B67A"
+        },
+        {
+          "type": "text",
+          "id": "text_2",
+          "label": "Label",
+          "default": "Money-back guarantee"
+        },
+        {
+          "type": "header",
+          "content": "Column 3"
+        },
+        {
+          "type": "image_picker",
+          "id": "image_3",
+          "label": "Image",
+          "info": "Overrides the icon. Rendered 40px tall (e.g. a review-platform logo)."
+        },
+        {
+          "type": "select",
+          "id": "icon_3",
+          "label": "Icon",
+          "options": [
+            {
+              "value": "none",
+              "label": "None"
+            },
+            {
+              "value": "picto-truck",
+              "label": "Truck"
+            },
+            {
+              "value": "picto-gift",
+              "label": "Gift"
+            },
+            {
+              "value": "picto-star",
+              "label": "Star"
+            },
+            {
+              "value": "picto-box",
+              "label": "Parcel"
+            },
+            {
+              "value": "picto-plane",
+              "label": "Plane"
+            },
+            {
+              "value": "picto-return",
+              "label": "Returns"
+            },
+            {
+              "value": "picto-shield",
+              "label": "Shield"
+            },
+            {
+              "value": "picto-lock",
+              "label": "Padlock"
+            },
+            {
+              "value": "picto-secure-profile",
+              "label": "Secure profile"
+            },
+            {
+              "value": "picto-credit-card",
+              "label": "Credit card"
+            },
+            {
+              "value": "picto-money",
+              "label": "Money"
+            },
+            {
+              "value": "picto-percent",
+              "label": "Percent"
+            },
+            {
+              "value": "picto-award-gift",
+              "label": "Award"
+            },
+            {
+              "value": "picto-validation",
+              "label": "Checkmark"
+            },
+            {
+              "value": "picto-like",
+              "label": "Thumbs up"
+            },
+            {
+              "value": "picto-love",
+              "label": "Heart"
+            },
+            {
+              "value": "picto-happy",
+              "label": "Smile"
+            },
+            {
+              "value": "picto-customer-support",
+              "label": "Customer support"
+            },
+            {
+              "value": "picto-timer",
+              "label": "Timer"
+            },
+            {
+              "value": "picto-leaf",
+              "label": "Leaf"
+            },
+            {
+              "value": "picto-question",
+              "label": "Question"
+            }
+          ],
+          "default": "picto-star"
+        },
+        {
+          "type": "color",
+          "id": "icon_color_3",
+          "label": "Icon colour",
+          "default": "#121212"
+        },
+        {
+          "type": "text",
+          "id": "text_3",
+          "label": "Label",
+          "default": "10,000+ happy fans"
+        }
+      ]
+    }
+  ],
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "label": "Full width",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_fixed_add_to_cart",
+      "label": "Show add to cart on scroll",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Media"
+    },
+    {
+      "type": "paragraph",
+      "content": "Learn more about [media types](https://help.shopify.com/en/manual/products/product-media)"
+    },
+    {
+      "type": "range",
+      "id": "desktop_media_width",
+      "label": "Desktop media size",
+      "min": 35,
+      "max": 65,
+      "step": 5,
+      "unit": "%",
+      "default": 55
+    },
+    {
+      "type": "select",
+      "id": "desktop_media_layout",
+      "label": "Desktop media layout",
+      "options": [
+        {
+          "value": "grid_one",
+          "label": "Grid (1x1)"
+        },
+        {
+          "value": "grid",
+          "label": "Grid (2x2)"
+        },
+        {
+          "value": "grid_highlight",
+          "label": "Grid (2x2) with highlighted media"
+        },
+        {
+          "value": "carousel_thumbnails_left",
+          "label": "Thumbnails left (carousel)"
+        },
+        {
+          "value": "carousel_thumbnails_bottom",
+          "label": "Thumbnails bottom (carousel)"
+        }
+      ],
+      "default": "carousel_thumbnails_left"
+    },
+    {
+      "type": "select",
+      "id": "mobile_media_size",
+      "label": "Mobile media size",
+      "options": [
+        {
+          "value": "expanded",
+          "label": "Expanded"
+        },
+        {
+          "value": "contained",
+          "label": "Contained"
+        }
+      ],
+      "default": "expanded"
+    },
+    {
+      "type": "select",
+      "id": "mobile_carousel_control",
+      "label": "Mobile carousel control",
+      "options": [
+        {
+          "value": "dots",
+          "label": "Dots"
+        },
+        {
+          "value": "floating_dots",
+          "label": "Floating dots"
+        },
+        {
+          "value": "thumbnails",
+          "label": "Thumbnails"
+        },
+        {
+          "value": "free_scroll",
+          "label": "Free scroll"
+        }
+      ],
+      "default": "floating_dots"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_video_autoplay",
+      "label": "Enable video autoplay",
+      "info": "Video are muted automatically to allow autoplay. Grid mode on desktop turn off autoplay.",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_video_looping",
+      "label": "Enable video looping",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Image zoom"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_image_zoom",
+      "label": "Enable",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "max_image_zoom_level",
+      "min": 1,
+      "max": 4,
+      "step": 0.5,
+      "label": "Max zoom level",
+      "default": 3
+    },
+    {
+      "type": "header",
+      "content": "Colors",
+      "info": "Gradient replaces solid colors when set."
+    },
+    {
+      "type": "color",
+      "id": "background",
+      "label": "Background"
+    },
+    {
+      "type": "color_background",
+      "id": "background_gradient",
+      "label": "Background gradient"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text"
+    },
+    {
+      "type": "header",
+      "content": "Input colors",
+      "info": "Applies to elements like quantity selector and variant selectors."
+    },
+    {
+      "type": "color",
+      "id": "input_background",
+      "label": "Background",
+      "default": "rgba(0,0,0,0)"
+    },
+    {
+      "type": "color",
+      "id": "input_text_color",
+      "label": "Text"
+    }
+  ]
+}
+{% endschema %}

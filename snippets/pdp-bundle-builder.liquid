@@ -1,0 +1,1609 @@
+{%- comment -%}
+----------------------------------------------------------------------------------------------------------------------
+PDP BUNDLE BUILDER (block type "pdp_bundle_builder")
+----------------------------------------------------------------------------------------------------------------------
+
+Buy-box item 14 of the reference layout: three tabs ("3 items / Get 1 free!", "6 items / Get 3 free!",
+"9 items / Get 5 free!"), then a card ("BUY 3, PAY 2" + "-33%" badge) holding N slots. Slot 1 is always the current
+product (image, struck compare-at price, price, "This item", a size <select> of its available variants and a
+"Personalise" link that scrolls to the personalisation block). The other N-1 slots are dashed placeholders
+("+ Choose a jersey"). A full-width pill button stays disabled ("2 more to choose") until every slot is filled, then
+reads "Add 3 to cart".
+
+Clicking a placeholder (or a filled slot) opens the theme's <x-drawer> listing the first 24 available products of a
+collection (block setting, falling back to the product's first collection, then to "all"), rendered server-side with
+image, title, price and a size <select> whose <option>s carry data-variant-id, data-available, the money-formatted
+prices and the variant image. "Add to bundle" fills the slot.
+
+Add-to-cart POSTs {items:[{id, quantity}], sections} to /cart/add.js exactly like the theme's <product-form>, then
+dispatches "variant:add" (bubbling) and "cart:change" on document.documentElement so the theme's cart drawer updates
+and opens. No price is faked in the cart: the discount is applied at checkout by the store's automatic
+"Buy X get Y" discount.
+
+State: chosen slots are kept in localStorage keyed by product.id + tab ("pdp-bundle:<product id>:<tab>") and the
+active tab in "pdp-bundle:<product id>:tab" plus a data attribute on the section wrapper (outside the re-rendered
+tree). The pure state machine + payload builder live between the "pdp-bundle:pure:start/end" markers and are
+unit-tested with node.
+
+None of the controls in this block submit with the product form (they never carry name= or form=): the bundle has its
+own cart request.
+
+********************************************
+Supported variables
+********************************************
+
+* block: the section block (settings: collection, hide_current_product, default_tab, tabN_quantity, tabN_free,
+         tabN_percent (N = 1..3), tab_items_label, tab_free_label, card_title, this_item_label, size_label,
+         one_size_label, sold_out_label, personalise_text, personalise_target, placeholder_text,
+         button_incomplete_text, button_ready_text, button_adding_text, drawer_title, drawer_subtitle, drawer_add_text,
+         remove_label, error_text, button_background, button_text_color, badge_color)
+* product: the product being rendered
+* product_form_id: the ID of the product form (used to listen to the theme's "variant:change" event)
+* section: the current section
+{%- endcomment -%}
+
+{%- liquid
+  assign pbb_class = 'pdp-bundle-builder-' | append: block.id
+  assign pbb_uid = section.id | append: '-' | append: block.id
+  assign pbb_drawer_id = 'pbb-drawer-' | append: pbb_uid
+  assign pbb_drawer_class = 'pbb-drawer-' | append: block.id
+
+  assign pbb_tab_items_label = block.settings.tab_items_label | default: '[count] items'
+  assign pbb_tab_free_label = block.settings.tab_free_label | default: 'Get [count] free!'
+  assign pbb_card_title = block.settings.card_title | default: 'Buy [pay], get [free] free'
+  assign pbb_this_item = block.settings.this_item_label | default: 'This item'
+  assign pbb_size_label = block.settings.size_label | default: 'Size'
+  assign pbb_one_size = block.settings.one_size_label | default: 'One size'
+  assign pbb_sold_out = block.settings.sold_out_label | default: 'Sold out'
+  assign pbb_personalise_text = block.settings.personalise_text | default: 'Personalise'
+  assign pbb_personalise_target = block.settings.personalise_target | default: 'pdp-personalisation, .product-info__personalisation'
+  assign pbb_placeholder_text = block.settings.placeholder_text | default: 'Choose a jersey'
+  assign pbb_button_incomplete = block.settings.button_incomplete_text | default: '[count] more to choose'
+  assign pbb_button_ready = block.settings.button_ready_text | default: 'Add [count] to cart'
+  assign pbb_button_adding = block.settings.button_adding_text | default: 'Adding to cart…'
+  assign pbb_drawer_title = block.settings.drawer_title | default: 'Choose a jersey'
+  assign pbb_drawer_subtitle = block.settings.drawer_subtitle | default: 'Pick any jersey and its size. It is added to your bundle right away.'
+  assign pbb_drawer_add = block.settings.drawer_add_text | default: 'Add to bundle'
+  assign pbb_remove_label = block.settings.remove_label | default: 'Remove from bundle'
+  assign pbb_change_label = block.settings.change_label | default: 'Change this jersey'
+  assign pbb_error_text = block.settings.error_text | default: 'Something went wrong. Please try again.'
+  assign pbb_empty_collection_text = block.settings.empty_collection_text | default: 'No jerseys are available right now.'
+
+  assign pbb_button_bg = '#FFCC00'
+  if block.settings.button_background != blank and block.settings.button_background.alpha != 0
+    assign pbb_button_bg = block.settings.button_background
+  endif
+
+  assign pbb_button_color = '#000000'
+  if block.settings.button_text_color != blank and block.settings.button_text_color.alpha != 0
+    assign pbb_button_color = block.settings.button_text_color
+  endif
+
+  assign pbb_badge_bg = '#F04242'
+  if block.settings.badge_color != blank and block.settings.badge_color.alpha != 0
+    assign pbb_badge_bg = block.settings.badge_color
+  endif
+
+  # Collection feeding the picker: block setting, else the product's first collection, else "all".
+  assign pbb_collection = block.settings.collection
+  if pbb_collection == blank
+    assign pbb_collection = product.collections.first
+  endif
+  if pbb_collection == blank
+    assign pbb_collection = collections.all
+  endif
+
+  # Visible tabs: a tab needs a quantity of at least 2 and a free count between 0 and quantity - 1.
+  assign pbb_tabs = '' | split: ''
+  assign pbb_default_tab = ''
+  assign pbb_requested_tab = block.settings.default_tab | default: '1' | append: ''
+  for i in (1..3)
+    assign pbb_qty_key = 'tab' | append: i | append: '_quantity'
+    assign pbb_free_key = 'tab' | append: i | append: '_free'
+    assign pbb_qty = block.settings[pbb_qty_key] | default: 0
+    assign pbb_free = block.settings[pbb_free_key] | default: 0
+    if pbb_qty >= 2 and pbb_free >= 0 and pbb_free < pbb_qty
+      assign pbb_i_str = i | append: ''
+      assign pbb_i_arr = pbb_i_str | split: ','
+      assign pbb_tabs = pbb_tabs | concat: pbb_i_arr
+      if pbb_default_tab == ''
+        assign pbb_default_tab = pbb_i_str
+      endif
+      if pbb_i_str == pbb_requested_tab
+        assign pbb_default_tab = pbb_i_str
+      endif
+    endif
+  endfor
+
+  assign pbb_current_variant = product.selected_or_first_available_variant
+  assign pbb_current_image = product.featured_image
+  if pbb_current_variant.featured_image != blank
+    assign pbb_current_image = pbb_current_variant.featured_image
+  endif
+  assign pbb_available_count = product.variants | where: 'available' | size
+-%}
+
+{%- if pbb_tabs.size > 0 -%}
+  <style>
+    .{{ pbb_class }} {
+      --pbb-text: #121212;
+      --pbb-muted: #737373;
+      --pbb-border: #F0F0F0;
+      --pbb-input-border: #E6E6E6;
+      --pbb-muted-bg: #F5F5F5;
+      --pbb-badge: {{ pbb_badge_bg }};
+      --pbb-button-bg: {{ pbb_button_bg }};
+      --pbb-button-color: {{ pbb_button_color }};
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: 100%;
+      color: var(--pbb-text);
+      font-family: Inter, var(--text-font-family), -apple-system, "Segoe UI", sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .{{ pbb_class }} *,
+    .{{ pbb_class }} *::before,
+    .{{ pbb_class }} *::after {
+      box-sizing: border-box;
+    }
+
+    .{{ pbb_class }} button {
+      font-family: inherit;
+    }
+
+    /* Tabs */
+    .{{ pbb_class }} .pbb-tabs {
+      display: grid;
+      grid-template-columns: repeat({{ pbb_tabs.size }}, minmax(0, 1fr));
+      gap: 6px;
+      margin: 0;
+      padding: 0;
+    }
+
+    .{{ pbb_class }} .pbb-tab {
+      appearance: none;
+      -webkit-appearance: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      min-height: 48px;
+      margin: 0;
+      padding: 7px 6px;
+      border: 1px solid var(--pbb-border);
+      border-radius: 12px;
+      background: #FFFFFF;
+      color: var(--pbb-muted);
+      text-align: center;
+      cursor: pointer;
+      transition: background-color .15s ease, color .15s ease, border-color .15s ease;
+    }
+
+    .{{ pbb_class }} .pbb-tab__items {
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1.2;
+      color: inherit;
+    }
+
+    .{{ pbb_class }} .pbb-tab__free {
+      font-size: 10.5px;
+      font-weight: 500;
+      line-height: 1.2;
+      color: inherit;
+      opacity: .85;
+    }
+
+    .{{ pbb_class }} .pbb-tab[aria-selected="true"] {
+      background: var(--pbb-text);
+      border-color: var(--pbb-text);
+      color: #FFFFFF;
+    }
+
+    .{{ pbb_class }} .pbb-tab:focus-visible {
+      outline: 2px solid var(--pbb-text);
+      outline-offset: 2px;
+    }
+
+    /* Card */
+    .{{ pbb_class }} .pbb-card {
+      padding: 14px;
+      border: 1px solid var(--pbb-border);
+      border-radius: 12px;
+      background: #FFFFFF;
+    }
+
+    .{{ pbb_class }} .pbb-card[hidden] {
+      display: none;
+    }
+
+    .{{ pbb_class }} .pbb-card__head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .{{ pbb_class }} .pbb-card__title {
+      margin: 0;
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1.25;
+      letter-spacing: .24px;
+      text-transform: uppercase;
+    }
+
+    .{{ pbb_class }} .pbb-card__badge {
+      display: inline-block;
+      flex-shrink: 0;
+      padding: 2px 6px;
+      border-radius: 3px;
+      background: var(--pbb-badge);
+      color: #FFFFFF;
+      font-size: 10.5px;
+      font-weight: 700;
+      line-height: 1.3;
+      letter-spacing: .1px;
+    }
+
+    /* Slots */
+    .{{ pbb_class }} .pbb-slots {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      margin: 12px 0 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .{{ pbb_class }} .pbb-slot-wrap {
+      position: relative;
+      display: flex;
+      min-width: 0;
+    }
+
+    .{{ pbb_class }} .pbb-slot {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      width: 100%;
+      min-width: 0;
+      padding: 8px;
+      border: 1px solid var(--pbb-border);
+      border-radius: 8px;
+      background: #FFFFFF;
+      color: var(--pbb-text);
+      text-align: left;
+    }
+
+    .{{ pbb_class }} .pbb-slot[hidden] {
+      display: none;
+    }
+
+    .{{ pbb_class }} .pbb-slot__media {
+      display: block;
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      border-radius: 6px;
+      background: var(--pbb-muted-bg);
+      overflow: hidden;
+    }
+
+    .{{ pbb_class }} .pbb-slot__media img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .{{ pbb_class }} .pbb-slot__media img[src=""],
+    .{{ pbb_class }} .pbb-slot__media img:not([src]) {
+      visibility: hidden;
+    }
+
+    .{{ pbb_class }} .pbb-slot__title {
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      overflow: hidden;
+      font-size: 11px;
+      font-weight: 600;
+      line-height: 1.3;
+    }
+
+    .{{ pbb_class }} .pbb-slot__prices {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 4px;
+      line-height: 1.2;
+    }
+
+    .{{ pbb_class }} .pbb-slot__compare {
+      font-size: 10.5px;
+      font-weight: 500;
+      color: var(--pbb-muted);
+      opacity: .5;
+      text-decoration: line-through;
+    }
+
+    .{{ pbb_class }} .pbb-slot__compare:empty {
+      display: none;
+    }
+
+    .{{ pbb_class }} .pbb-slot__price {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--pbb-text);
+    }
+
+    .{{ pbb_class }} .pbb-slot--on-sale .pbb-slot__price {
+      color: var(--pbb-badge);
+    }
+
+    .{{ pbb_class }} .pbb-slot__caption {
+      font-size: 10.5px;
+      font-weight: 500;
+      line-height: 1.2;
+      color: var(--pbb-muted);
+    }
+
+    .{{ pbb_class }} .pbb-slot__size-label {
+      display: block;
+      margin-top: 2px;
+      font-size: 10px;
+      font-weight: 500;
+      line-height: 1.2;
+      letter-spacing: .2px;
+      text-transform: uppercase;
+      color: var(--pbb-muted);
+    }
+
+    .{{ pbb_class }} .pbb-select,
+    .{{ pbb_drawer_class }} .pbb-select {
+      appearance: none;
+      -webkit-appearance: none;
+      display: block;
+      width: 100%;
+      height: 32px;
+      margin: 0;
+      padding: 0 24px 0 8px;
+      border: 1px solid #E6E6E6;
+      border-radius: 6px;
+      background: #FFFFFF url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7' viewBox='0 0 10 7'%3E%3Cpath d='m1 1 4 4 4-4' fill='none' stroke='%23121212' stroke-width='1.5'/%3E%3C/svg%3E") no-repeat right 8px center;
+      color: #121212;
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 500;
+      line-height: 30px;
+      cursor: pointer;
+    }
+
+    .{{ pbb_class }} .pbb-select:focus-visible,
+    .{{ pbb_drawer_class }} .pbb-select:focus-visible {
+      outline: none;
+      border-color: #121212;
+      box-shadow: inset 0 0 0 1px #121212;
+    }
+
+    .{{ pbb_class }} .pbb-select:disabled,
+    .{{ pbb_drawer_class }} .pbb-select:disabled {
+      opacity: .5;
+      cursor: not-allowed;
+    }
+
+    .{{ pbb_class }} .pbb-slot__meta {
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      line-height: 1.2;
+    }
+
+    .{{ pbb_class }} .pbb-slot__meta .pbb-slot__size-label {
+      margin: 0;
+    }
+
+    .{{ pbb_class }} .pbb-slot__personalise {
+      appearance: none;
+      -webkit-appearance: none;
+      align-self: flex-start;
+      margin: 2px 0 0;
+      padding: 0;
+      border: 0;
+      background: none;
+      color: var(--pbb-text);
+      font-size: 11px;
+      font-weight: 500;
+      line-height: 1.3;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      cursor: pointer;
+    }
+
+    /* Empty slot */
+    .{{ pbb_class }} .pbb-slot--empty {
+      appearance: none;
+      -webkit-appearance: none;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      min-height: 120px;
+      border: 1.5px dashed var(--pbb-input-border);
+      border-radius: 8px;
+      background: #FAFAFA;
+      color: var(--pbb-muted);
+      font-size: 11px;
+      font-weight: 500;
+      line-height: 1.3;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color .15s ease, background-color .15s ease;
+    }
+
+    .{{ pbb_class }} .pbb-slot--empty:hover {
+      border-color: var(--pbb-text);
+      background: #FFFFFF;
+    }
+
+    .{{ pbb_class }} .pbb-slot--empty:focus-visible {
+      outline: 2px solid var(--pbb-text);
+      outline-offset: 2px;
+    }
+
+    .{{ pbb_class }} .pbb-slot__plus {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      border: 1px solid var(--pbb-input-border);
+      border-radius: 9999px;
+      background: #FFFFFF;
+      color: var(--pbb-text);
+      font-size: 16px;
+      font-weight: 500;
+      line-height: 1;
+    }
+
+    /* Filled slot */
+    .{{ pbb_class }} .pbb-slot--filled {
+      padding: 0;
+    }
+
+    .{{ pbb_class }} .pbb-slot__change {
+      appearance: none;
+      -webkit-appearance: none;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      width: 100%;
+      margin: 0;
+      padding: 8px;
+      border: 0;
+      background: none;
+      color: inherit;
+      font: inherit;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .{{ pbb_class }} .pbb-slot__change:focus-visible {
+      outline: 2px solid var(--pbb-text);
+      outline-offset: 2px;
+      border-radius: 8px;
+    }
+
+    .{{ pbb_class }} .pbb-slot__remove {
+      appearance: none;
+      -webkit-appearance: none;
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      z-index: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      margin: 0;
+      padding: 0;
+      border: 1px solid var(--pbb-border);
+      border-radius: 9999px;
+      background: #FFFFFF;
+      color: var(--pbb-text);
+      font-size: 14px;
+      line-height: 1;
+      cursor: pointer;
+      box-shadow: 0 1px 6px rgba(0, 0, 0, .08);
+    }
+
+    /* Add button */
+    .{{ pbb_class }} .pbb-add {
+      appearance: none;
+      -webkit-appearance: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 46px;
+      margin: 12px 0 0;
+      padding: 0 16px;
+      border: 0;
+      border-radius: 9999px;
+      background: var(--pbb-button-bg);
+      color: var(--pbb-button-color);
+      font-size: 14px;
+      font-weight: 600;
+      line-height: 1;
+      letter-spacing: 0;
+      cursor: pointer;
+      transition: opacity .15s ease, filter .15s ease;
+    }
+
+    .{{ pbb_class }} .pbb-add:hover:not(:disabled) {
+      filter: brightness(.96);
+    }
+
+    .{{ pbb_class }} .pbb-add:disabled {
+      opacity: .55;
+      cursor: not-allowed;
+    }
+
+    .{{ pbb_class }} .pbb-add[aria-busy="true"] {
+      opacity: .75;
+      cursor: progress;
+    }
+
+    .{{ pbb_class }} .pbb-add:focus-visible {
+      outline: 2px solid var(--pbb-text);
+      outline-offset: 2px;
+    }
+
+    .{{ pbb_class }} .pbb-error {
+      margin: 8px 0 0;
+      font-size: 12px;
+      line-height: 1.4;
+      color: var(--pbb-badge);
+    }
+
+    .{{ pbb_class }} .pbb-error:empty {
+      display: none;
+    }
+
+    /* Drawer (moved to <body> while open, so it is scoped by its own class) */
+    .{{ pbb_drawer_class }} .pbb-picker {
+      color: #121212;
+      font-family: Inter, var(--text-font-family), -apple-system, "Segoe UI", sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .{{ pbb_drawer_class }} .pbb-picker *,
+    .{{ pbb_drawer_class }} .pbb-picker *::before,
+    .{{ pbb_drawer_class }} .pbb-picker *::after {
+      box-sizing: border-box;
+    }
+
+    .{{ pbb_drawer_class }} .pbb-picker__hint {
+      margin: 0 0 4px;
+      font-size: 13px;
+      line-height: 1.5;
+      color: #737373;
+    }
+
+    .{{ pbb_drawer_class }} .pbb-picker__list {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .{{ pbb_drawer_class }} .pbb-picker__item {
+      display: grid;
+      grid-template-columns: 64px minmax(0, 1fr);
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid #F0F0F0;
+    }
+
+    .{{ pbb_drawer_class }} .pbb-picker__media {
+      display: block;
+      width: 64px;
+      height: 64px;
+      border-radius: 6px;
+      background: #F5F5F5;
+      overflow: hidden;
+    }
+
+    .{{ pbb_drawer_class }} .pbb-picker__media img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .{{ pbb_drawer_class }} .pbb-picker__info {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-width: 0;
+    }
+
+    .{{ pbb_drawer_class }} .pbb-picker__title {
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      overflow: hidden;
+      font-size: 13px;
+      font-weight: 600;
+      line-height: 1.3;
+      color: #121212;
+      text-decoration: none;
+    }
+
+    .{{ pbb_drawer_class }} .pbb-picker__prices {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+      line-height: 1.2;
+    }
+
+    .{{ pbb_drawer_class }} .pbb-picker__compare {
+      font-size: 11px;
+      font-weight: 500;
+      color: #737373;
+      opacity: .5;
+      text-decoration: line-through;
+    }
+
+    .{{ pbb_drawer_class }} .pbb-picker__compare:empty {
+      display: none;
+    }
+
+    .{{ pbb_drawer_class }} .pbb-picker__price {
+      font-size: 13px;
+      font-weight: 700;
+      color: #121212;
+    }
+
+    .{{ pbb_drawer_class }} .pbb-picker__item--on-sale .pbb-picker__price {
+      color: {{ pbb_badge_bg }};
+    }
+
+    .{{ pbb_drawer_class }} .pbb-picker__actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .{{ pbb_drawer_class }} .pbb-picker__actions .pbb-select {
+      flex: 1 1 auto;
+      min-width: 0;
+    }
+
+    .{{ pbb_drawer_class }} .pbb-picker__add {
+      appearance: none;
+      -webkit-appearance: none;
+      flex-shrink: 0;
+      height: 32px;
+      margin: 0;
+      padding: 0 14px;
+      border: 0;
+      border-radius: 9999px;
+      background: #121212;
+      color: #FFFFFF;
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 1;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+
+    .{{ pbb_drawer_class }} .pbb-picker__add:focus-visible {
+      outline: 2px solid #121212;
+      outline-offset: 2px;
+    }
+
+    .{{ pbb_drawer_class }} .pbb-picker__empty {
+      margin: 0;
+      font-size: 13px;
+      color: #737373;
+    }
+
+    @media screen and (max-width: 699px) {
+      .{{ pbb_class }} .pbb-tab__items {
+        font-size: 11.5px;
+      }
+
+      .{{ pbb_class }} .pbb-slots {
+        gap: 6px;
+      }
+
+      .{{ pbb_class }} .pbb-slot {
+        padding: 6px;
+      }
+
+      .{{ pbb_drawer_class }} .pbb-picker__actions {
+        flex-wrap: wrap;
+      }
+    }
+  </style>
+
+  <pdp-bundle-builder
+    class="product-info__bundle-builder {{ pbb_class }}"
+    product-id="{{ product.id }}"
+    section-id="{{ section.id }}"
+    form-id="{{ product_form_id }}"
+    drawer-id="{{ pbb_drawer_id }}"
+    default-tab="{{ pbb_default_tab }}"
+    personalise-target="{{ pbb_personalise_target | escape }}"
+    label-incomplete="{{ pbb_button_incomplete | escape }}"
+    label-ready="{{ pbb_button_ready | escape }}"
+    label-adding="{{ pbb_button_adding | escape }}"
+    label-error="{{ pbb_error_text | escape }}"
+    {{ block.shopify_attributes }}
+  >
+    {%- comment -%} Tabs {%- endcomment -%}
+    <div class="pbb-tabs" role="tablist" aria-label="{{ block.settings.tabs_label | default: 'Bundle size' | escape }}">
+      {%- for pbb_tab in pbb_tabs -%}
+        {%- liquid
+          assign pbb_qty_key = 'tab' | append: pbb_tab | append: '_quantity'
+          assign pbb_free_key = 'tab' | append: pbb_tab | append: '_free'
+          assign pbb_qty = block.settings[pbb_qty_key]
+          assign pbb_free = block.settings[pbb_free_key] | default: 0
+          assign pbb_items_text = pbb_tab_items_label | replace: '[count]', pbb_qty
+          assign pbb_free_text = pbb_tab_free_label | replace: '[count]', pbb_free
+        -%}
+        <button
+          type="button"
+          class="pbb-tab"
+          role="tab"
+          id="pbb-tab-{{ pbb_uid }}-{{ pbb_tab }}"
+          aria-controls="pbb-panel-{{ pbb_uid }}-{{ pbb_tab }}"
+          aria-selected="{% if pbb_tab == pbb_default_tab %}true{% else %}false{% endif %}"
+          tabindex="{% if pbb_tab == pbb_default_tab %}0{% else %}-1{% endif %}"
+          data-pbb-tab="{{ pbb_tab }}"
+        >
+          <span class="pbb-tab__items">{{ pbb_items_text | escape }}</span>
+          {%- if pbb_free > 0 -%}
+            <span class="pbb-tab__free">{{ pbb_free_text | escape }}</span>
+          {%- endif -%}
+        </button>
+      {%- endfor -%}
+    </div>
+
+    {%- comment -%} One card per tab, only the active one is visible {%- endcomment -%}
+    {%- for pbb_tab in pbb_tabs -%}
+      {%- liquid
+        assign pbb_qty_key = 'tab' | append: pbb_tab | append: '_quantity'
+        assign pbb_free_key = 'tab' | append: pbb_tab | append: '_free'
+        assign pbb_pct_key = 'tab' | append: pbb_tab | append: '_percent'
+        assign pbb_qty = block.settings[pbb_qty_key]
+        assign pbb_free = block.settings[pbb_free_key] | default: 0
+        assign pbb_pay = pbb_qty | minus: pbb_free
+        assign pbb_pct = block.settings[pbb_pct_key] | default: 0
+        if pbb_pct <= 0 and pbb_free > 0
+          assign pbb_pct = pbb_free | times: 100.0 | divided_by: pbb_qty | round
+        endif
+        assign pbb_title_text = pbb_card_title | replace: '[quantity]', pbb_qty | replace: '[pay]', pbb_pay | replace: '[free]', pbb_free
+        assign pbb_last_slot = pbb_qty | minus: 1
+      -%}
+
+      <div
+        class="pbb-card"
+        role="tabpanel"
+        id="pbb-panel-{{ pbb_uid }}-{{ pbb_tab }}"
+        aria-labelledby="pbb-tab-{{ pbb_uid }}-{{ pbb_tab }}"
+        data-pbb-panel="{{ pbb_tab }}"
+        data-pbb-quantity="{{ pbb_qty }}"
+        {% unless pbb_tab == pbb_default_tab %}hidden{% endunless %}
+      >
+        <div class="pbb-card__head">
+          <p class="pbb-card__title">{{ pbb_title_text | escape }}</p>
+          {%- if pbb_pct > 0 -%}
+            <span class="pbb-card__badge">-{{ pbb_pct }}%</span>
+          {%- endif -%}
+        </div>
+
+        <ul class="pbb-slots">
+          {%- comment -%} Slot 1: the current product {%- endcomment -%}
+          <li class="pbb-slot-wrap" data-pbb-slot="0">
+            <div class="pbb-slot pbb-slot--current {% if pbb_current_variant.compare_at_price > pbb_current_variant.price %}pbb-slot--on-sale{% endif %}" data-pbb-current>
+              <span class="pbb-slot__media">
+                {%- if pbb_current_image != blank -%}
+                  <img
+                    src="{{ pbb_current_image | image_url: width: 240 }}"
+                    srcset="{{ pbb_current_image | image_url: width: 120 }} 120w, {{ pbb_current_image | image_url: width: 240 }} 240w, {{ pbb_current_image | image_url: width: 360 }} 360w"
+                    sizes="120px"
+                    width="{{ pbb_current_image.width }}"
+                    height="{{ pbb_current_image.height }}"
+                    alt="{{ product.title | escape }}"
+                    loading="lazy"
+                    data-pbb-current-image
+                  >
+                {%- else -%}
+                  <img src="" alt="" data-pbb-current-image>
+                {%- endif -%}
+              </span>
+
+              <span class="pbb-slot__prices">
+                <s class="pbb-slot__compare" data-pbb-current-compare>{% if pbb_current_variant.compare_at_price > pbb_current_variant.price %}{{ pbb_current_variant.compare_at_price | money }}{% endif %}</s>
+                <span class="pbb-slot__price" data-pbb-current-price>{{ pbb_current_variant.price | money }}</span>
+              </span>
+
+              <span class="pbb-slot__caption">{{ pbb_this_item | escape }}</span>
+
+              <label class="pbb-slot__size-label" for="pbb-current-select-{{ pbb_uid }}-{{ pbb_tab }}">{{ pbb_size_label | escape }}</label>
+              <select
+                id="pbb-current-select-{{ pbb_uid }}-{{ pbb_tab }}"
+                class="pbb-select"
+                data-pbb-current-select
+                aria-label="{{ pbb_size_label | escape }} — {{ product.title | escape }}"
+                {% if pbb_available_count == 0 %}disabled{% endif %}
+              >
+                {%- if pbb_available_count == 0 -%}
+                  <option value="">{{ pbb_sold_out | escape }}</option>
+                {%- else -%}
+                  {%- for variant in product.variants -%}
+                    {%- if variant.available -%}
+                      <option
+                        value="{{ variant.id }}"
+                        data-variant-id="{{ variant.id }}"
+                        data-available="true"
+                        data-price="{{ variant.price | money | escape }}"
+                        data-compare="{% if variant.compare_at_price > variant.price %}{{ variant.compare_at_price | money | escape }}{% endif %}"
+                        data-image="{% if variant.featured_image != blank %}{{ variant.featured_image | image_url: width: 300 }}{% endif %}"
+                        {% if variant.id == pbb_current_variant.id %}selected{% endif %}
+                      >
+                        {%- if product.has_only_default_variant -%}{{ pbb_one_size | escape }}{%- else -%}{{ variant.title | escape }}{%- endif -%}
+                      </option>
+                    {%- endif -%}
+                  {%- endfor -%}
+                {%- endif -%}
+              </select>
+
+              <button type="button" class="pbb-slot__personalise" data-pbb-personalise>{{ pbb_personalise_text | escape }}</button>
+            </div>
+          </li>
+
+          {%- comment -%} Slots 2..N: placeholder + (hidden) filled view, toggled by JS {%- endcomment -%}
+          {%- for pbb_slot in (1..pbb_last_slot) -%}
+            <li class="pbb-slot-wrap" data-pbb-slot="{{ pbb_slot }}">
+              <button type="button" class="pbb-slot pbb-slot--empty" data-pbb-empty aria-label="{{ pbb_placeholder_text | escape }} ({{ pbb_slot | plus: 1 }}/{{ pbb_qty }})">
+                <span class="pbb-slot__plus" aria-hidden="true">+</span>
+                <span>{{ pbb_placeholder_text | escape }}</span>
+              </button>
+
+              <div class="pbb-slot pbb-slot--filled" data-pbb-filled hidden>
+                <button type="button" class="pbb-slot__remove" data-pbb-remove aria-label="{{ pbb_remove_label | escape }}">&times;</button>
+                <button type="button" class="pbb-slot__change" data-pbb-change aria-label="{{ pbb_change_label | escape }}">
+                  <span class="pbb-slot__media"><img src="" alt="" data-pbb-image loading="lazy"></span>
+                  <span class="pbb-slot__title" data-pbb-title></span>
+                  <span class="pbb-slot__prices">
+                    <s class="pbb-slot__compare" data-pbb-compare></s>
+                    <span class="pbb-slot__price" data-pbb-price></span>
+                  </span>
+                  <span class="pbb-slot__meta">
+                    <span class="pbb-slot__size-label">{{ pbb_size_label | escape }}</span>
+                    <span data-pbb-size></span>
+                  </span>
+                </button>
+              </div>
+            </li>
+          {%- endfor -%}
+        </ul>
+
+        <button type="button" class="pbb-add" data-pbb-add disabled>
+          {{- pbb_button_incomplete | replace: '[count]', pbb_last_slot | escape -}}
+        </button>
+
+        <p class="pbb-error" data-pbb-error role="alert" aria-live="polite"></p>
+      </div>
+    {%- endfor -%}
+
+    {%- comment -%} Product picker drawer (theme <x-drawer>): server-rendered, first 24 available products {%- endcomment -%}
+    <x-drawer id="{{ pbb_drawer_id }}" class="drawer drawer--lg {{ pbb_drawer_class }}" data-pbb-drawer>
+      <span class="h5" slot="header">{{ pbb_drawer_title | escape }}</span>
+
+      <div class="pbb-picker">
+        {%- if pbb_drawer_subtitle != blank -%}
+          <p class="pbb-picker__hint">{{ pbb_drawer_subtitle | escape }}</p>
+        {%- endif -%}
+
+        {%- assign pbb_rendered = 0 -%}
+        <ul class="pbb-picker__list">
+          {%- for pbb_item in pbb_collection.products -%}
+            {%- if pbb_rendered >= 24 -%}
+              {%- break -%}
+            {%- endif -%}
+            {%- if pbb_item.available == false -%}
+              {%- continue -%}
+            {%- endif -%}
+            {%- if block.settings.hide_current_product and pbb_item.id == product.id -%}
+              {%- continue -%}
+            {%- endif -%}
+            {%- liquid
+              assign pbb_rendered = pbb_rendered | plus: 1
+              assign pbb_item_variant = pbb_item.selected_or_first_available_variant
+              assign pbb_item_image = pbb_item.featured_image
+              assign pbb_item_on_sale = false
+              if pbb_item_variant.compare_at_price > pbb_item_variant.price
+                assign pbb_item_on_sale = true
+              endif
+            -%}
+            <li
+              class="pbb-picker__item {% if pbb_item_on_sale %}pbb-picker__item--on-sale{% endif %}"
+              data-pbb-item
+              data-product-id="{{ pbb_item.id }}"
+              data-title="{{ pbb_item.title | escape }}"
+              data-url="{{ pbb_item.url }}"
+              data-image="{% if pbb_item_image != blank %}{{ pbb_item_image | image_url: width: 300 }}{% endif %}"
+            >
+              <a href="{{ pbb_item.url }}" class="pbb-picker__media" tabindex="-1" aria-hidden="true">
+                {%- if pbb_item_image != blank -%}
+                  {{- pbb_item_image | image_url: width: 192 | image_tag: loading: 'lazy', sizes: '64px', widths: '64,128,192', alt: '' -}}
+                {%- endif -%}
+              </a>
+
+              <div class="pbb-picker__info">
+                <a href="{{ pbb_item.url }}" class="pbb-picker__title">{{ pbb_item.title | escape }}</a>
+
+                <div class="pbb-picker__prices">
+                  <s class="pbb-picker__compare" data-pbb-item-compare>{% if pbb_item_on_sale %}{{ pbb_item_variant.compare_at_price | money }}{% endif %}</s>
+                  <span class="pbb-picker__price" data-pbb-item-price>{{ pbb_item_variant.price | money }}</span>
+                </div>
+
+                <div class="pbb-picker__actions">
+                  <select class="pbb-select" data-pbb-item-select aria-label="{{ pbb_size_label | escape }} — {{ pbb_item.title | escape }}">
+                    {%- for variant in pbb_item.variants -%}
+                      <option
+                        value="{{ variant.id }}"
+                        data-variant-id="{{ variant.id }}"
+                        data-available="{% if variant.available %}true{% else %}false{% endif %}"
+                        data-price="{{ variant.price | money | escape }}"
+                        data-compare="{% if variant.compare_at_price > variant.price %}{{ variant.compare_at_price | money | escape }}{% endif %}"
+                        data-image="{% if variant.featured_image != blank %}{{ variant.featured_image | image_url: width: 300 }}{% endif %}"
+                        {% unless variant.available %}disabled{% endunless %}
+                        {% if variant.id == pbb_item_variant.id %}selected{% endif %}
+                      >
+                        {%- if pbb_item.has_only_default_variant -%}{{ pbb_one_size | escape }}{%- else -%}{{ variant.title | escape }}{%- endif -%}
+                        {%- unless variant.available %} — {{ pbb_sold_out | escape }}{% endunless -%}
+                      </option>
+                    {%- endfor -%}
+                  </select>
+
+                  <button type="button" class="pbb-picker__add" data-pbb-pick>{{ pbb_drawer_add | escape }}</button>
+                </div>
+              </div>
+            </li>
+          {%- endfor -%}
+        </ul>
+
+        {%- if pbb_rendered == 0 -%}
+          <p class="pbb-picker__empty">{{ pbb_empty_collection_text | escape }}</p>
+        {%- endif -%}
+      </div>
+    </x-drawer>
+  </pdp-bundle-builder>
+
+  <script>
+    if (!window.customElements.get('pdp-bundle-builder')) {
+      /* pdp-bundle:pure:start */
+      // Pure helpers (no DOM, no globals). Extracted and unit-tested with node, see the block's self-test.
+      var PdpBundleBuilderLogic = {
+        // localStorage keys: one per product + tab for the slots, one per product for the active tab.
+        storageKey: function (productId, tab) {
+          return 'pdp-bundle:' + String(productId) + ':' + String(tab);
+        },
+
+        tabStorageKey: function (productId) {
+          return 'pdp-bundle:' + String(productId) + ':tab';
+        },
+
+        // A slot item is valid when it has a positive integer variant id and string fields.
+        isValidItem: function (item) {
+          if (!item || typeof item !== 'object') return false;
+          var id = String(item.id == null ? '' : item.id);
+          if (!/^[1-9][0-9]*$/.test(id)) return false;
+          return ['productId', 'title', 'price', 'compare', 'image', 'size'].every(function (key) {
+            return item[key] == null || typeof item[key] === 'string';
+          });
+        },
+
+        // Normalises an item: ids become strings, missing strings become ''.
+        normalizeItem: function (item) {
+          if (!PdpBundleBuilderLogic.isValidItem(item)) return null;
+          return {
+            id: String(item.id),
+            productId: String(item.productId == null ? '' : item.productId),
+            title: String(item.title == null ? '' : item.title),
+            price: String(item.price == null ? '' : item.price),
+            compare: String(item.compare == null ? '' : item.compare),
+            image: String(item.image == null ? '' : item.image),
+            size: String(item.size == null ? '' : item.size)
+          };
+        },
+
+        // Empty state for a panel of `size` slots. Slot 0 is the current product (may be null when sold out).
+        createState: function (size, current) {
+          var count = Math.max(1, parseInt(size, 10) || 1);
+          var slots = [];
+          for (var i = 0; i < count; i++) slots.push(null);
+          slots[0] = PdpBundleBuilderLogic.normalizeItem(current);
+          return { size: count, slots: slots };
+        },
+
+        // Rebuilds a state from a stored JSON string (slots 1..n-1). Invalid / foreign data is dropped.
+        restoreState: function (raw, size, current) {
+          var state = PdpBundleBuilderLogic.createState(size, current);
+          var parsed = null;
+          if (typeof raw === 'string' && raw !== '') {
+            try { parsed = JSON.parse(raw); } catch (error) { parsed = null; }
+          } else if (raw && typeof raw === 'object') {
+            parsed = raw;
+          }
+          if (!parsed || !Array.isArray(parsed.slots)) return state;
+          for (var i = 1; i < state.size; i++) {
+            var item = PdpBundleBuilderLogic.normalizeItem(parsed.slots[i]);
+            if (item) state.slots[i] = item;
+          }
+          return state;
+        },
+
+        // What is persisted: only the chosen slots (slot 0 always comes from the page).
+        serialize: function (state) {
+          var slots = state.slots.map(function (item, index) { return index === 0 ? null : item; });
+          return JSON.stringify({ v: 1, slots: slots });
+        },
+
+        // Puts an item in a slot (index 1..n-1). Returns a NEW state, or the same state when the move is invalid.
+        fillSlot: function (state, index, item) {
+          var i = parseInt(index, 10);
+          var normalized = PdpBundleBuilderLogic.normalizeItem(item);
+          if (!normalized || isNaN(i) || i < 1 || i >= state.size) return state;
+          var slots = state.slots.slice();
+          slots[i] = normalized;
+          return { size: state.size, slots: slots };
+        },
+
+        // Empties a slot (index 1..n-1). Returns a NEW state, or the same state when the index is invalid.
+        clearSlot: function (state, index) {
+          var i = parseInt(index, 10);
+          if (isNaN(i) || i < 1 || i >= state.size) return state;
+          var slots = state.slots.slice();
+          slots[i] = null;
+          return { size: state.size, slots: slots };
+        },
+
+        // Replaces slot 0 (the current product's chosen variant). null when the product is sold out.
+        setCurrent: function (state, current) {
+          var slots = state.slots.slice();
+          slots[0] = PdpBundleBuilderLogic.normalizeItem(current);
+          return { size: state.size, slots: slots };
+        },
+
+        // Index of the first empty slot after slot 0, or -1.
+        nextEmptySlot: function (state) {
+          for (var i = 1; i < state.size; i++) {
+            if (!state.slots[i]) return i;
+          }
+          return -1;
+        },
+
+        // Number of slots (1..n-1) still to choose. Slot 0 is not "to choose" but blocks completion when null.
+        missingCount: function (state) {
+          var missing = 0;
+          for (var i = 1; i < state.size; i++) {
+            if (!state.slots[i]) missing += 1;
+          }
+          return missing;
+        },
+
+        isComplete: function (state) {
+          return !!state.slots[0] && PdpBundleBuilderLogic.missingCount(state) === 0;
+        },
+
+        // Label of the add button: "[count] more to choose" while incomplete, "Add [count] to cart" when complete.
+        buttonLabel: function (state, labels) {
+          var missing = PdpBundleBuilderLogic.missingCount(state);
+          if (missing > 0 || !state.slots[0]) {
+            return String(labels.incomplete || '').replace('[count]', String(Math.max(missing, 1)));
+          }
+          return String(labels.ready || '').replace('[count]', String(state.size));
+        },
+
+        // Cart payload for /cart/add.js: identical variants are merged into one line with a higher quantity.
+        // Returns null while the bundle is incomplete.
+        buildCartPayload: function (state) {
+          if (!PdpBundleBuilderLogic.isComplete(state)) return null;
+          var items = [];
+          var index = {};
+          state.slots.forEach(function (item) {
+            var id = String(item.id);
+            if (index[id] == null) {
+              index[id] = items.length;
+              items.push({ id: parseInt(id, 10), quantity: 1 });
+            } else {
+              items[index[id]].quantity += 1;
+            }
+          });
+          return { items: items };
+        },
+
+        // First candidate that is one of the rendered tabs, else the default, else the first tab.
+        resolveTab: function (candidates, tabs, fallback) {
+          var list = (tabs || []).map(String);
+          for (var i = 0; i < candidates.length; i++) {
+            var candidate = candidates[i];
+            if (candidate != null && candidate !== '' && list.indexOf(String(candidate)) !== -1) return String(candidate);
+          }
+          if (fallback != null && list.indexOf(String(fallback)) !== -1) return String(fallback);
+          return list[0] || '';
+        },
+
+        // Builds a slot item from the data attributes of a picker row and its selected <option>.
+        itemFromSelection: function (row, option) {
+          if (!row || !option) return null;
+          if (String(option.available) === 'false') return null;
+          var image = option.image && option.image !== '' ? option.image : (row.image || '');
+          return PdpBundleBuilderLogic.normalizeItem({
+            id: option.variantId,
+            productId: row.productId,
+            title: row.title,
+            price: option.price,
+            compare: option.compare,
+            image: image,
+            size: option.label
+          });
+        }
+      };
+      /* pdp-bundle:pure:end */
+
+      window.customElements.define('pdp-bundle-builder', class extends HTMLElement {
+        connectedCallback() {
+          this._logic = PdpBundleBuilderLogic;
+          this._productId = this.getAttribute('product-id') || '';
+          this._sectionId = this.getAttribute('section-id') || '';
+          this._formId = this.getAttribute('form-id') || '';
+          this._drawerId = this.getAttribute('drawer-id') || '';
+          this._defaultTab = this.getAttribute('default-tab') || '';
+          this._personaliseTarget = this.getAttribute('personalise-target') || 'pdp-personalisation';
+          this._labels = {
+            incomplete: this.getAttribute('label-incomplete') || '[count] more to choose',
+            ready: this.getAttribute('label-ready') || 'Add [count] to cart',
+            adding: this.getAttribute('label-adding') || 'Adding to cart…',
+            error: this.getAttribute('label-error') || 'Something went wrong. Please try again.'
+          };
+
+          // Host outside the re-rendered tree: the section wrapper survives <product-rerender>.
+          this._host = document.getElementById('shopify-section-' + this._sectionId) || document.body;
+          this._hostTabAttr = 'data-pbb-tab-' + this._productId;
+
+          this._tabs = Array.from(this.querySelectorAll('[data-pbb-tab]'));
+          this._panels = Array.from(this.querySelectorAll('[data-pbb-panel]'));
+          this._states = {};
+          this._target = null;
+          this._submitting = false;
+
+          // The drawer is moved to <body> while open, so it keeps its own listeners.
+          this._drawer = document.getElementById(this._drawerId);
+          this._onDrawerClick = this._onDrawerClick.bind(this);
+          if (this._drawer) this._drawer.addEventListener('click', this._onDrawerClick);
+
+          this._onClick = this._onClick.bind(this);
+          this._onChange = this._onChange.bind(this);
+          this._onKeydown = this._onKeydown.bind(this);
+          this._onVariantChange = this._onVariantChange.bind(this);
+          this.addEventListener('click', this._onClick);
+          this.addEventListener('change', this._onChange);
+          this.addEventListener('keydown', this._onKeydown);
+
+          this._form = document.getElementById(this._formId);
+          if (this._form) this._form.addEventListener('variant:change', this._onVariantChange);
+
+          var self = this;
+          this._panels.forEach(function (panel) {
+            var tab = panel.getAttribute('data-pbb-panel');
+            var size = parseInt(panel.getAttribute('data-pbb-quantity'), 10) || 1;
+            self._states[tab] = self._logic.restoreState(self._readStored(self._logic.storageKey(self._productId, tab)), size, self._currentItem(panel));
+            self._renderPanel(panel);
+          });
+
+          var tabIds = this._tabs.map(function (tab) { return tab.getAttribute('data-pbb-tab'); });
+          var active = this._logic.resolveTab([this._host.getAttribute(this._hostTabAttr), this._readStored(this._logic.tabStorageKey(this._productId))], tabIds, this._defaultTab);
+          this._activateTab(active, false);
+        }
+
+        disconnectedCallback() {
+          this.removeEventListener('click', this._onClick);
+          this.removeEventListener('change', this._onChange);
+          this.removeEventListener('keydown', this._onKeydown);
+          if (this._drawer) this._drawer.removeEventListener('click', this._onDrawerClick);
+          if (this._form) this._form.removeEventListener('variant:change', this._onVariantChange);
+        }
+
+        /* ---------- storage ---------- */
+
+        _readStored(key) {
+          try { return window.localStorage.getItem(key); } catch (error) { return null; }
+        }
+
+        _writeStored(key, value) {
+          try {
+            if (value == null || value === '') window.localStorage.removeItem(key);
+            else window.localStorage.setItem(key, value);
+          } catch (error) { /* private mode, quota... */ }
+        }
+
+        _persist(tab) {
+          var state = this._states[tab];
+          if (!state) return;
+          var value = this._logic.missingCount(state) === state.size - 1 ? '' : this._logic.serialize(state);
+          this._writeStored(this._logic.storageKey(this._productId, tab), value);
+        }
+
+        /* ---------- tabs ---------- */
+
+        _activateTab(tab, persist) {
+          if (!tab) return;
+          this._tabs.forEach(function (button) {
+            var selected = button.getAttribute('data-pbb-tab') === tab;
+            button.setAttribute('aria-selected', selected ? 'true' : 'false');
+            button.setAttribute('tabindex', selected ? '0' : '-1');
+          });
+          this._panels.forEach(function (panel) {
+            panel.hidden = panel.getAttribute('data-pbb-panel') !== tab;
+          });
+          this._activeTab = tab;
+          this._host.setAttribute(this._hostTabAttr, tab);
+          if (persist) this._writeStored(this._logic.tabStorageKey(this._productId), tab);
+        }
+
+        _onKeydown(event) {
+          var tab = event.target.closest('[data-pbb-tab]');
+          if (!tab || !this.contains(tab)) return;
+          var keys = ['ArrowLeft', 'ArrowRight', 'Home', 'End'];
+          if (keys.indexOf(event.key) === -1) return;
+          event.preventDefault();
+          var index = this._tabs.indexOf(tab);
+          var count = this._tabs.length;
+          if (event.key === 'ArrowRight') index = (index + 1) % count;
+          else if (event.key === 'ArrowLeft') index = (index - 1 + count) % count;
+          else if (event.key === 'Home') index = 0;
+          else index = count - 1;
+          this._activateTab(this._tabs[index].getAttribute('data-pbb-tab'), true);
+          this._tabs[index].focus();
+        }
+
+        /* ---------- current product (slot 0) ---------- */
+
+        _currentItem(panel) {
+          var select = panel.querySelector('[data-pbb-current-select]');
+          if (!select || select.disabled) return null;
+          var option = select.options[select.selectedIndex];
+          if (!option || option.value === '') return null;
+          return {
+            id: option.value,
+            productId: this._productId,
+            title: '',
+            price: option.getAttribute('data-price') || '',
+            compare: option.getAttribute('data-compare') || '',
+            image: option.getAttribute('data-image') || '',
+            size: option.textContent.trim()
+          };
+        }
+
+        _syncCurrent(panel) {
+          var tab = panel.getAttribute('data-pbb-panel');
+          var item = this._currentItem(panel);
+          this._states[tab] = this._logic.setCurrent(this._states[tab], item);
+
+          var slot = panel.querySelector('[data-pbb-current]');
+          var price = panel.querySelector('[data-pbb-current-price]');
+          var compare = panel.querySelector('[data-pbb-current-compare]');
+          var image = panel.querySelector('[data-pbb-current-image]');
+          if (item) {
+            if (price) price.textContent = item.price;
+            if (compare) compare.textContent = item.compare;
+            if (slot) slot.classList.toggle('pbb-slot--on-sale', item.compare !== '');
+            if (image && item.image !== '') {
+              image.removeAttribute('srcset');
+              image.removeAttribute('sizes');
+              image.src = item.image;
+            }
+          }
+          this._renderButton(panel);
+        }
+
+        // The theme fires "variant:change" on the product form when the main variant picker changes.
+        _onVariantChange(event) {
+          var variant = event.detail && event.detail.variant;
+          if (!variant || variant.id == null) return;
+          var id = String(variant.id);
+          var self = this;
+          this._panels.forEach(function (panel) {
+            var select = panel.querySelector('[data-pbb-current-select]');
+            if (!select || select.disabled) return;
+            var option = Array.from(select.options).find(function (candidate) { return candidate.value === id; });
+            if (option) {
+              select.value = id;
+              self._syncCurrent(panel);
+            }
+          });
+        }
+
+        /* ---------- rendering ---------- */
+
+        _renderPanel(panel) {
+          var tab = panel.getAttribute('data-pbb-panel');
+          var state = this._states[tab];
+          var self = this;
+          Array.from(panel.querySelectorAll('[data-pbb-slot]')).forEach(function (wrap) {
+            var index = parseInt(wrap.getAttribute('data-pbb-slot'), 10);
+            if (index === 0) return;
+            var item = state.slots[index];
+            var empty = wrap.querySelector('[data-pbb-empty]');
+            var filled = wrap.querySelector('[data-pbb-filled]');
+            if (!empty || !filled) return;
+            if (item) {
+              var image = filled.querySelector('[data-pbb-image]');
+              if (image) {
+                image.src = item.image;
+                image.alt = item.title;
+              }
+              self._setText(filled, '[data-pbb-title]', item.title);
+              self._setText(filled, '[data-pbb-price]', item.price);
+              self._setText(filled, '[data-pbb-compare]', item.compare);
+              self._setText(filled, '[data-pbb-size]', item.size);
+              filled.classList.toggle('pbb-slot--on-sale', item.compare !== '');
+            }
+            empty.hidden = !!item;
+            filled.hidden = !item;
+          });
+          this._renderButton(panel);
+        }
+
+        _renderButton(panel) {
+          var tab = panel.getAttribute('data-pbb-panel');
+          var state = this._states[tab];
+          var button = panel.querySelector('[data-pbb-add]');
+          if (!button || !state) return;
+          if (button.getAttribute('aria-busy') === 'true') return;
+          button.textContent = this._logic.buttonLabel(state, this._labels);
+          button.disabled = !this._logic.isComplete(state);
+        }
+
+        _setText(root, selector, text) {
+          var element = root.querySelector(selector);
+          if (element) element.textContent = text || '';
+        }
+
+        _setError(panel, message) {
+          var error = panel.querySelector('[data-pbb-error]');
+          if (error) error.textContent = message || '';
+        }
+
+        /* ---------- interactions inside the block ---------- */
+
+        _onClick(event) {
+          var tab = event.target.closest('[data-pbb-tab]');
+          if (tab && this.contains(tab)) {
+            event.preventDefault();
+            this._activateTab(tab.getAttribute('data-pbb-tab'), true);
+            return;
+          }
+
+          var panel = event.target.closest('[data-pbb-panel]');
+          if (!panel || !this.contains(panel)) return;
+
+          var personalise = event.target.closest('[data-pbb-personalise]');
+          if (personalise) {
+            event.preventDefault();
+            this._scrollToPersonalisation();
+            return;
+          }
+
+          var remove = event.target.closest('[data-pbb-remove]');
+          if (remove) {
+            event.preventDefault();
+            var wrapToClear = remove.closest('[data-pbb-slot]');
+            this._clear(panel, wrapToClear ? wrapToClear.getAttribute('data-pbb-slot') : null);
+            return;
+          }
+
+          var opener = event.target.closest('[data-pbb-empty], [data-pbb-change]');
+          if (opener) {
+            event.preventDefault();
+            var wrap = opener.closest('[data-pbb-slot]');
+            this._openPicker(panel, wrap ? wrap.getAttribute('data-pbb-slot') : null);
+            return;
+          }
+
+          var add = event.target.closest('[data-pbb-add]');
+          if (add) {
+            event.preventDefault();
+            this._addToCart(panel);
+          }
+        }
+
+        _onChange(event) {
+          var select = event.target.closest('[data-pbb-current-select]');
+          if (!select || !this.contains(select)) return;
+          var panel = select.closest('[data-pbb-panel]');
+          if (panel) this._syncCurrent(panel);
+        }
+
+        _clear(panel, index) {
+          var tab = panel.getAttribute('data-pbb-panel');
+          this._states[tab] = this._logic.clearSlot(this._states[tab], index);
+          this._setError(panel, '');
+          this._persist(tab);
+          this._renderPanel(panel);
+          var empty = panel.querySelector('[data-pbb-slot="' + index + '"] [data-pbb-empty]');
+          if (empty) empty.focus();
+        }
+
+        _scrollToPersonalisation() {
+          var target = null;
+          try { target = document.querySelector(this._personaliseTarget); } catch (error) { target = null; }
+          if (!target) return;
+          target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          var focusable = target.querySelector('button, select, input, textarea, [tabindex]:not([tabindex="-1"])');
+          if (focusable) {
+            window.setTimeout(function () { focusable.focus({ preventScroll: true }); }, 400);
+          }
+        }
+
+        /* ---------- picker drawer ---------- */
+
+        _openPicker(panel, index) {
+          if (!this._drawer) return;
+          this._target = { tab: panel.getAttribute('data-pbb-panel'), index: index };
+          if (typeof this._drawer.show === 'function') this._drawer.show();
+          else this._drawer.setAttribute('open', '');
+        }
+
+        _closePicker() {
+          if (!this._drawer) return;
+          if (typeof this._drawer.hide === 'function') this._drawer.hide();
+          else this._drawer.removeAttribute('open');
+        }
+
+        _onDrawerClick(event) {
+          var pick = event.target.closest('[data-pbb-pick]');
+          if (!pick) return;
+          event.preventDefault();
+          var row = pick.closest('[data-pbb-item]');
+          var select = row ? row.querySelector('[data-pbb-item-select]') : null;
+          var option = select ? select.options[select.selectedIndex] : null;
+          if (!row || !option) return;
+
+          var item = this._logic.itemFromSelection({
+            productId: row.getAttribute('data-product-id'),
+            title: row.getAttribute('data-title'),
+            image: row.getAttribute('data-image')
+          }, {
+            variantId: option.getAttribute('data-variant-id') || option.value,
+            available: option.getAttribute('data-available'),
+            price: option.getAttribute('data-price'),
+            compare: option.getAttribute('data-compare'),
+            image: option.getAttribute('data-image'),
+            label: option.textContent.trim()
+          });
+          if (!item) return;
+
+          var target = this._target;
+          var panel = target ? this._panels.find(function (candidate) { return candidate.getAttribute('data-pbb-panel') === target.tab; }) : null;
+          if (!panel) panel = this._panels.find(function (candidate) { return !candidate.hidden; });
+          if (!panel) return;
+          var tab = panel.getAttribute('data-pbb-panel');
+          var state = this._states[tab];
+          var index = target && target.index != null ? parseInt(target.index, 10) : this._logic.nextEmptySlot(state);
+          if (isNaN(index) || index < 1) index = this._logic.nextEmptySlot(state);
+          if (index < 1) return;
+
+          this._states[tab] = this._logic.fillSlot(state, index, item);
+          this._setError(panel, '');
+          this._persist(tab);
+          this._renderPanel(panel);
+          this._closePicker();
+
+          // Next empty slot (if any) opens the picker again on the next click; focus the add button when complete.
+          var next = this._logic.nextEmptySlot(this._states[tab]);
+          var focusTarget = next === -1 ? panel.querySelector('[data-pbb-add]') : panel.querySelector('[data-pbb-slot="' + next + '"] [data-pbb-empty]');
+          if (focusTarget) window.setTimeout(function () { focusTarget.focus({ preventScroll: true }); }, 450);
+        }
+
+        /* ---------- cart ---------- */
+
+        async _addToCart(panel) {
+          if (this._submitting) return;
+          var tab = panel.getAttribute('data-pbb-panel');
+          var state = this._states[tab];
+          var payload = this._logic.buildCartPayload(state);
+          if (!payload) {
+            this._renderButton(panel);
+            return;
+          }
+
+          var button = panel.querySelector('[data-pbb-add]');
+          var root = (window.Shopify && window.Shopify.routes && window.Shopify.routes.root) || '/';
+          var settings = (window.themeVariables && window.themeVariables.settings) || {};
+
+          this._submitting = true;
+          this._setError(panel, '');
+          if (button) {
+            button.setAttribute('aria-busy', 'true');
+            button.textContent = this._labels.adding;
+          }
+
+          // Same choreography as the theme's <product-form>: bundle the cart drawer section, POST, refetch cart.js,
+          // then dispatch "variant:add" (opens the drawer) and "cart:change" (refreshes it and the header count).
+          var sectionsToBundle = ['variant-added'];
+          document.documentElement.dispatchEvent(new CustomEvent('cart:prepare-bundled-sections', { bubbles: true, detail: { sections: sectionsToBundle } }));
+          payload.sections = sectionsToBundle.join(',');
+          payload.sections_url = window.location.pathname;
+
+          var response = null;
+          var responseJson = null;
+          try {
+            response = await fetch(root + 'cart/add.js', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+              body: JSON.stringify(payload)
+            });
+            responseJson = await response.json();
+          } catch (error) {
+            response = null;
+          }
+
+          this._submitting = false;
+          if (button) button.removeAttribute('aria-busy');
+
+          if (!response || !response.ok) {
+            var message = (responseJson && (responseJson.description || responseJson.message)) || this._labels.error;
+            this._setError(panel, typeof message === 'string' ? message : this._labels.error);
+            this._renderButton(panel);
+            document.dispatchEvent(new CustomEvent('cart:refresh'));
+            return;
+          }
+
+          // Bundle is in the cart: forget the chosen slots for this tab.
+          this._states[tab] = this._logic.createState(state.size, state.slots[0]);
+          this._persist(tab);
+          this._renderPanel(panel);
+
+          if (settings.cartType === 'page' || settings.pageType === 'cart') {
+            window.location.href = root + 'cart';
+            return;
+          }
+
+          var cartContent = null;
+          try {
+            cartContent = await (await fetch(root + 'cart.js')).json();
+          } catch (error) {
+            document.dispatchEvent(new CustomEvent('cart:refresh'));
+            return;
+          }
+          cartContent.sections = responseJson.sections || {};
+
+          this.dispatchEvent(new CustomEvent('variant:add', {
+            bubbles: true,
+            detail: {
+              items: Object.prototype.hasOwnProperty.call(responseJson, 'items') ? responseJson.items : [responseJson],
+              cart: cartContent
+            }
+          }));
+          document.documentElement.dispatchEvent(new CustomEvent('cart:change', {
+            bubbles: true,
+            detail: { baseEvent: 'variant:add', cart: cartContent }
+          }));
+        }
+      });
+    }
+  </script>
+{%- endif -%}

@@ -1,0 +1,92 @@
+{%- comment -%}
+----------------------------------------------------------------------------------------------------------------------
+PDP CREDIT LINE (block type "pdp_credit_line")
+----------------------------------------------------------------------------------------------------------------------
+
+Buy-box item 1: a small pill at the very top of the buy box: coin icon + "Earn {amount} in store credit", where
+{amount} = current variant price x a percentage setting. The value is fully Liquid-driven, so it refreshes on
+variant change through <product-rerender> (the whole product-info column is re-rendered).
+
+********************************************
+Supported variables
+********************************************
+
+* block: the section block (settings: credit_percent, text, icon_color, background, text_color)
+* product: the product being rendered
+* product_form_id: the ID of the product form (unused here, kept for signature consistency)
+* section: the current section
+{%- endcomment -%}
+
+{%- liquid
+  assign pcl_variant = product.selected_or_first_available_variant
+  assign pcl_percent = block.settings.credit_percent | default: 5
+  assign pcl_amount = pcl_variant.price | times: pcl_percent | divided_by: 100.0 | round
+
+  assign pcl_template = block.settings.text
+  if pcl_template == blank
+    assign pcl_template = 'Earn [amount] in store credit'
+  endif
+
+  assign pcl_amount_money = pcl_amount | money
+  assign pcl_amount_html = '<strong class="pdp-credit-line__amount">' | append: pcl_amount_money | append: '</strong>'
+  assign pcl_amount_text = pcl_amount_money | strip_html
+  assign pcl_label = pcl_template | escape | replace: '[amount]', pcl_amount_html
+  assign pcl_aria = pcl_template | replace: '[amount]', pcl_amount_text | strip_html
+-%}
+
+{%- if pcl_variant != blank and pcl_percent > 0 -%}
+  <style>
+    .pdp-credit-line-{{ block.id }} {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      max-width: 100%;
+      min-height: 36px;
+      padding: 0 14px 0 12px;
+      border-radius: 6px;
+      background: {% if block.settings.background.alpha != 0 and block.settings.background != blank %}{{ block.settings.background }}{% else %}#F5F5F5{% endif %};
+      color: {% if block.settings.text_color.alpha != 0 and block.settings.text_color != blank %}{{ block.settings.text_color }}{% else %}#121212{% endif %};
+      font-family: Inter, -apple-system, "Segoe UI", sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      line-height: 1.2;
+      letter-spacing: -0.13px;
+      text-decoration: none;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .pdp-credit-line-{{ block.id }} .pdp-credit-line__icon {
+      display: inline-flex;
+      flex-shrink: 0;
+      width: 18px;
+      height: 18px;
+      color: {% if block.settings.icon_color.alpha != 0 and block.settings.icon_color != blank %}{{ block.settings.icon_color }}{% else %}#FFD014{% endif %};
+    }
+
+    .pdp-credit-line-{{ block.id }} .pdp-credit-line__icon svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    .pdp-credit-line-{{ block.id }} .pdp-credit-line__amount {
+      font-weight: 700;
+    }
+
+    @media screen and (max-width: 699px) {
+      .pdp-credit-line-{{ block.id }} {
+        font-size: 12px;
+      }
+    }
+  </style>
+
+  <div class="product-info__credit-line pdp-credit-line-{{ block.id }}" role="note" aria-label="{{ pcl_aria | escape }}" {{ block.shopify_attributes }}>
+    <span class="pdp-credit-line__icon" aria-hidden="true">
+      <svg role="presentation" focusable="false" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="12" cy="12" r="10" fill="currentColor"></circle>
+        <circle cx="12" cy="12" r="7" fill="none" stroke="#000000" stroke-opacity=".28" stroke-width="1.5"></circle>
+        <path d="M12 7.2v9.6M9.6 9.7c0-1 1.1-1.6 2.4-1.6s2.4.6 2.4 1.6c0 2.1-4.8 1.3-4.8 3.6 0 1 1.1 1.7 2.4 1.7s2.4-.7 2.4-1.7" fill="none" stroke="#000000" stroke-opacity=".7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+      </svg>
+    </span>
+    <span class="pdp-credit-line__text">{{ pcl_label }}</span>
+  </div>
+{%- endif -%}

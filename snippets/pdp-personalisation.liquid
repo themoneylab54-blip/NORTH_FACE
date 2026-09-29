@@ -1,0 +1,659 @@
+{%- comment -%}
+----------------------------------------------------------------------------------------------------------------------
+PDP PERSONALISATION (block type "pdp_personalisation")
+----------------------------------------------------------------------------------------------------------------------
+
+Buy-box item 6: "Personalise your jersey". A two-button segmented control switches between:
+
+  * Panel A "Choose a player": a <select> of players (block setting "players", one per line, "Name · 23").
+    When the setting is empty the list is built from the product tags starting with "joueur-"
+    (joueur-jalen-brunson -> "Jalen Brunson", joueur-jalen-brunson-11 -> "Jalen Brunson · 11").
+    Submits as properties[Player].
+  * Panel B "Add your name": Name (max N chars, forced uppercase) + Number (max 2 digits).
+    Submits as properties[Name] and properties[Number].
+
+Only the ACTIVE panel reaches the cart: the JS disables every field of the hidden panel (disabled controls are
+never serialised) and drops the name attribute of empty fields so no blank property is sent.
+
+The whole product-info column is re-rendered by <product-rerender> on variant change, so the active tab and the
+typed values are persisted OUTSIDE the re-rendered tree (data attributes on #shopify-section-{{ section.id }})
+and the active tab is also kept in localStorage keyed by product.id.
+
+********************************************
+Supported variables
+********************************************
+
+* block: the section block (settings: label, tab_player_label, tab_name_label, players, player_placeholder,
+         name_label, name_placeholder, name_max_length, number_label, number_placeholder, helper_text, default_tab,
+         accent_color)
+* product: the product being rendered
+* product_form_id: the ID of the product form every field is attached to (form="...")
+* section: the current section
+{%- endcomment -%}
+
+{%- liquid
+  assign pp_label = block.settings.label | default: 'Personalise your jersey'
+  assign pp_tab_player = block.settings.tab_player_label | default: 'Choose a player'
+  assign pp_tab_name = block.settings.tab_name_label | default: 'Add your name'
+  assign pp_player_placeholder = block.settings.player_placeholder | default: 'Choose a player (optional)'
+  assign pp_name_label = block.settings.name_label | default: 'Name'
+  assign pp_name_placeholder = block.settings.name_placeholder | default: 'YOUR NAME'
+  assign pp_number_label = block.settings.number_label | default: 'Number'
+  assign pp_number_placeholder = block.settings.number_placeholder | default: '00'
+  assign pp_helper = block.settings.helper_text
+  assign pp_name_max = block.settings.name_max_length | default: 12
+  assign pp_default_tab = block.settings.default_tab | default: 'player'
+  assign pp_accent = '#121212'
+  if block.settings.accent_color != blank and block.settings.accent_color.alpha != 0
+    assign pp_accent = block.settings.accent_color
+  endif
+
+  comment
+    1. Players from the block textarea (one per line). newline_to_br turns every line break into "<br />\n",
+       so we split on "<br />" and strip each entry.
+  endcomment
+  assign pp_players = '' | split: ''
+  if block.settings.players != blank
+    assign pp_raw_lines = block.settings.players | strip | newline_to_br | split: '<br />'
+    for pp_line in pp_raw_lines
+      assign pp_entry = pp_line | strip_html | strip
+      if pp_entry != blank
+        assign pp_entry_arr = pp_entry | split: "|||"
+        assign pp_players = pp_players | concat: pp_entry_arr
+      endif
+    endfor
+  endif
+
+  comment
+    2. Fallback: product tags "joueur-first-last[-number]" -> "First Last[ · number]".
+  endcomment
+  if pp_players.size == 0
+    for pp_tag in product.tags
+      assign pp_prefix = pp_tag | downcase | slice: 0, 7
+      if pp_prefix != 'joueur-'
+        continue
+      endif
+
+      assign pp_parts = pp_tag | downcase | remove_first: 'joueur-' | split: '-'
+      if pp_parts.size == 0
+        continue
+      endif
+
+      assign pp_number = ''
+      assign pp_last = pp_parts | last
+      assign pp_last_numeric = pp_last | plus: 0 | append: ''
+      if pp_last_numeric == pp_last and pp_parts.size > 1
+        assign pp_number = pp_last
+        assign pp_word_count = pp_parts.size | minus: 1
+        assign pp_parts = pp_parts | slice: 0, pp_word_count
+      endif
+
+      assign pp_name_words = '' | split: ''
+      for pp_word in pp_parts
+        if pp_word == blank
+          continue
+        endif
+        assign pp_word_cap = pp_word | capitalize
+        assign pp_word_arr = pp_word_cap | split: "|||"
+        assign pp_name_words = pp_name_words | concat: pp_word_arr
+      endfor
+
+      if pp_name_words.size == 0
+        continue
+      endif
+
+      assign pp_entry = pp_name_words | join: ' '
+      if pp_number != blank
+        assign pp_entry = pp_entry | append: ' · ' | append: pp_number
+      endif
+      assign pp_entry_arr = pp_entry | split: "|||"
+      assign pp_players = pp_players | concat: pp_entry_arr
+    endfor
+  endif
+
+  assign pp_has_players = false
+  if pp_players.size > 0
+    assign pp_has_players = true
+  endif
+
+  if pp_has_players == false
+    assign pp_default_tab = 'name'
+  endif
+
+  assign pp_uid = section.id | append: '-' | append: block.id | append: '-' | append: product.id
+  assign pp_name_words = nil
+-%}
+
+<style>
+  .pdp-personalisation-{{ block.id }} {
+    --pp-text: #121212;
+    --pp-muted: #737373;
+    --pp-track: #F5F5F5;
+    --pp-border: #F0F0F0;
+    --pp-input-border: #E6E6E6;
+    --pp-accent: {{ pp_accent }};
+    display: block;
+    font-family: Inter, -apple-system, "Segoe UI", sans-serif;
+    color: var(--pp-text);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .pdp-personalisation-{{ block.id }} .pdp-personalisation__label {
+    display: block;
+    margin: 0 0 8px;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 16px;
+    letter-spacing: .02em;
+    text-transform: uppercase;
+    color: var(--pp-text);
+  }
+
+  /* Segmented control: 40px track, #F5F5F5, radius 6px */
+  .pdp-personalisation-{{ block.id }} .pdp-personalisation__tabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px;
+    box-sizing: border-box;
+    height: 40px;
+    padding: 4px;
+    margin: 0 0 12px;
+    border-radius: 6px;
+    background: var(--pp-track);
+  }
+
+  .pdp-personalisation-{{ block.id }} .pdp-personalisation__tab {
+    appearance: none;
+    -webkit-appearance: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    height: 32px;
+    padding: 0 10px;
+    margin: 0;
+    border: 0;
+    border-radius: 4px;
+    background: transparent;
+    color: var(--pp-muted);
+    font: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: -0.13px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: pointer;
+    transition: background-color .15s ease, color .15s ease, box-shadow .15s ease;
+  }
+
+  .pdp-personalisation-{{ block.id }} .pdp-personalisation__tab:hover {
+    color: var(--pp-text);
+  }
+
+  .pdp-personalisation-{{ block.id }} .pdp-personalisation__tab[aria-selected="true"] {
+    background: #FFFFFF;
+    color: var(--pp-accent);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, .06), 0 0 0 1px rgba(0, 0, 0, .03);
+  }
+
+  .pdp-personalisation-{{ block.id }} .pdp-personalisation__tab:focus-visible {
+    outline: 2px solid var(--pp-text);
+    outline-offset: 1px;
+  }
+
+  .pdp-personalisation-{{ block.id }} .pdp-personalisation__panel[hidden] {
+    display: none;
+  }
+
+  /* Player select: 40px, border #F0F0F0, radius 6px */
+  .pdp-personalisation-{{ block.id }} .pdp-personalisation__select-wrap {
+    position: relative;
+  }
+
+  .pdp-personalisation-{{ block.id }} .pdp-personalisation__select {
+    appearance: none;
+    -webkit-appearance: none;
+    box-sizing: border-box;
+    width: 100%;
+    height: 40px;
+    padding: 0 40px 0 12px;
+    margin: 0;
+    border: 1px solid var(--pp-border);
+    border-radius: 6px;
+    background: #FFFFFF;
+    color: var(--pp-text);
+    font: inherit;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 38px;
+    cursor: pointer;
+    transition: border-color .15s ease, box-shadow .15s ease;
+  }
+
+  .pdp-personalisation-{{ block.id }} .pdp-personalisation__select:has(option[value=""]:checked) {
+    color: var(--pp-muted);
+  }
+
+  .pdp-personalisation-{{ block.id }} .pdp-personalisation__select:focus,
+  .pdp-personalisation-{{ block.id }} .pdp-personalisation__input:focus {
+    outline: none;
+    border-color: var(--pp-text);
+    box-shadow: 0 0 0 1px var(--pp-text);
+  }
+
+  .pdp-personalisation-{{ block.id }} .pdp-personalisation__chevron {
+    position: absolute;
+    top: 50%;
+    right: 14px;
+    width: 10px;
+    height: 7px;
+    transform: translateY(-50%);
+    color: var(--pp-muted);
+    pointer-events: none;
+  }
+
+  .pdp-personalisation-{{ block.id }} .pdp-personalisation__chevron svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Name + number */
+  .pdp-personalisation-{{ block.id }} .pdp-personalisation__fields {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 104px;
+    gap: 8px;
+  }
+
+  .pdp-personalisation-{{ block.id }} .pdp-personalisation__field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+  }
+
+  .pdp-personalisation-{{ block.id }} .pdp-personalisation__field-label {
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 14px;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    color: var(--pp-muted);
+  }
+
+  .pdp-personalisation-{{ block.id }} .pdp-personalisation__input {
+    appearance: none;
+    -webkit-appearance: none;
+    box-sizing: border-box;
+    width: 100%;
+    height: 40px;
+    padding: 0 12px;
+    margin: 0;
+    border: 1px solid var(--pp-input-border);
+    border-radius: 6px;
+    background: #FFFFFF;
+    color: var(--pp-text);
+    font: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 38px;
+    letter-spacing: .04em;
+    transition: border-color .15s ease, box-shadow .15s ease;
+  }
+
+  .pdp-personalisation-{{ block.id }} .pdp-personalisation__input--name {
+    text-transform: uppercase;
+  }
+
+  .pdp-personalisation-{{ block.id }} .pdp-personalisation__input--number {
+    text-align: center;
+  }
+
+  .pdp-personalisation-{{ block.id }} .pdp-personalisation__input::placeholder {
+    color: var(--pp-muted);
+    opacity: .7;
+    font-weight: 500;
+  }
+
+  .pdp-personalisation-{{ block.id }} .pdp-personalisation__helper {
+    margin: 8px 0 0;
+    font-size: 12px;
+    line-height: 16px;
+    color: var(--pp-muted);
+  }
+
+  .pdp-personalisation-{{ block.id }} .pdp-personalisation__counter {
+    font-variant-numeric: tabular-nums;
+  }
+</style>
+
+<pdp-personalisation
+  class="product-info__personalisation pdp-personalisation-{{ block.id }}"
+  product-id="{{ product.id }}"
+  section-id="{{ section.id }}"
+  form-id="{{ product_form_id }}"
+  default-tab="{{ pp_default_tab }}"
+  name-max="{{ pp_name_max }}"
+  data-active-tab="{{ pp_default_tab }}"
+  {{ block.shopify_attributes }}
+>
+  <span class="pdp-personalisation__label" id="pp-label-{{ pp_uid }}">{{ pp_label | escape }}</span>
+
+  {%- if pp_has_players -%}
+    <div class="pdp-personalisation__tabs" role="tablist" aria-labelledby="pp-label-{{ pp_uid }}">
+      <button
+        type="button"
+        role="tab"
+        class="pdp-personalisation__tab"
+        id="pp-tab-player-{{ pp_uid }}"
+        data-pp-tab="player"
+        aria-controls="pp-panel-player-{{ pp_uid }}"
+        aria-selected="{% if pp_default_tab == 'player' %}true{% else %}false{% endif %}"
+        tabindex="{% if pp_default_tab == 'player' %}0{% else %}-1{% endif %}"
+      >{{ pp_tab_player | escape }}</button>
+      <button
+        type="button"
+        role="tab"
+        class="pdp-personalisation__tab"
+        id="pp-tab-name-{{ pp_uid }}"
+        data-pp-tab="name"
+        aria-controls="pp-panel-name-{{ pp_uid }}"
+        aria-selected="{% if pp_default_tab == 'name' %}true{% else %}false{% endif %}"
+        tabindex="{% if pp_default_tab == 'name' %}0{% else %}-1{% endif %}"
+      >{{ pp_tab_name | escape }}</button>
+    </div>
+
+    {%- comment -%} Panel A: player {%- endcomment -%}
+    <div
+      class="pdp-personalisation__panel"
+      id="pp-panel-player-{{ pp_uid }}"
+      role="tabpanel"
+      aria-labelledby="pp-tab-player-{{ pp_uid }}"
+      data-pp-panel="player"
+      {% if pp_default_tab != 'player' %}hidden{% endif %}
+    >
+      <div class="pdp-personalisation__select-wrap">
+        <label class="sr-only" for="pp-player-{{ pp_uid }}">{{ pp_tab_player | escape }}</label>
+        <select
+          id="pp-player-{{ pp_uid }}"
+          class="pdp-personalisation__select"
+          name="properties[Player]"
+          data-pp-name="properties[Player]"
+          data-pp-field="player"
+          data-pp-panel-owner="player"
+          form="{{ product_form_id }}"
+          autocomplete="off"
+          {% if pp_default_tab != 'player' %}disabled{% endif %}
+        >
+          <option value="">{{ pp_player_placeholder | escape }}</option>
+          {%- for pp_player in pp_players -%}
+            <option value="{{ pp_player | escape }}">{{ pp_player | escape }}</option>
+          {%- endfor -%}
+        </select>
+        <span class="pdp-personalisation__chevron" aria-hidden="true">
+          <svg role="presentation" focusable="false" viewBox="0 0 10 7" xmlns="http://www.w3.org/2000/svg">
+            <path d="m1 1 4 4 4-4" fill="none" stroke="currentColor" stroke-width="2"></path>
+          </svg>
+        </span>
+      </div>
+    </div>
+  {%- endif -%}
+
+  {%- comment -%} Panel B: custom name + number {%- endcomment -%}
+  <div
+    class="pdp-personalisation__panel"
+    id="pp-panel-name-{{ pp_uid }}"
+    role="{% if pp_has_players %}tabpanel{% else %}group{% endif %}"
+    {% if pp_has_players %}aria-labelledby="pp-tab-name-{{ pp_uid }}"{% else %}aria-labelledby="pp-label-{{ pp_uid }}"{% endif %}
+    data-pp-panel="name"
+    {% if pp_default_tab != 'name' %}hidden{% endif %}
+  >
+    <div class="pdp-personalisation__fields">
+      <div class="pdp-personalisation__field">
+        <label class="pdp-personalisation__field-label" for="pp-name-{{ pp_uid }}">
+          {{ pp_name_label | escape }}
+          <span class="pdp-personalisation__counter" data-pp-counter aria-hidden="true">(0/{{ pp_name_max }})</span>
+        </label>
+        <input
+          id="pp-name-{{ pp_uid }}"
+          class="pdp-personalisation__input pdp-personalisation__input--name"
+          type="text"
+          name="properties[Name]"
+          data-pp-name="properties[Name]"
+          data-pp-field="name"
+          data-pp-panel-owner="name"
+          form="{{ product_form_id }}"
+          maxlength="{{ pp_name_max }}"
+          placeholder="{{ pp_name_placeholder | escape }}"
+          autocomplete="off"
+          autocapitalize="characters"
+          spellcheck="false"
+          {% if pp_default_tab != 'name' %}disabled{% endif %}
+        >
+      </div>
+      <div class="pdp-personalisation__field">
+        <label class="pdp-personalisation__field-label" for="pp-number-{{ pp_uid }}">{{ pp_number_label | escape }}</label>
+        <input
+          id="pp-number-{{ pp_uid }}"
+          class="pdp-personalisation__input pdp-personalisation__input--number"
+          type="text"
+          inputmode="numeric"
+          pattern="[0-9]*"
+          name="properties[Number]"
+          data-pp-name="properties[Number]"
+          data-pp-field="number"
+          data-pp-panel-owner="name"
+          form="{{ product_form_id }}"
+          maxlength="2"
+          placeholder="{{ pp_number_placeholder | escape }}"
+          autocomplete="off"
+          {% if pp_default_tab != 'name' %}disabled{% endif %}
+        >
+      </div>
+    </div>
+    {%- if pp_helper != blank -%}
+      <p class="pdp-personalisation__helper">{{ pp_helper | escape }}</p>
+    {%- endif -%}
+  </div>
+</pdp-personalisation>
+
+<script>
+  if (!window.customElements.get('pdp-personalisation')) {
+    /* pdp-perso:pure:start */
+    // Pure helpers (no DOM). Extracted and unit-tested with node, see the block's self-test.
+    var PdpPersonalisationLogic = {
+      TABS: ['player', 'name'],
+
+      // Picks the first valid tab among the candidates (section data attribute, localStorage, Liquid default).
+      resolveTab: function (candidates, fallback) {
+        for (var i = 0; i < candidates.length; i++) {
+          if (this.TABS.indexOf(candidates[i]) !== -1) return candidates[i];
+        }
+        return this.TABS.indexOf(fallback) !== -1 ? fallback : 'player';
+      },
+
+      // Given the active tab and the list of fields, returns what each field must look like:
+      //   disabled -> true when the field belongs to the hidden panel (disabled controls are never submitted)
+      //   submit   -> true when the field is visible AND has a value (empty fields lose their name attribute)
+      resolveFieldState: function (activeTab, fields) {
+        return fields.map(function (field) {
+          var visible = field.panel === activeTab;
+          var filled = String(field.value == null ? '' : field.value).trim() !== '';
+          return { key: field.key, disabled: !visible, submit: visible && filled };
+        });
+      },
+
+      // Name: uppercase, letters / digits / space / . ' - only, capped at max characters.
+      sanitizeName: function (value, max) {
+        var limit = parseInt(max, 10);
+        if (!(limit > 0)) limit = 12;
+        return String(value == null ? '' : value)
+          .toLocaleUpperCase()
+          .replace(/[^\p{L}\p{N} .'\-]/gu, '')
+          .replace(/\s{2,}/g, ' ')
+          .slice(0, limit);
+      },
+
+      // Number: digits only, 2 characters max.
+      sanitizeNumber: function (value) {
+        return String(value == null ? '' : value).replace(/\D/g, '').slice(0, 2);
+      }
+    };
+    /* pdp-perso:pure:end */
+
+    window.customElements.define('pdp-personalisation', class extends HTMLElement {
+      connectedCallback() {
+        this._logic = PdpPersonalisationLogic;
+        this._productId = this.getAttribute('product-id') || '';
+        this._sectionId = this.getAttribute('section-id') || '';
+        this._nameMax = this.getAttribute('name-max') || '12';
+        this._storageKey = 'pdp-personalisation:tab:' + this._productId;
+        this._tabAttr = 'data-pp-tab-' + this._productId;
+        this._valuesAttr = 'data-pp-values-' + this._productId;
+
+        // Host outside the re-rendered tree: the section wrapper survives <product-rerender>.
+        this._host = document.getElementById('shopify-section-' + this._sectionId) || document.body;
+
+        this._tabs = Array.from(this.querySelectorAll('[data-pp-tab]'));
+        this._panels = Array.from(this.querySelectorAll('[data-pp-panel]'));
+        this._fields = Array.from(this.querySelectorAll('[data-pp-field]'));
+        this._counter = this.querySelector('[data-pp-counter]');
+
+        this._restoreValues();
+
+        var candidates = [this._host.getAttribute(this._tabAttr), this._readStoredTab()];
+        var initial = this._logic.resolveTab(candidates, this.getAttribute('default-tab'));
+
+        // A single-panel render (no players) can only show the name panel.
+        if (!this._panelFor(initial)) initial = this._panels.length ? this._panels[0].dataset.ppPanel : 'name';
+
+        this._onClick = this._onClick.bind(this);
+        this._onKeydown = this._onKeydown.bind(this);
+        this._onInput = this._onInput.bind(this);
+        this.addEventListener('click', this._onClick);
+        this.addEventListener('keydown', this._onKeydown);
+        this.addEventListener('input', this._onInput);
+        this.addEventListener('change', this._onInput);
+
+        this._setActive(initial, false);
+      }
+
+      disconnectedCallback() {
+        this.removeEventListener('click', this._onClick);
+        this.removeEventListener('keydown', this._onKeydown);
+        this.removeEventListener('input', this._onInput);
+        this.removeEventListener('change', this._onInput);
+      }
+
+      _panelFor(tab) {
+        return this._panels.find(function (panel) { return panel.dataset.ppPanel === tab; });
+      }
+
+      _readStoredTab() {
+        try { return window.localStorage.getItem(this._storageKey); } catch (error) { return null; }
+      }
+
+      _writeStoredTab(tab) {
+        try { window.localStorage.setItem(this._storageKey, tab); } catch (error) { /* private mode, quota... */ }
+      }
+
+      _restoreValues() {
+        var raw = this._host.getAttribute(this._valuesAttr);
+        if (!raw) return;
+        var values;
+        try { values = JSON.parse(raw); } catch (error) { return; }
+        this._fields.forEach(function (field) {
+          var key = field.dataset.ppField;
+          if (values && typeof values[key] === 'string' && field.value === '') field.value = values[key];
+        });
+      }
+
+      _persistValues() {
+        var values = {};
+        this._fields.forEach(function (field) { values[field.dataset.ppField] = field.value; });
+        this._host.setAttribute(this._valuesAttr, JSON.stringify(values));
+      }
+
+      _onClick(event) {
+        var tab = event.target.closest('[data-pp-tab]');
+        if (!tab || !this.contains(tab)) return;
+        event.preventDefault();
+        this._setActive(tab.dataset.ppTab, true);
+      }
+
+      _onKeydown(event) {
+        var tab = event.target.closest('[data-pp-tab]');
+        if (!tab || (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight')) return;
+        var index = this._tabs.indexOf(tab);
+        if (index === -1) return;
+        var next = event.key === 'ArrowRight' ? (index + 1) % this._tabs.length : (index - 1 + this._tabs.length) % this._tabs.length;
+        event.preventDefault();
+        this._setActive(this._tabs[next].dataset.ppTab, true);
+        this._tabs[next].focus();
+      }
+
+      _onInput(event) {
+        var field = event.target.closest('[data-pp-field]');
+        if (!field || !this.contains(field)) return;
+
+        if (field.dataset.ppField === 'name') {
+          var cleanName = this._logic.sanitizeName(field.value, this._nameMax);
+          if (cleanName !== field.value) field.value = cleanName;
+        } else if (field.dataset.ppField === 'number') {
+          var cleanNumber = this._logic.sanitizeNumber(field.value);
+          if (cleanNumber !== field.value) field.value = cleanNumber;
+        }
+
+        this._updateCounter();
+        this._persistValues();
+        this._syncFields();
+      }
+
+      _updateCounter() {
+        if (!this._counter) return;
+        var nameField = this._fields.find(function (field) { return field.dataset.ppField === 'name'; });
+        if (nameField) this._counter.textContent = '(' + nameField.value.length + '/' + this._nameMax + ')';
+      }
+
+      _setActive(tab, persist) {
+        this._active = tab;
+        this.setAttribute('data-active-tab', tab);
+        this._host.setAttribute(this._tabAttr, tab);
+        if (persist) this._writeStoredTab(tab);
+
+        this._tabs.forEach(function (button) {
+          var selected = button.dataset.ppTab === tab;
+          button.setAttribute('aria-selected', selected ? 'true' : 'false');
+          button.setAttribute('tabindex', selected ? '0' : '-1');
+        });
+
+        this._panels.forEach(function (panel) {
+          panel.hidden = panel.dataset.ppPanel !== tab;
+        });
+
+        this._updateCounter();
+        this._syncFields();
+      }
+
+      // Applies disabled / name to every field so only the active, non-empty choice reaches the cart.
+      _syncFields() {
+        var descriptors = this._fields.map(function (field) {
+          return { key: field.dataset.ppField, panel: field.dataset.ppPanelOwner, value: field.value };
+        });
+        var states = this._logic.resolveFieldState(this._active, descriptors);
+
+        this._fields.forEach(function (field, index) {
+          var state = states[index];
+          field.disabled = state.disabled;
+          if (state.submit) {
+            field.setAttribute('name', field.dataset.ppName);
+          } else {
+            field.removeAttribute('name');
+          }
+        });
+      }
+    });
+  }
+</script>

@@ -1,0 +1,418 @@
+{%- comment -%}
+----------------------------------------------------------------------------------------------------------------------
+PDP SIZE SELECTOR (block type "pdp_size_selector")
+----------------------------------------------------------------------------------------------------------------------
+
+Buy-box item 5 of the reference layout: a header row ("Choose your size: M" + underlined "Size guide" link that opens a
+drawer with the integrated size guide) followed by the size option rendered as rectangular 40px buttons.
+
+The block keeps the theme's variant machinery intact: it outputs the same <variant-picker> custom element, the same
+<script data-variant> JSON and the same radio inputs (rendered through the theme's "option-value" snippet) that
+assets/theme.js expects. Only the wrapper markup and the CSS are custom, so the measurements can match the reference.
+
+IMPORTANT: this block REPLACES the theme's "variant_picker" block. Do not keep both in the same section, otherwise the
+product form would receive two radio groups per option.
+
+********************************************
+Supported variables
+********************************************
+
+* block: the block (settings: label_text, size_option_name, show_size_guide, size_guide_text, other_options, hide_sold_out_variants)
+* product: the product
+* product_form_id: the ID of the product form
+* section: the section the block belongs to
+* context: "quick_buy" when rendered in the quick buy drawer of a product card (no size guide, no URL update)
+{%- endcomment -%}
+
+{%- liquid
+  assign pss_quick_buy = false
+  if context == 'quick_buy'
+    assign pss_quick_buy = true
+  endif
+
+  assign pss_class = 'pdp-size-selector-' | append: block.id
+  assign pss_label = block.settings.label_text | default: 'Choose your size'
+  assign pss_guide_text = block.settings.size_guide_text | default: 'Size guide'
+  assign pss_size_name = block.settings.size_option_name | default: 'Size' | downcase | strip
+  assign pss_other_options = block.settings.other_options | default: 'show'
+  assign pss_hide_sold_out = block.settings.hide_sold_out_variants | default: false
+  assign pss_show_guide = block.settings.show_size_guide
+  if pss_show_guide == nil
+    assign pss_show_guide = true
+  endif
+
+  # The quick buy copy lives in the same product page HTML as the main one: it gets its own key so the main picker
+  # never swaps in the quick buy markup (or the reverse) on variant change.
+  if pss_quick_buy
+    assign pss_key = product_form_id | append: '-' | append: block.id
+  else
+    assign pss_key = section.id | append: '-' | append: block.id
+  endif
+
+  assign size_label_list = 'general.label.size' | t | replace: ', ', ',' | downcase | split: ','
+
+  # The variant picker only reloads the page for combined products on the real product page. The quick buy is also
+  # rendered as part of the product page, but it opens on other pages (collections, home): it must never touch the URL.
+  assign pss_update_url = false
+  if request.page_type == 'product' and pss_quick_buy == false
+    assign pss_update_url = true
+  endif
+
+  # The size guide opens in its own drawer, which cannot stack on top of the quick buy drawer.
+  if pss_quick_buy
+    assign pss_show_guide = false
+  endif
+
+  # Find which option is the size option: the configured name first, then the theme's translated size labels.
+  assign pss_size_position = 0
+  for option in product.options_with_values
+    assign option_downcase = option.name | downcase | strip
+    if option_downcase == pss_size_name
+      assign pss_size_position = option.position
+      break
+    endif
+  endfor
+
+  if pss_size_position == 0
+    for option in product.options_with_values
+      assign option_downcase = option.name | downcase | strip
+      if size_label_list contains option_downcase
+        assign pss_size_position = option.position
+        break
+      endif
+    endfor
+  endif
+
+  # Without a recognisable size option, the first option takes the header row and the size guide link.
+  if pss_size_position == 0 and product.has_only_default_variant == false
+    assign pss_size_position = product.options_with_values.first.position
+  endif
+
+  capture drawer_id
+    echo 'pdp-size-guide-' | append: pss_key
+  endcapture
+-%}
+
+<style>
+  .{{ pss_class }} {
+    font-family: Inter, var(--text-font-family), sans-serif;
+    color: #121212;
+  }
+
+  .{{ pss_class }} .variant-picker {
+    gap: 16px;
+  }
+
+  .{{ pss_class }} .pdp-size-selector__option {
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  .{{ pss_class }} .pdp-size-selector__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-block-end: 10px;
+  }
+
+  .{{ pss_class }} .pdp-size-selector__label {
+    margin: 0;
+    padding: 0;
+    font-size: 12px;
+    line-height: 16px;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: #121212;
+  }
+
+  .{{ pss_class }} .pdp-size-selector__label-value {
+    font-weight: 600;
+  }
+
+  .{{ pss_class }} .pdp-size-selector__guide {
+    flex-shrink: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    font: inherit;
+    font-size: 12px;
+    line-height: 16px;
+    font-weight: 400;
+    color: #737373;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    cursor: pointer;
+  }
+
+  .{{ pss_class }} .pdp-size-selector__guide:hover {
+    color: #121212;
+  }
+
+  .{{ pss_class }} .pdp-size-selector__values {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 0;
+  }
+
+  /* Size buttons: 40px tall, min 46px wide, 1px #F0F0F0 border, 6px radius, 14px/500, transparent background. */
+  .{{ pss_class }} .block-swatch {
+    box-sizing: border-box;
+    height: 40px;
+    min-width: 46px;
+    padding-inline: 12px;
+    justify-content: center;
+    border: 1px solid #F0F0F0;
+    border-radius: 6px;
+    background: transparent;
+    color: #121212;
+    font-size: 14px;
+    line-height: 1;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color .15s ease, color .15s ease, border-color .15s ease;
+  }
+
+  .{{ pss_class }} .block-swatch::before {
+    display: none;
+  }
+
+  @media (hover: hover) {
+    .{{ pss_class }} .block-swatch:hover {
+      border-color: #121212;
+    }
+  }
+
+  .{{ pss_class }} :checked + .block-swatch {
+    background: #121212;
+    border-color: #121212;
+    color: #FFFFFF;
+  }
+
+  {%- comment -%}
+    Out of stock: greyed out with the label struck through. The theme draws a
+    diagonal rule across the whole box; `background-image: none` removes it.
+  {%- endcomment -%}
+  .{{ pss_class }} .block-swatch.is-disabled {
+    color: #A3A3A3;
+    background-image: none;
+    background-color: #FAFAFA;
+    border-color: #EFEFEF;
+    text-decoration: line-through;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0;
+    cursor: not-allowed;
+  }
+
+  .{{ pss_class }} :checked + .block-swatch.is-disabled {
+    color: #FFFFFF;
+    background-image: none;
+    background-color: #6B6B6B;
+    border-color: #6B6B6B;
+    text-decoration: line-through;
+  }
+
+  .{{ pss_class }} :focus-visible + .block-swatch {
+    outline: 2px solid #121212;
+    outline-offset: 2px;
+  }
+
+  .{{ pss_class }} .pdp-size-selector__drawer .h5 {
+    font-family: Inter, var(--text-font-family), sans-serif;
+    font-size: 19px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: -0.38px;
+  }
+</style>
+
+<pdp-size-selector class="pdp-size-selector {{ pss_class }}{% if pss_quick_buy %} pdp-size-selector--quick-buy{% endif %}" form-id="{{ product_form_id }}" data-pdp-size-selector="{{ pss_key }}" data-drawer-id="{{ drawer_id }}" {% unless pss_quick_buy %}{{ block.shopify_attributes }}{% endunless %}>
+  {%- comment -%} Everything inside [data-pdp-size-picker] is swapped for fresh Liquid HTML on every variant change. {%- endcomment -%}
+  <div data-pdp-size-picker="{{ pss_key }}">
+    {%- unless product.has_only_default_variant -%}
+      <variant-picker class="variant-picker" section-id="{{ section.id }}" handle="{{ product.handle }}" form-id="{{ product_form_id }}" {% if pss_update_url %}update-url{% endif %}>
+        {%- comment -%} Required by assets/theme.js: the selected variant as JSON. Do not remove. {%- endcomment -%}
+        <script data-variant type="application/json">
+          {{- product.selected_or_first_available_variant | json -}}
+        </script>
+
+        {%- for option in product.options_with_values -%}
+          {%- liquid
+            assign is_size_option = false
+            if option.position == pss_size_position
+              assign is_size_option = true
+            endif
+
+            assign hide_option = false
+            if is_size_option == false and pss_other_options == 'hide'
+              assign hide_option = true
+            endif
+
+            assign param_name = product_form_id | append: '-option' | append: option.position
+          -%}
+
+          <fieldset class="pdp-size-selector__option" {% if hide_option %}hidden{% endif %}>
+            <div class="pdp-size-selector__head">
+              <legend class="pdp-size-selector__label">
+                {%- if is_size_option -%}
+                  {{ pss_label | escape }}: <span class="pdp-size-selector__label-value">{{ option.selected_value | escape }}</span>
+                {%- else -%}
+                  {{ option.name | escape }}: <span class="pdp-size-selector__label-value">{{ option.selected_value | escape }}</span>
+                {%- endif -%}
+              </legend>
+
+              {%- if is_size_option and pss_show_guide -%}
+                <button type="button" class="pdp-size-selector__guide" aria-controls="{{ drawer_id }}" aria-expanded="false">{{ pss_guide_text | escape }}</button>
+              {%- endif -%}
+            </div>
+
+            <div class="pdp-size-selector__values">
+              {%- for option_value in option.values -%}
+                {%- render 'option-value', type: 'block', form: product_form_id, option_value: option_value, param_name: param_name, option_position: option.position, hide_if_disabled: pss_hide_sold_out, reload_page_for_combined_products: pss_update_url, id_prefix: forloop.index -%}
+              {%- endfor -%}
+            </div>
+          </fieldset>
+        {%- endfor -%}
+      </variant-picker>
+    {%- elsif pss_show_guide -%}
+      <div class="pdp-size-selector__head">
+        <p class="pdp-size-selector__label">{{ pss_label | escape }}</p>
+        <button type="button" class="pdp-size-selector__guide" aria-controls="{{ drawer_id }}" aria-expanded="false">{{ pss_guide_text | escape }}</button>
+      </div>
+    {%- endunless -%}
+  </div>
+
+  {%- if pss_show_guide -%}
+    {%- comment -%}
+      Bridge to the integrated size guide: its rows look for an input[data-option-position] whose VALUE equals the size
+      label, but the theme's real inputs carry option value IDs. These detached proxies (no form attribute, so the
+      product form and the theme's variant picker ignore them) satisfy that lookup; the custom element below forwards
+      the change to the real radio.
+    {%- endcomment -%}
+    {%- unless product.has_only_default_variant -%}
+      <div hidden data-pdp-size-bridge>
+        {%- for option in product.options_with_values -%}
+          {%- if option.position == pss_size_position -%}
+            {%- for option_value in option.values -%}
+              <input type="radio" name="pdp-size-bridge-{{ pss_key }}" value="{{ option_value.name | escape }}" data-option-position="{{ option.position }}" data-pdp-size-proxy tabindex="-1" aria-hidden="true">
+            {%- endfor -%}
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+    {%- endunless -%}
+
+    <x-drawer id="{{ drawer_id }}" class="drawer drawer--lg pdp-size-selector__drawer">
+      <span class="h5" slot="header">{{ pss_guide_text | escape }}</span>
+      {%- render 'size-guide', context: 'modal' -%}
+    </x-drawer>
+  {%- endif -%}
+</pdp-size-selector>
+
+<script>
+  if (!window.customElements.get('pdp-size-selector')) {
+    window.customElements.define('pdp-size-selector', class extends HTMLElement {
+      /* Pure helper: pick the real option input whose label text equals the requested size (case/space insensitive). */
+      static matchSizeInput(candidates, size) {
+        const wanted = String(size || '').trim().toUpperCase();
+
+        if (!wanted) {
+          return null;
+        }
+
+        return candidates.find((candidate) => String(candidate.label || '').trim().toUpperCase() === wanted) || null;
+      }
+
+      connectedCallback() {
+        this._formId = this.getAttribute('form-id');
+        this._key = this.getAttribute('data-pdp-size-selector');
+        this._abortController = new AbortController();
+
+        /*
+          main-product uses <product-rerender allow-partial-rerender>, which only swaps a fixed list of theme block
+          types on variant change. This block is not in that list, so we swap our own picker markup from the fragment
+          the theme already fetched: the "Choose your size: X" label and the availability states stay in sync.
+          The product form sits below this block in the buy box, so binding waits until the document is parsed.
+        */
+        const bindForm = () => {
+          const form = document.forms[this._formId];
+
+          if (form && !this._abortController.signal.aborted) {
+            form.addEventListener('product:rerender', (event) => this._onRerender(event), { signal: this._abortController.signal });
+          }
+        };
+
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', bindForm, { once: true, signal: this._abortController.signal });
+        } else {
+          bindForm();
+        }
+
+        this.addEventListener('change', (event) => {
+          if (event.target.matches('input[data-pdp-size-proxy]')) {
+            this._applyProxy(event.target);
+          }
+        }, { signal: this._abortController.signal });
+      }
+
+      disconnectedCallback() {
+        this._abortController?.abort();
+      }
+
+      _onRerender(event) {
+        if (event.detail?.productChange || !this.isConnected) {
+          return;
+        }
+
+        const current = this.querySelector('[data-pdp-size-picker="' + this._key + '"]');
+        const fresh = event.detail?.htmlFragment?.querySelector?.('[data-pdp-size-picker="' + this._key + '"]');
+
+        if (!current || !fresh) {
+          return;
+        }
+
+        const focusedId = document.activeElement?.id;
+        current.replaceWith(fresh);
+
+        if (focusedId) {
+          const element = document.getElementById(focusedId);
+
+          if (element && this.contains(element)) {
+            element.focus({ preventScroll: true });
+          }
+        }
+      }
+
+      _applyProxy(proxy) {
+        const position = proxy.getAttribute('data-option-position');
+        const inputs = Array.from(this.querySelectorAll('input[data-option-position="' + position + '"][form="' + this._formId + '"]'));
+        const candidates = inputs.map((input) => ({ input, label: input.nextElementSibling?.textContent || '' }));
+        const match = this.constructor.matchSizeInput(candidates, proxy.value);
+
+        proxy.checked = false;
+
+        if (!match || match.input.disabled) {
+          return;
+        }
+
+        if (!match.input.checked) {
+          match.input.checked = true;
+          match.input.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+
+        /* The drawer's close button lives in its shadow DOM, so the size guide cannot click it: close it here.
+           The theme moves an open drawer to document.body, so it is no longer a descendant of this element:
+           resolve it by id instead of by containment. */
+        const drawerId = this.getAttribute('data-drawer-id');
+        const drawer = (drawerId && document.getElementById(drawerId)) || this.querySelector('x-drawer');
+
+        if (drawer && typeof drawer.hide === 'function') {
+          window.setTimeout(() => drawer.hide(), 400);
+        }
+      }
+    });
+  }
+</script>

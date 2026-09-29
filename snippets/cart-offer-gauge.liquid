@@ -1,0 +1,232 @@
+{%- comment -%}
+----------------------------------------------------------------------------------------------------------------------
+CART OFFER GAUGE
+----------------------------------------------------------------------------------------------------------------------
+
+Shows the progress towards a "Buy X, get Y free" offer: one step per item, the free items at the end, and an optional
+"free shipping unlocked" line. Used in the cart drawer and on the cart page. The quantities and the collection must match
+the automatic discount configured in Shopify, which is what actually applies the offer at checkout.
+
+********************************************
+Supported variables
+********************************************
+
+* block: the "offer_gauge" block (required)
+{%- endcomment -%}
+
+{%- liquid
+  assign og_buy = block.settings.buy_quantity | default: 3
+  assign og_free = block.settings.free_quantity | default: 1 | plus: 0
+  assign og_target = og_buy | plus: og_free
+  assign og_collection_handle = block.settings.collection.handle
+
+  assign og_count = 0
+
+  for line_item in cart.items
+    if og_collection_handle == blank
+      assign og_count = og_count | plus: line_item.quantity
+    else
+      assign og_item_collections = line_item.product.collections | map: 'handle'
+
+      if og_item_collections contains og_collection_handle
+        assign og_count = og_count | plus: line_item.quantity
+      endif
+    endif
+  endfor
+
+  assign og_remaining = og_target | minus: og_count | at_least: 0
+  assign og_segments = og_target | minus: 1
+  assign og_progress = og_count | at_most: og_target | minus: 1 | at_least: 0 | times: 1.0 | divided_by: og_segments
+
+  if og_remaining == 0
+    assign og_message = block.settings.text_unlocked
+  elsif og_remaining == 1
+    assign og_message = block.settings.text_last
+  else
+    assign og_message = block.settings.text_progress
+  endif
+
+  assign og_message = og_message | escape | replace: '[count]', og_remaining | replace: '[free]', og_free | replace: '[buy]', og_buy | replace: '[target]', og_target
+
+  capture og_style
+    echo '--og-progress: ' | append: og_progress | append: ';'
+
+    if block.settings.fill_color != blank and block.settings.fill_color.alpha != 0
+      echo ' --og-fill: ' | append: block.settings.fill_color | append: ';'
+    endif
+
+    if block.settings.accent_color != blank and block.settings.accent_color.alpha != 0
+      assign og_accent_brightness = block.settings.accent_color | color_brightness
+
+      echo ' --og-accent: ' | append: block.settings.accent_color | append: ';'
+
+      if og_accent_brightness > 150
+        echo ' --og-accent-text: #000000;'
+      else
+        echo ' --og-accent-text: #ffffff;'
+      endif
+    endif
+  endcapture
+-%}
+
+<div class="offer-gauge{% if og_remaining == 0 %} offer-gauge--unlocked{% endif %}" style="{{ og_style | strip }}" {{ block.shopify_attributes }}>
+  <p class="offer-gauge__text">{{ og_message }}</p>
+
+  <div class="offer-gauge__steps" aria-hidden="true">
+    <span class="offer-gauge__track"><span class="offer-gauge__track-fill"></span></span>
+
+    {%- for step in (1..og_target) -%}
+      <span class="offer-gauge__step{% if step <= og_count %} is-reached{% endif %}{% if step > og_buy %} is-free{% endif %}">
+        <span class="offer-gauge__dot">
+          {%- if step > og_buy -%}
+            {%- render 'icon' with 'picto-gift', width: 18, height: 18 -%}
+          {%- else -%}
+            <svg class="offer-gauge__jersey" width="18" height="18" viewBox="0 0 24 24" focusable="false"><path fill="currentColor" d="M6 3h2.5Q12 9 15.5 3H18Q18 9 20 10v11H4V10Q6 9 6 3Z"/></svg>
+          {%- endif -%}
+        </span>
+
+        <span class="offer-gauge__label">
+          {%- if step > og_buy -%}{{ block.settings.free_label | escape }}{%- else -%}{{ step }}{%- endif -%}
+        </span>
+      </span>
+    {%- endfor -%}
+  </div>
+
+  {%- if block.settings.show_shipping and block.settings.shipping_text != blank and cart.requires_shipping -%}
+    <p class="offer-gauge__shipping">
+      {%- if block.settings.shipping_icon != blank and block.settings.shipping_icon != 'none' -%}
+        <span class="offer-gauge__shipping-icon" aria-hidden="true">{%- render 'icon' with block.settings.shipping_icon, width: 16, height: 16 -%}</span>
+      {%- endif -%}
+      <span>{{ block.settings.shipping_text | escape }}</span>
+    </p>
+  {%- endif -%}
+</div>
+
+<style>
+  .offer-gauge {
+    --og-dot: 34px;
+    --og-column: 46px;
+    display: grid;
+    gap: var(--spacing-2-5);
+  }
+
+  .cart-drawer .offer-gauge {
+    padding-block-start: var(--spacing-1);
+  }
+
+  .offer-gauge__text {
+    margin: 0;
+    font-size: var(--text-sm);
+    font-weight: 600;
+    line-height: 1.35;
+    text-align: center;
+  }
+
+  .offer-gauge__steps {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .offer-gauge__track {
+    position: absolute;
+    inset-block-start: calc(var(--og-dot) / 2 - 1.5px);
+    inset-inline: calc(var(--og-column) / 2);
+    height: 3px;
+    overflow: hidden;
+    border-radius: 3px;
+    background: rgb(var(--text-color) / .12);
+  }
+
+  .offer-gauge__track-fill {
+    display: block;
+    width: calc(var(--og-progress, 0) * 100%);
+    height: 100%;
+    background: var(--og-fill, rgb(var(--text-color)));
+    transition: width .3s ease;
+  }
+
+  .offer-gauge__step {
+    position: relative;
+    display: grid;
+    justify-items: center;
+    gap: 5px;
+    width: var(--og-column);
+  }
+
+  .offer-gauge__dot {
+    display: grid;
+    place-items: center;
+    width: var(--og-dot);
+    height: var(--og-dot);
+    border-radius: var(--rounded-full);
+    background: linear-gradient(rgb(var(--text-color) / .06), rgb(var(--text-color) / .06)), rgb(var(--background));
+    color: rgb(var(--text-color) / .3);
+  }
+
+  .offer-gauge__step.is-reached .offer-gauge__dot {
+    background: var(--og-fill, rgb(var(--text-color)));
+    color: rgb(var(--background));
+  }
+
+  .offer-gauge__step.is-free .offer-gauge__dot {
+    box-shadow: inset 0 0 0 2px var(--og-accent, #ffd014);
+    color: rgb(var(--text-color) / .6);
+  }
+
+  .offer-gauge__step.is-free.is-reached .offer-gauge__dot {
+    background: var(--og-accent, #ffd014);
+    box-shadow: none;
+    color: var(--og-accent-text, #000000);
+  }
+
+  .offer-gauge__label {
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    color: rgb(var(--text-color) / .45);
+  }
+
+  .offer-gauge__step.is-reached .offer-gauge__label,
+  .offer-gauge__step.is-free .offer-gauge__label {
+    color: rgb(var(--text-color));
+  }
+
+  .offer-gauge__step.is-free .offer-gauge__label {
+    font-weight: 700;
+  }
+
+  .offer-gauge__shipping {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-1-5, 6px);
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.3;
+    color: rgb(var(--text-color) / .8);
+  }
+
+  .offer-gauge__shipping-icon {
+    display: inline-flex;
+    color: rgb(var(--success-text));
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .offer-gauge__step.is-free.is-reached .offer-gauge__dot {
+      animation: offer-gauge-pop .45s cubic-bezier(.34, 1.56, .64, 1) both;
+    }
+  }
+
+  @keyframes offer-gauge-pop {
+    from {
+      transform: scale(.6);
+    }
+
+    to {
+      transform: scale(1);
+    }
+  }
+</style>

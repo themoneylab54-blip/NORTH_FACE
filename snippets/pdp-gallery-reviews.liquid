@@ -1,0 +1,493 @@
+{%- comment -%}
+----------------------------------------------------------------------------------------------------------------------
+PDP GALLERY REVIEWS (block type "pdp_gallery_reviews")
+----------------------------------------------------------------------------------------------------------------------
+
+Rendered UNDER THE GALLERY, in the LEFT column of the product grid (render location: gallery_footer).
+
+Structure, top to bottom:
+  1. Header: big average rating (24px 700) + five Trustpilot-style green squares (16px, #00B67A) + "(count)".
+  2. Green banner (bg #E9F9EF, border #BFF0D0, radius 6px, 12px text, check icon): "All reviews are from verified purchases".
+  3. Tabs "Recommended" (active: black pill, white text) / "Most recent" (plain, #737373). Tabs only REORDER the
+     cards client-side: "Recommended" = the order the merchant entered them, "Most recent" = newest date first.
+  4. Up to three review cards from the block settings (review_1_* .. review_3_*): avatar circle with the author's
+     initial (#F5F5F5), name 14px 600, flag + city + " · " + date 12px #737373, stars, "Bought: {size}" chip and fit
+     chip (11px, #F5F5F5, radius 4px), body 14px, "Helpful (n)" 12px #737373.
+  5. Full-width outline button "See all {count} reviews" linking to reviews_url.
+
+No form inputs: nothing here submits with the product form. The tree is re-rendered by <product-rerender> on
+variant change; the chosen tab is remembered in sessionStorage (keyed by block id) so it survives the re-render.
+
+********************************************
+Supported variables
+********************************************
+
+* block: the section block (settings: rating, count, banner_text, reviews_url, labels, review_1..3_*)
+* product: the product being rendered (used for the accessible name of the header only)
+* product_form_id: the product form id (unused, accepted for signature parity with the other pdp-* snippets)
+* section: the current section
+{%- endcomment -%}
+
+{%- liquid
+  assign gr_uid = 'pdp-gallery-reviews-' | append: block.id
+  assign gr_rating = block.settings.rating | default: '4.6'
+  assign gr_count = block.settings.count | default: 0
+  assign gr_count_str = gr_count | append: ''
+  assign gr_bought_label = block.settings.bought_label | default: 'Bought:'
+  assign gr_helpful_label = block.settings.helpful_label | default: 'Helpful'
+  assign gr_tab_recommended = block.settings.tab_recommended_label | default: 'Recommended'
+  assign gr_tab_recent = block.settings.tab_recent_label | default: 'Most recent'
+  assign gr_see_all = block.settings.see_all_text | default: 'See all [count] reviews' | replace: '[count]', gr_count_str
+
+  assign gr_rating_rounded = gr_rating | times: 1.0 | round
+  if gr_rating_rounded < 0
+    assign gr_rating_rounded = 0
+  endif
+  if gr_rating_rounded > 5
+    assign gr_rating_rounded = 5
+  endif
+
+  assign gr_border = '#f0f0f0'
+  assign gr_card_border = '#f3f4f6'
+  assign gr_muted_bg = '#f5f5f5'
+  assign gr_muted_text = '#737373'
+  assign gr_text = '#121212'
+  assign gr_green = '#00b67a'
+  assign gr_star_empty = '#dcdce6'
+-%}
+
+{%- capture gr_star_svg -%}
+  <svg role="presentation" focusable="false" viewBox="0 0 16 16" aria-hidden="true"><rect width="16" height="16" rx="1.5" fill="currentColor"></rect><path d="M8 2.9l1.45 3.3 3.55.35-2.68 2.4.8 3.55L8 10.6l-3.12 1.9.8-3.55L3 6.55l3.55-.35L8 2.9z" fill="#ffffff"></path></svg>
+{%- endcapture -%}
+
+<style>
+  .{{ gr_uid }} {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    padding-top: 16px;
+    border-top: 1px solid {{ gr_border }};
+    font-family: Inter, -apple-system, "Segoe UI", sans-serif;
+    color: {{ gr_text }};
+    -webkit-font-smoothing: antialiased;
+  }
+  @media screen and (min-width: 1000px) {
+    /* Third child of the .product grid: sits under the gallery in column 1 while the sticky buy box keeps
+       spanning both rows, so it stays sticky along the full height of gallery + reviews. */
+    #shopify-section-{{ section.id }} .product > .{{ gr_uid }} { grid-column: 1; }
+    #shopify-section-{{ section.id }} .product > .product-info { grid-row: 1 / span 2; }
+  }
+
+  .{{ gr_uid }}__header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+  }
+  .{{ gr_uid }}__score {
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -.02em;
+  }
+  .{{ gr_uid }}__stars {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    color: {{ gr_green }};
+    flex-shrink: 0;
+  }
+  .{{ gr_uid }}__stars svg { display: block; width: 16px; height: 16px; }
+  .{{ gr_uid }}__stars--sm svg { width: 14px; height: 14px; }
+  .{{ gr_uid }}__stars .is-empty { color: {{ gr_star_empty }}; }
+  .{{ gr_uid }}__count {
+    font-size: 14px;
+    font-weight: 500;
+    color: {{ gr_muted_text }};
+  }
+
+  .{{ gr_uid }}__banner {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 12px 0 0;
+    padding: 8px 12px;
+    background: #e9f9ef;
+    border: 1px solid #bff0d0;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.35;
+    color: {{ gr_text }};
+  }
+  .{{ gr_uid }}__banner-icon {
+    display: inline-flex;
+    flex-shrink: 0;
+    color: {{ gr_green }};
+  }
+  .{{ gr_uid }}__banner-icon svg { display: block; width: 16px; height: 16px; }
+
+  .{{ gr_uid }}__tabs {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 12px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .{{ gr_uid }}__tab {
+    appearance: none;
+    -webkit-appearance: none;
+    margin: 0;
+    padding: 0 14px;
+    height: 30px;
+    border: 1px solid transparent;
+    border-radius: 9999px;
+    background: transparent;
+    color: {{ gr_muted_text }};
+    font: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1;
+    cursor: pointer;
+    transition: color .15s ease, background-color .15s ease;
+  }
+  .{{ gr_uid }}__tab:hover { color: {{ gr_text }}; }
+  .{{ gr_uid }}__tab[aria-selected="true"] {
+    background: {{ gr_text }};
+    border-color: {{ gr_text }};
+    color: #ffffff;
+  }
+  .{{ gr_uid }}__tab:focus-visible {
+    outline: 2px solid {{ gr_text }};
+    outline-offset: 2px;
+  }
+
+  {%- comment -%}One scrolling row instead of a stack: the list used to run the full page height.{%- endcomment -%}
+  .{{ gr_uid }}__list {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    gap: 12px;
+    margin: 14px 0 0;
+    padding: 2px 2px 10px;
+    list-style: none;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x proximity;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+  }
+  .{{ gr_uid }}__list::-webkit-scrollbar {
+    height: 6px;
+  }
+  .{{ gr_uid }}__list::-webkit-scrollbar-thumb {
+    background: {{ gr_card_border }};
+    border-radius: 9999px;
+  }
+  .{{ gr_uid }}__card {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 0 0 300px;
+    max-width: 300px;
+    scroll-snap-align: start;
+    padding: 16px;
+    border: 1px solid {{ gr_card_border }};
+    border-radius: 12px;
+    background: #ffffff;
+    box-shadow: 0 1px 6px rgba(0, 0, 0, .04);
+  }
+  @media screen and (max-width: 699px) {
+    .{{ gr_uid }}__card {
+      flex-basis: 84%;
+      max-width: 84%;
+    }
+  }
+  {%- comment -%}Clamp the body so every card in the row keeps the same height.{%- endcomment -%}
+  .{{ gr_uid }}__body {
+    display: -webkit-box;
+    -webkit-line-clamp: 5;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .{{ gr_uid }}__helpful {
+    margin-top: auto;
+  }
+  .{{ gr_uid }}__who {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+  }
+  .{{ gr_uid }}__avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    border-radius: 9999px;
+    background: {{ gr_muted_bg }};
+    color: {{ gr_text }};
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+  .{{ gr_uid }}__meta {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+  .{{ gr_uid }}__name {
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.2;
+    color: {{ gr_text }};
+  }
+  .{{ gr_uid }}__place {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 1.2;
+    color: {{ gr_muted_text }};
+  }
+  .{{ gr_uid }}__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .{{ gr_uid }}__chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 8px;
+    border-radius: 4px;
+    background: {{ gr_muted_bg }};
+    color: {{ gr_text }};
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 1.3;
+  }
+  .{{ gr_uid }}__body {
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.5;
+    color: {{ gr_text }};
+  }
+  .{{ gr_uid }}__body p { margin: 0; }
+  .{{ gr_uid }}__body p + p { margin-top: 6px; }
+  .{{ gr_uid }}__helpful {
+    font-size: 12px;
+    font-weight: 400;
+    color: {{ gr_muted_text }};
+  }
+
+  .{{ gr_uid }}__all {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 44px;
+    margin-top: 14px;
+    padding: 0 16px;
+    border: 1px solid #e6e6e6;
+    border-radius: 6px;
+    background: #ffffff;
+    color: {{ gr_text }};
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.2;
+    text-align: center;
+    text-decoration: none;
+    transition: border-color .15s ease, background-color .15s ease;
+  }
+  .{{ gr_uid }}__all:hover {
+    border-color: {{ gr_text }};
+    background: {{ gr_muted_bg }};
+  }
+</style>
+
+<pdp-gallery-reviews class="{{ gr_uid }}" data-block-id="{{ block.id }}" {{ block.shopify_attributes }}>
+  <p class="{{ gr_uid }}__header">
+    <span class="{{ gr_uid }}__score">{{ gr_rating | escape }}</span>
+    <span class="{{ gr_uid }}__stars" role="img" aria-label="{{ gr_rating | escape }} out of 5 stars for {{ product.title | escape }}">
+      {%- for i in (1..5) -%}
+        <span class="{% if i > gr_rating_rounded %}is-empty{% endif %}">{{ gr_star_svg }}</span>
+      {%- endfor -%}
+    </span>
+    <span class="{{ gr_uid }}__count">({{ gr_count }})</span>
+  </p>
+
+  {%- if block.settings.banner_text != blank -%}
+    <div class="{{ gr_uid }}__banner">
+      <span class="{{ gr_uid }}__banner-icon">{%- render 'icon' with 'success', width: 16, height: 16 -%}</span>
+      <span>{{ block.settings.banner_text | escape }}</span>
+    </div>
+  {%- endif -%}
+
+  {%- capture gr_cards -%}
+    {%- for i in (1..10) -%}
+      {%- liquid
+        assign k_author = 'review_' | append: i | append: '_author'
+        assign k_city = 'review_' | append: i | append: '_city'
+        assign k_flag = 'review_' | append: i | append: '_flag'
+        assign k_date = 'review_' | append: i | append: '_date'
+        assign k_rating = 'review_' | append: i | append: '_rating'
+        assign k_size = 'review_' | append: i | append: '_size'
+        assign k_fit = 'review_' | append: i | append: '_fit'
+        assign k_body = 'review_' | append: i | append: '_body'
+        assign k_helpful = 'review_' | append: i | append: '_helpful'
+
+        assign r_author = block.settings[k_author]
+        assign r_city = block.settings[k_city]
+        assign r_flag = block.settings[k_flag]
+        assign r_date = block.settings[k_date]
+        assign r_rating = block.settings[k_rating] | default: 5
+        assign r_size = block.settings[k_size]
+        assign r_fit = block.settings[k_fit]
+        assign r_body = block.settings[k_body]
+        assign r_helpful = block.settings[k_helpful] | default: 0
+
+        if r_author == blank and r_body == blank
+          continue
+        endif
+
+        assign r_initial = r_author | strip | slice: 0, 1 | upcase
+      -%}
+      <li class="{{ gr_uid }}__card" data-index="{{ i }}" data-date="{{ r_date | escape }}" data-helpful="{{ r_helpful }}">
+        <div class="{{ gr_uid }}__who">
+          <span class="{{ gr_uid }}__avatar" aria-hidden="true">{{ r_initial }}</span>
+          <div class="{{ gr_uid }}__meta">
+            <span class="{{ gr_uid }}__name">{{ r_author | escape }}</span>
+            <span class="{{ gr_uid }}__place">
+              {%- if r_flag != blank -%}<span aria-hidden="true">{{ r_flag | escape }}</span>{%- endif -%}
+              {%- if r_city != blank -%}<span>{{ r_city | escape }}</span>{%- endif -%}
+              {%- if r_city != blank and r_date != blank -%}<span aria-hidden="true">·</span>{%- endif -%}
+              {%- if r_date != blank -%}<time>{{ r_date | escape }}</time>{%- endif -%}
+            </span>
+          </div>
+        </div>
+
+        <span class="{{ gr_uid }}__stars {{ gr_uid }}__stars--sm" role="img" aria-label="{{ r_rating }} out of 5 stars">
+          {%- for s in (1..5) -%}
+            <span class="{% if s > r_rating %}is-empty{% endif %}">{{ gr_star_svg }}</span>
+          {%- endfor -%}
+        </span>
+
+        {%- if r_size != blank or r_fit != blank -%}
+          <ul class="{{ gr_uid }}__chips">
+            {%- if r_size != blank -%}
+              <li class="{{ gr_uid }}__chip">{{ gr_bought_label | escape }} {{ r_size | escape }}</li>
+            {%- endif -%}
+            {%- if r_fit != blank -%}
+              <li class="{{ gr_uid }}__chip">{{ r_fit | escape }}</li>
+            {%- endif -%}
+          </ul>
+        {%- endif -%}
+
+        {%- if r_body != blank -%}
+          <div class="{{ gr_uid }}__body">{{ r_body }}</div>
+        {%- endif -%}
+
+        <span class="{{ gr_uid }}__helpful">{{ gr_helpful_label | escape }} ({{ r_helpful }})</span>
+      </li>
+    {%- endfor -%}
+  {%- endcapture -%}
+
+  {%- if gr_cards contains '__card' -%}
+    <div class="{{ gr_uid }}__tabs" role="tablist" aria-label="Sort reviews">
+      <button type="button" class="{{ gr_uid }}__tab" role="tab" data-sort="recommended" aria-selected="true">{{ gr_tab_recommended | escape }}</button>
+      <button type="button" class="{{ gr_uid }}__tab" role="tab" data-sort="recent" aria-selected="false">{{ gr_tab_recent | escape }}</button>
+    </div>
+
+    <ul class="{{ gr_uid }}__list" data-reviews-list>
+      {{- gr_cards -}}
+    </ul>
+  {%- endif -%}
+
+  {%- if block.settings.reviews_url != blank and gr_count > 0 -%}
+    <a class="{{ gr_uid }}__all" href="{{ block.settings.reviews_url }}">{{ gr_see_all | escape }}</a>
+  {%- endif -%}
+</pdp-gallery-reviews>
+
+<script>
+  if (!window.customElements.get('pdp-gallery-reviews')) {
+    window.customElements.define('pdp-gallery-reviews', class extends HTMLElement {
+      /* Turns a free-text date into a sortable number. Supports ISO (2026-09-11), day-first numeric dates
+         (11/09/2026, 11.09.26) and anything Date.parse understands. Unknown text sorts last. */
+      static dateKey(text) {
+        const value = String(text || '').trim();
+        if (!value) return 0;
+
+        let match = value.match(/(\d{4})-(\d{1,2})-(\d{1,2})/);
+        if (match) return Date.UTC(+match[1], +match[2] - 1, +match[3]);
+
+        match = value.match(/(\d{1,2})[\/.\-](\d{1,2})[\/.\-](\d{2,4})/);
+        if (match) {
+          const year = match[3].length === 2 ? 2000 + +match[3] : +match[3];
+          return Date.UTC(year, +match[2] - 1, +match[1]);
+        }
+
+        const parsed = Date.parse(value);
+        return Number.isNaN(parsed) ? 0 : parsed;
+      }
+
+      /* Pure ordering: items are { index, date }. "recommended" keeps the merchant's order,
+         "recent" puts the newest date first and breaks ties by the original order. */
+      static order(items, mode) {
+        const list = items.slice();
+        if (mode === 'recent') {
+          list.sort((a, b) => {
+            const diff = this.dateKey(b.date) - this.dateKey(a.date);
+            return diff !== 0 ? diff : a.index - b.index;
+          });
+        } else {
+          list.sort((a, b) => a.index - b.index);
+        }
+        return list;
+      }
+
+      connectedCallback() {
+        this._onClick = this._onClick.bind(this);
+        this.addEventListener('click', this._onClick);
+        this._storageKey = 'pdp-gallery-reviews:' + (this.dataset.blockId || '');
+
+        let saved = null;
+        try { saved = window.sessionStorage.getItem(this._storageKey); } catch (error) { saved = null; }
+        if (saved === 'recent') this._apply('recent');
+      }
+
+      disconnectedCallback() {
+        this.removeEventListener('click', this._onClick);
+      }
+
+      _onClick(event) {
+        const tab = event.target.closest('[role="tab"][data-sort]');
+        if (!tab || !this.contains(tab)) return;
+        this._apply(tab.dataset.sort);
+      }
+
+      _apply(mode) {
+        const list = this.querySelector('[data-reviews-list]');
+        if (!list) return;
+
+        const cards = Array.from(list.children);
+        const items = cards.map((card) => ({ index: +card.dataset.index || 0, date: card.dataset.date || '', el: card }));
+        this.constructor.order(items, mode).forEach((item) => list.appendChild(item.el));
+
+        this.querySelectorAll('[role="tab"][data-sort]').forEach((tab) => {
+          tab.setAttribute('aria-selected', tab.dataset.sort === mode ? 'true' : 'false');
+        });
+
+        try { window.sessionStorage.setItem(this._storageKey, mode); } catch (error) { /* storage unavailable */ }
+      }
+    });
+  }
+</script>

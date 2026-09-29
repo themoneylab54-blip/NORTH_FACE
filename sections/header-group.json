@@ -1,0 +1,236 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "type": "header",
+  "name": "Header group",
+  "sections": {
+    "offer-bar": {
+      "type": "countdown-timer",
+      "name": "Offer bar (countdown)",
+      "settings": {
+        "full_width": true,
+        "layout": "bar",
+        "sticky": true,
+        "countdown_mode": "evergreen",
+        "end_date": "2026-09-27",
+        "end_time": "23:59",
+        "daily_reset_hour": 0,
+        "evergreen_minutes": 420,
+        "evergreen_scope": "session",
+        "on_expiry": "restart",
+        "expired_text": "This offer has ended.",
+        "subheading": "",
+        "title": "BUY 3, GET 1 FREE — LAST CHANCE",
+        "heading_tag": "p",
+        "content": "",
+        "button_text": "",
+        "button_url": "",
+        "show_days": true,
+        "pulse": false,
+        "label_days": "Days",
+        "label_hours": "Hours",
+        "label_minutes": "Min",
+        "label_seconds": "Sec",
+        "background": "#000000",
+        "background_gradient": "",
+        "text_color": "#ffffff",
+        "digit_background": "",
+        "digit_text_color": "#ffffff",
+        "digit_radius": 4,
+        "button_background": "",
+        "button_text_color": "",
+        "spacing_block_start": 8,
+        "spacing_block_end": 8
+      }
+    },
+    "announcement-bar": {
+      "type": "announcement-bar",
+      "blocks": {
+        "m1": {
+          "type": "message",
+          "settings": {
+            "text": "FLASH SALE — UP TO 50% OFF, ENDS AT MIDNIGHT",
+            "url": "/collections/all"
+          }
+        },
+        "m2": {
+          "type": "message",
+          "settings": {
+            "text": "FREE NAME & NUMBER LETTERING ON EVERY JERSEY",
+            "url": "/collections/all"
+          }
+        },
+        "m3": {
+          "type": "message",
+          "settings": {
+            "text": "FREE WORLDWIDE SHIPPING OVER $79",
+            "url": "/collections/all"
+          }
+        },
+        "m4": {
+          "type": "message",
+          "settings": {
+            "text": "LOW STOCK ON 2025/26 CITY EDITIONS — SIZES SELLING OUT",
+            "url": "/collections/all"
+          }
+        },
+        "m5": {
+          "type": "message",
+          "settings": {
+            "text": "30-DAY FREE RETURNS & SIZE SWAPS",
+            "url": "/collections/all"
+          }
+        }
+      },
+      "block_order": [
+        "m1",
+        "m2",
+        "m3",
+        "m4",
+        "m5"
+      ],
+      "disabled": true,
+      "settings": {
+        "enable_sticky": true,
+        "autoplay": false,
+        "cycle_speed": 6,
+        "text_size": "text-xs",
+        "navigation_mode": "scrolling",
+        "scrolling_speed": 12,
+        "background": "#14241e",
+        "background_gradient": "",
+        "text_color": "#ffffff"
+      }
+    },
+    "header": {
+      "type": "header",
+      "blocks": {
+        "mega_menu_kEMTDB": {
+          "type": "mega_menu",
+          "settings": {
+            "menu_item": "",
+            "layout": "horizontal",
+            "submenu_style": "bold_heading",
+            "image_heading_1": "",
+            "image_link_1": "",
+            "image_text_color_1": "#ffffff",
+            "image_heading_2": "",
+            "image_link_2": "",
+            "image_text_color_2": "#ffffff",
+            "image_heading_3": "",
+            "image_link_3": "",
+            "image_text_color_3": "#ffffff",
+            "product": "",
+            "product_card_background": "",
+            "product_card_text_color": "",
+            "promo_content_layout": "grid",
+            "stretch_promo": false,
+            "drawer_link_image": "hide"
+          }
+        }
+      },
+      "block_order": [
+        "mega_menu_kEMTDB"
+      ],
+      "settings": {
+        "enable_sticky": true,
+        "hide_on_scroll": false,
+        "show_inline_search": true,
+        "inline_search_placeholder": "Search a team, player or season",
+        "search_placeholder_prefix": "Search",
+        "search_placeholder_terms": "Lakers\nWarriors\nThrowback jerseys\nYour team\nKids sizes",
+        "logo": "shopify://shop_images/LOGO.webp",
+        "logo_max_width": 195,
+        "logo_mobile_max_width": 125,
+        "two_row_logo_height": 24,
+        "menu": "main-menu",
+        "sidebar_menu": "",
+        "secondary_menu": "",
+        "nav_highlight_item": "NBA 2025/26",
+        "menu_open_trigger": "hover",
+        "team_menu_item": "Teams, Shop by team",
+        "team_collections": [
+          "atlanta-hawks-jerseys",
+          "boston-celtics-jerseys",
+          "brooklyn-nets-jerseys",
+          "charlotte-hornets-jerseys",
+          "chicago-bulls-jerseys",
+          "cleveland-cavaliers-jerseys",
+          "dallas-mavericks-jerseys",
+          "denver-nuggets-jerseys",
+          "detroit-pistons-jerseys",
+          "golden-state-warriors-jerseys",
+          "houston-rockets-jerseys",
+          "indiana-pacers-jerseys",
+          "la-clippers-jerseys",
+          "los-angeles-lakers-jerseys",
+          "memphis-grizzlies-jerseys",
+          "miami-heat-jerseys",
+          "milwaukee-bucks-jerseys",
+          "minnesota-timberwolves-jerseys",
+          "new-orleans-pelicans-jerseys",
+          "new-york-knicks-jerseys",
+          "oklahoma-city-thunder-jerseys",
+          "orlando-magic-jerseys",
+          "philadelphia-76ers-jerseys",
+          "phoenix-suns-jerseys",
+          "portland-trail-blazers-jerseys",
+          "sacramento-kings-jerseys",
+          "san-antonio-spurs-jerseys",
+          "toronto-raptors-jerseys",
+          "utah-jazz-jerseys",
+          "washington-wizards-jerseys"
+        ],
+        "team_strip_text": "Jerseys",
+        "team_grid_title": "Shop by team",
+        "team_search_placeholder": "Search a team",
+        "team_no_results_text": "No team found",
+        "team_view_all_text": "View all jerseys",
+        "opening_from": "left",
+        "drawer_compact_links": true,
+        "drawer_show_search": true,
+        "drawer_featured_teams": [
+          "los-angeles-lakers-jerseys",
+          "golden-state-warriors-jerseys",
+          "boston-celtics-jerseys",
+          "chicago-bulls-jerseys",
+          "new-york-knicks-jerseys",
+          "miami-heat-jerseys",
+          "philadelphia-76ers-jerseys",
+          "milwaukee-bucks-jerseys",
+          "dallas-mavericks-jerseys",
+          "denver-nuggets-jerseys",
+          "oklahoma-city-thunder-jerseys",
+          "san-antonio-spurs-jerseys"
+        ],
+        "drawer_featured_title": "Popular teams",
+        "drawer_offer_title": "Buy 3, get 1 free",
+        "drawer_offer_text": "Discount applied automatically at checkout",
+        "drawer_offer_url": "/collections/all-jerseys",
+        "drawer_help_menu": "help-menu",
+        "layout": "logo_left_navigation_center",
+        "show_social_media": false,
+        "show_locale_selector": false,
+        "show_country_selector": false,
+        "show_country_flag": false,
+        "show_country_name": false,
+        "transparent_header_text_color": "#ffffff",
+        "reduce_padding": false,
+        "background_opacity": 100,
+        "background_blur_radius": 0
+      }
+    }
+  },
+  "order": [
+    "offer-bar",
+    "announcement-bar",
+    "header"
+  ]
+}

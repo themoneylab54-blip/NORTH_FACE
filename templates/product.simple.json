@@ -1,0 +1,233 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-product",
+      "name": "Product (simple)",
+      "blocks": {
+        "rating_line": {
+          "type": "rating_line",
+          "settings": {
+            "rating": 5,
+            "stars_color": "#0DA558",
+            "text": "4.8/5 · 2,400+ jerseys shipped",
+            "link": ""
+          }
+        },
+        "title": {
+          "type": "title",
+          "settings": {
+            "heading_tag": "h1"
+          }
+        },
+        "price": {
+          "type": "price",
+          "settings": {
+            "show_taxes_notice": false
+          }
+        },
+        "stock_alert": {
+          "type": "stock_alert",
+          "settings": {
+            "text": "Almost gone — fewer than 12 left in this size",
+            "color": "#C62828"
+          }
+        },
+        "ib1": {
+          "type": "icon_benefit",
+          "settings": {
+            "icon": "picto-award-gift",
+            "icon_size": 24,
+            "icon_gap": 10,
+            "text_size": "text-sm",
+            "vertical_alignment": "center",
+            "icon_background": "",
+            "icon_color": "#12866A",
+            "text": "<p>Free name &amp; number lettering included</p>"
+          }
+        },
+        "ib2": {
+          "type": "icon_benefit",
+          "settings": {
+            "icon": "picto-plane",
+            "icon_size": 24,
+            "icon_gap": 10,
+            "text_size": "text-sm",
+            "vertical_alignment": "center",
+            "icon_background": "",
+            "icon_color": "#12866A",
+            "text": "<p>Ships in 24h · free over $79</p>"
+          }
+        },
+        "ib3": {
+          "type": "icon_benefit",
+          "settings": {
+            "icon": "picto-return",
+            "icon_size": 24,
+            "icon_gap": 10,
+            "text_size": "text-sm",
+            "vertical_alignment": "center",
+            "icon_background": "",
+            "icon_color": "#12866A",
+            "text": "<p>30-day free returns and size swaps</p>"
+          }
+        },
+        "variant_picker": {
+          "type": "variant_picker",
+          "settings": {
+            "hide_sold_out_variants": false,
+            "stack_blocks": true,
+            "selector_style": "block",
+            "swatch_selector_style": "swatch",
+            "variant_image_options": "",
+            "size_chart_page": ""
+          }
+        },
+        "size_guide": {
+          "type": "size_guide",
+          "settings": {
+            "text": "Size guide",
+            "use_integrated_guide": true,
+            "reassurance_text": "Between two sizes? Size down for fitted, up for oversized.",
+            "page": "",
+            "image": "",
+            "style": "outline",
+            "stretch": false,
+            "size": "sm",
+            "border_color": "",
+            "border_width": 1,
+            "border_radius": 8,
+            "background": "",
+            "text_color": ""
+          }
+        },
+        "inventory": {
+          "type": "inventory",
+          "settings": {
+            "low_inventory_threshold": 12
+          }
+        },
+        "buy_buttons": {
+          "type": "buy_buttons",
+          "settings": {
+            "show_payment_button": true,
+            "show_gift_card_recipient": false,
+            "atc_button_background": "#14241E",
+            "atc_button_text_color": "#FFFFFF",
+            "payment_button_background": "",
+            "payment_button_text_color": ""
+          }
+        },
+        "delivery": {
+          "type": "delivery_estimate",
+          "settings": {
+            "icon": "picto-box",
+            "min_days": 3,
+            "max_days": 6,
+            "text": "Order today, delivered between [date_min] and [date_max]"
+          }
+        },
+        "description": {
+          "type": "description",
+          "settings": {
+            "icon": "none",
+            "icon_width": 20,
+            "collapse_content": false
+          }
+        },
+        "ct1": {
+          "type": "collapsible_text",
+          "settings": {
+            "icon": "picto-question",
+            "icon_width": 20,
+            "title": "Fit & sizing",
+            "content": "<p>Oversized basketball cut with standard US sizing. Size down for a fitted look; stay true to size for the classic on-court look.</p>",
+            "page": ""
+          }
+        },
+        "ct2": {
+          "type": "collapsible_text",
+          "settings": {
+            "icon": "picto-plane",
+            "icon_width": 20,
+            "title": "Shipping & returns",
+            "content": "<p>Dispatched within 24 hours on working days, delivered in 3-6 days with tracking. Free shipping over $79. 30 days to return or exchange any unworn jersey — size swaps are free.</p>",
+            "page": ""
+          }
+        },
+        "sticky_atc": {
+          "type": "sticky_atc",
+          "settings": {
+            "button_text": "Add to cart",
+            "show_image": true,
+            "mobile_only": true,
+            "background": "#FFFFFF",
+            "text_color": "#14241E",
+            "button_background": "#14241E",
+            "button_text_color": "#FFFFFF"
+          }
+        }
+      },
+      "block_order": [
+        "rating_line",
+        "title",
+        "price",
+        "stock_alert",
+        "ib1",
+        "ib2",
+        "ib3",
+        "variant_picker",
+        "size_guide",
+        "inventory",
+        "buy_buttons",
+        "delivery",
+        "description",
+        "ct1",
+        "ct2",
+        "sticky_atc"
+      ],
+      "settings": {
+        "full_width": true,
+        "show_fixed_add_to_cart": false,
+        "desktop_media_width": 55,
+        "desktop_media_layout": "grid",
+        "mobile_media_size": "expanded",
+        "mobile_carousel_control": "dots",
+        "enable_video_autoplay": false,
+        "enable_video_looping": false,
+        "enable_image_zoom": true,
+        "max_image_zoom_level": 2,
+        "background": "",
+        "background_gradient": "",
+        "text_color": "",
+        "input_background": "",
+        "input_text_color": ""
+      }
+    },
+    "related": {
+      "type": "related-products",
+      "settings": {
+        "recommendations_count": 8,
+        "products": [],
+        "full_width": true,
+        "stack_products": true,
+        "show_progress_bar": false,
+        "products_per_row_mobile": "2",
+        "products_per_row_desktop": 4,
+        "subheading": "Complete the fit",
+        "title": "Fans who bought this also took",
+        "content": "",
+        "background": "",
+        "background_gradient": "",
+        "text_color": "",
+        "heading_color": "",
+        "heading_gradient": "",
+        "product_card_background": "",
+        "product_card_text_color": ""
+      }
+    }
+  },
+  "order": [
+    "main",
+    "related"
+  ]
+}

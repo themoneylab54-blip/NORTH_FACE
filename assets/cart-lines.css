@@ -1,0 +1,89 @@
+/*
+ * Cart lines: "- 1 +" quantity stepper and green savings (badge per line, total row).
+ * Used by the cart drawer and the cart page (snippets cart-quantity-stepper, line-item, cart-savings).
+ */
+
+:root {
+  --savings-color: 10 122 63;
+  --savings-background: 230 246 236;
+}
+
+/* Quantity stepper: the theme's quantity selector, compact for the cart */
+.cart-quantity-stepper {
+  height: 2.25rem;
+  align-items: center;
+  overflow: hidden;
+  border: 1px solid rgb(var(--text-color) / .15);
+  border-radius: var(--rounded-button);
+  background: rgb(var(--background));
+  color: rgb(var(--text-color));
+}
+
+.cart-quantity-stepper .quantity-selector__button {
+  display: grid;
+  place-items: center;
+  width: 2.125rem;
+  height: 100%;
+  padding: 0;
+  color: rgb(var(--text-color));
+  transition: background-color .15s ease, opacity .15s ease;
+}
+
+@media (hover: hover) {
+  .cart-quantity-stepper .quantity-selector__button:not(:disabled):hover {
+    background: rgb(var(--text-color) / .06);
+  }
+}
+
+.cart-quantity-stepper .quantity-selector__button:disabled {
+  opacity: .3;
+  cursor: not-allowed;
+}
+
+.cart-quantity-stepper .quantity-selector__input {
+  min-width: 1.75rem;
+  padding: 0;
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+/* Green badge with the money saved on a line */
+.savings-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: .375rem;
+  margin: .125rem 0 0;
+  padding: .25rem .625rem;
+  border-radius: var(--rounded-full);
+  background: rgb(var(--savings-background));
+  color: rgb(var(--savings-color));
+  font-size: .75rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.savings-badge svg {
+  flex-shrink: 0;
+}
+
+/* Green row with the money saved on the whole cart, above the total */
+.cart-savings {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-4);
+  margin: 0 0 var(--spacing-1);
+  padding: .625rem .75rem;
+  border-radius: var(--rounded-button);
+  background: rgb(var(--savings-background));
+  color: rgb(var(--savings-color));
+  font-size: .9375rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.cart-savings__label {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+}

@@ -1,0 +1,385 @@
+{%- comment -%}
+----------------------------------------------------------------------------------------------------------------------
+PDP SOCIAL VIDEOS (block type "pdp_social_videos")
+----------------------------------------------------------------------------------------------------------------------
+
+Buy-box item 13: a small uppercase label ("LOVED ON SOCIALS", 10.5px, #121212 at 70%) followed by three vertical
+video tiles (aspect 9/16, radius 8px, gap 8px). Each tile carries a "Verified" tag in the top-left corner (10px,
+white on rgba(0,0,0,.6)) and a centred play button. Clicking a tile plays the video MUTED and INLINE (a native
+<video> with a poster for Shopify-hosted files, a lazily injected YouTube/Vimeo iframe for external URLs).
+Clicking a playing tile pauses it; starting one tile pauses the others.
+
+Tile resolution order, per slot N (1..3):
+  1. block.settings.video_N      -> native <video> (preload "none", poster from poster_N or the video's own preview)
+  2. block.settings.video_url_N  -> iframe injected on click (YouTube / Vimeo), poster_N or YouTube thumbnail
+  3. block.settings.poster_N     -> static image, no play button
+  4. nothing                     -> neutral #F5F5F5 placeholder, so the 3-column layout never collapses
+
+No form inputs: nothing here submits with the product form. The product-info column is re-rendered by
+<product-rerender> on variant change; playback simply resets, no state needs to survive.
+
+********************************************
+Supported variables
+********************************************
+
+* block: the section block (settings: label, verified_text, show_verified, video_1..3, video_url_1..3, poster_1..3)
+* product: the product being rendered (used only for the accessible names)
+* product_form_id: the product form id (unused, accepted for signature parity with the other pdp-* snippets)
+* section: the current section
+{%- endcomment -%}
+
+{%- liquid
+  assign psv_label = block.settings.label | default: 'Loved on socials'
+  assign psv_verified = block.settings.verified_text | default: 'Verified'
+  assign psv_show_verified = true
+  if block.settings.show_verified == false
+    assign psv_show_verified = false
+  endif
+  assign psv_slots = '1,2,3' | split: ','
+  assign psv_origin = 'https://' | append: request.host | url_encode
+-%}
+
+<style>
+  .pdp-social-videos-{{ block.id }} {
+    --psv-text: #121212;
+    --psv-muted-bg: #F5F5F5;
+    --psv-tag-bg: rgba(0, 0, 0, .6);
+    --psv-radius: 8px;
+    --psv-gap: 8px;
+    display: block;
+    font-family: Inter, -apple-system, "Segoe UI", sans-serif;
+    color: var(--psv-text);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .pdp-social-videos-{{ block.id }} .pdp-social-videos__label {
+    display: block;
+    margin: 0 0 10px;
+    font-size: 10.5px;
+    font-weight: 600;
+    line-height: 1.3;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    text-align: center;
+    color: rgba(18, 18, 18, .7);
+  }
+
+  .pdp-social-videos-{{ block.id }} .pdp-social-videos__grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--psv-gap);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .pdp-social-videos-{{ block.id }} .pdp-social-videos__tile {
+    position: relative;
+    display: block;
+    width: 100%;
+    aspect-ratio: 9 / 16;
+    overflow: hidden;
+    border-radius: var(--psv-radius);
+    background: var(--psv-muted-bg);
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Fallback for browsers without aspect-ratio support */
+  @supports not (aspect-ratio: 9 / 16) {
+    .pdp-social-videos-{{ block.id }} .pdp-social-videos__tile::before {
+      content: "";
+      display: block;
+      padding-top: 177.78%;
+    }
+  }
+
+  .pdp-social-videos-{{ block.id }} .pdp-social-videos__media,
+  .pdp-social-videos-{{ block.id }} .pdp-social-videos__tile video,
+  .pdp-social-videos-{{ block.id }} .pdp-social-videos__tile iframe,
+  .pdp-social-videos-{{ block.id }} .pdp-social-videos__tile img {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border: 0;
+    background: var(--psv-muted-bg);
+  }
+
+  .pdp-social-videos-{{ block.id }} .pdp-social-videos__placeholder {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(18, 18, 18, .25);
+    background: var(--psv-muted-bg);
+  }
+
+  .pdp-social-videos-{{ block.id }} .pdp-social-videos__tag {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 600;
+    line-height: 1.3;
+    color: #FFFFFF;
+    background: var(--psv-tag-bg);
+    pointer-events: none;
+  }
+
+  .pdp-social-videos-{{ block.id }} .pdp-social-videos__tag svg {
+    width: 9px;
+    height: 9px;
+    flex-shrink: 0;
+  }
+
+  .pdp-social-videos-{{ block.id }} .pdp-social-videos__play {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #FFFFFF;
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
+  .pdp-social-videos-{{ block.id }} .pdp-social-videos__play-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 9999px;
+    background: rgba(0, 0, 0, .55);
+    color: #FFFFFF;
+    box-shadow: 0 1px 6px rgba(0, 0, 0, .08);
+    transition: transform .15s ease, background-color .15s ease;
+  }
+
+  .pdp-social-videos-{{ block.id }} .pdp-social-videos__play-icon svg {
+    width: 14px;
+    height: 14px;
+    margin-left: 2px;
+  }
+
+  .pdp-social-videos-{{ block.id }} .pdp-social-videos__play:hover .pdp-social-videos__play-icon,
+  .pdp-social-videos-{{ block.id }} .pdp-social-videos__play:focus-visible .pdp-social-videos__play-icon {
+    transform: scale(1.06);
+    background: rgba(0, 0, 0, .7);
+  }
+
+  .pdp-social-videos-{{ block.id }} .pdp-social-videos__play:focus-visible {
+    outline: 2px solid #FFFFFF;
+    outline-offset: -4px;
+  }
+
+  /* While playing, the play glyph disappears but the whole tile stays clickable to pause */
+  .pdp-social-videos-{{ block.id }} .pdp-social-videos__tile.is-playing .pdp-social-videos__play-icon {
+    opacity: 0;
+  }
+
+  .pdp-social-videos-{{ block.id }} .pdp-social-videos__tile.is-playing .pdp-social-videos__tag {
+    opacity: .85;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pdp-social-videos-{{ block.id }} .pdp-social-videos__play-icon {
+      transition: none;
+    }
+  }
+</style>
+
+<pdp-social-videos class="pdp-social-videos-{{ block.id }}" data-product-id="{{ product.id }}" {{ block.shopify_attributes }}>
+  <span class="pdp-social-videos__label">{{ psv_label | escape }}</span>
+
+  <ul class="pdp-social-videos__grid">
+    {%- for psv_index in psv_slots -%}
+      {%- liquid
+        assign psv_video_key = 'video_' | append: psv_index
+        assign psv_url_key = 'video_url_' | append: psv_index
+        assign psv_poster_key = 'poster_' | append: psv_index
+
+        assign psv_video = block.settings[psv_video_key]
+        assign psv_url = block.settings[psv_url_key]
+        assign psv_poster = block.settings[psv_poster_key]
+
+        assign psv_kind = 'empty'
+        if psv_video != blank
+          assign psv_kind = 'hosted'
+        elsif psv_url != blank and psv_url.id != blank
+          assign psv_kind = 'external'
+        elsif psv_poster != blank
+          assign psv_kind = 'image'
+        endif
+
+        assign psv_poster_url = blank
+        if psv_poster != blank
+          assign psv_poster_url = psv_poster | image_url: width: 480
+        elsif psv_kind == 'hosted' and psv_video.preview_image != blank
+          assign psv_poster_url = psv_video.preview_image | image_url: width: 480
+        elsif psv_kind == 'external' and psv_url.type == 'youtube'
+          assign psv_poster_url = 'https://i.ytimg.com/vi/' | append: psv_url.id | append: '/hqdefault.jpg'
+        endif
+
+        assign psv_aria = 'Play customer video ' | append: psv_index | append: ' for ' | append: product.title
+      -%}
+
+      <li class="pdp-social-videos__tile pdp-social-videos__tile--{{ psv_kind }}" data-kind="{{ psv_kind }}">
+        {%- case psv_kind -%}
+          {%- when 'hosted' -%}
+            <video
+              class="pdp-social-videos__media"
+              playsinline
+              muted
+              loop
+              preload="none"
+              {% if psv_poster_url != blank %}poster="{{ psv_poster_url }}"{% endif %}
+              {% if psv_video.alt != blank %}aria-label="{{ psv_video.alt | escape }}"{% else %}aria-label="{{ psv_aria | escape }}"{% endif %}
+            >
+              {%- for psv_source in psv_video.sources -%}
+                {%- if psv_source.format == 'mp4' -%}
+                  <source src="{{ psv_source.url }}" type="{{ psv_source.mime_type }}">
+                {%- endif -%}
+              {%- endfor -%}
+              {%- for psv_source in psv_video.sources -%}
+                {%- if psv_source.format == 'm3u8' -%}
+                  <source src="{{ psv_source.url }}" type="{{ psv_source.mime_type }}">
+                {%- endif -%}
+              {%- endfor -%}
+            </video>
+
+          {%- when 'external' -%}
+            {%- if psv_poster_url != blank -%}
+              <img class="pdp-social-videos__media" src="{{ psv_poster_url }}" alt="" loading="lazy" width="270" height="480">
+            {%- else -%}
+              <span class="pdp-social-videos__placeholder" aria-hidden="true">
+                {%- render 'icon' with 'play-video', width: 20, height: 20 -%}
+              </span>
+            {%- endif -%}
+            <template class="pdp-social-videos__embed">
+              {%- if psv_url.type == 'youtube' -%}
+                <iframe class="pdp-social-videos__media" src="https://www.youtube.com/embed/{{ psv_url.id }}?playsinline=1&autoplay=1&mute=1&controls=0&loop=1&playlist={{ psv_url.id }}&rel=0&modestbranding=1&origin={{ psv_origin }}" title="{{ psv_aria | escape }}" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+              {%- elsif psv_url.type == 'vimeo' -%}
+                <iframe class="pdp-social-videos__media" src="https://player.vimeo.com/video/{{ psv_url.id }}?autoplay=1&muted=1&loop=1&background=1&playsinline=1&title=0&byline=0&portrait=0" title="{{ psv_aria | escape }}" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+              {%- endif -%}
+            </template>
+
+          {%- when 'image' -%}
+            {{- psv_poster | image_url: width: 480 | image_tag: loading: 'lazy', sizes: '160px', widths: '160,240,320,480', class: 'pdp-social-videos__media', alt: psv_poster.alt -}}
+
+          {%- else -%}
+            <span class="pdp-social-videos__placeholder" aria-hidden="true">
+              {%- render 'icon' with 'play-video', width: 20, height: 20 -%}
+            </span>
+        {%- endcase -%}
+
+        {%- if psv_show_verified -%}
+          <span class="pdp-social-videos__tag">
+            <svg viewBox="0 0 12 12" fill="none" aria-hidden="true" focusable="false"><path d="M2.5 6.2 5 8.6l4.5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            {{- psv_verified | escape -}}
+          </span>
+        {%- endif -%}
+
+        {%- if psv_kind == 'hosted' or psv_kind == 'external' -%}
+          <button type="button" class="pdp-social-videos__play" aria-label="{{ psv_aria | escape }}" aria-pressed="false">
+            <span class="pdp-social-videos__play-icon">
+              {%- render 'icon' with 'play-video', width: 14, height: 14 -%}
+            </span>
+          </button>
+        {%- endif -%}
+      </li>
+    {%- endfor -%}
+  </ul>
+</pdp-social-videos>
+
+<script>
+  if (!window.customElements.get('pdp-social-videos')) {
+    window.customElements.define('pdp-social-videos', class extends HTMLElement {
+      connectedCallback() {
+        this._onClick = this._onClick.bind(this);
+        this._onEnded = this._onEnded.bind(this);
+        this.addEventListener('click', this._onClick);
+        this.querySelectorAll('video').forEach((video) => {
+          video.addEventListener('ended', this._onEnded);
+          video.addEventListener('pause', this._onEnded);
+        });
+      }
+
+      disconnectedCallback() {
+        this.removeEventListener('click', this._onClick);
+      }
+
+      _onClick(event) {
+        const button = event.target.closest('.pdp-social-videos__play');
+        if (!button || !this.contains(button)) return;
+
+        const tile = button.closest('.pdp-social-videos__tile');
+        if (!tile) return;
+
+        const isPlaying = tile.classList.contains('is-playing');
+        this._pauseOthers(tile);
+        this._setPlaying(tile, !isPlaying);
+      }
+
+      _onEnded(event) {
+        // Fires on 'ended' and on any 'pause' (ours or the browser's): the tile simply leaves the playing state.
+        const tile = event.target.closest('.pdp-social-videos__tile');
+        if (tile && tile.classList.contains('is-playing')) this._setPlaying(tile, false);
+      }
+
+      _pauseOthers(current) {
+        this.querySelectorAll('.pdp-social-videos__tile.is-playing').forEach((tile) => {
+          if (tile !== current) this._setPlaying(tile, false);
+        });
+      }
+
+      _setPlaying(tile, playing) {
+        const video = tile.querySelector('video');
+        const iframe = tile.querySelector('iframe');
+        const template = tile.querySelector('template.pdp-social-videos__embed');
+        const button = tile.querySelector('.pdp-social-videos__play');
+
+        if (playing) {
+          if (video) {
+            video.muted = true;
+            const attempt = video.play();
+            if (attempt && typeof attempt.catch === 'function') {
+              attempt.catch(() => tile.classList.remove('is-playing'));
+            }
+          } else if (!iframe && template) {
+            const embed = template.content.firstElementChild;
+            if (embed) tile.insertBefore(embed.cloneNode(true), template);
+          }
+        } else {
+          if (video) {
+            video.pause();
+          } else if (iframe) {
+            // Removing the iframe stops external playback; the poster underneath shows again.
+            iframe.remove();
+          }
+        }
+
+        tile.classList.toggle('is-playing', playing);
+        if (button) button.setAttribute('aria-pressed', playing ? 'true' : 'false');
+      }
+    });
+  }
+</script>

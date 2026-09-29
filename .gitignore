@@ -1,0 +1,14 @@
+# Archives
+*.zip
+
+# macOS
+.DS_Store
+__MACOSX/
+
+# Shopify CLI
+.shopify/
+.shopifyignore
+
+# Editors
+.vscode/
+.idea/

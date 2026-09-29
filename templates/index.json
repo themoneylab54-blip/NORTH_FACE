@@ -1,0 +1,1258 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "hero": {
+      "type": "image-with-text-overlay",
+      "blocks": {
+        "display_font": {
+          "type": "liquid",
+          "settings": {
+            "liquid": "<style>#shopify-section-{{ section.id }} h1{font-family:'Anton','Bebas Neue',Impact,'Haettenschweiler','Arial Narrow Bold',sans-serif;font-weight:400;letter-spacing:.005em;line-height:.94;text-shadow:0 2px 24px rgba(0,0,0,.45)}</style>"
+          }
+        },
+        "heading": {
+          "type": "heading",
+          "settings": {
+            "text": "BUY 3 JERSEYS. GET 1 FREE.",
+            "heading_tag": "h1"
+          }
+        },
+        "subtitle": {
+          "type": "richtext",
+          "settings": {
+            "content": "<p>2025/26 kits, throwbacks and kids. Ends when the clock hits zero.</p>"
+          }
+        },
+        "button": {
+          "type": "button",
+          "settings": {
+            "style": "fill",
+            "size": "lg",
+            "text": "SHOP 2025/26 JERSEYS",
+            "url": "/collections/nba-2025-26",
+            "background": "#ffffff",
+            "text_color": "#121212"
+          }
+        },
+        "button2": {
+          "type": "button",
+          "settings": {
+            "style": "fill",
+            "size": "lg",
+            "text": "BUY 3, GET 1 FREE",
+            "url": "/collections/best-sellers",
+            "background": "#ffd014",
+            "text_color": "#000000"
+          }
+        },
+        "trust": {
+          "type": "richtext",
+          "settings": {
+            "content": "<p><strong>✓ Free shipping &nbsp;·&nbsp; ✓ 30-day returns &nbsp;·&nbsp; ✓ Secure checkout</strong></p>"
+          }
+        }
+      },
+      "block_order": [
+        "display_font",
+        "heading",
+        "subtitle",
+        "button",
+        "button2",
+        "trust"
+      ],
+      "name": "Hero",
+      "settings": {
+        "full_width": true,
+        "allow_transparent_header": false,
+        "enable_parallax": false,
+        "image_size": "lg",
+        "image": "shopify://shop_images/HERO.webp",
+        "mobile_image": "shopify://shop_images/HERO_mobile_1.webp",
+        "mobile_text_position": "place-self-center text-center",
+        "desktop_text_position": "sm:place-self-center sm:text-center",
+        "text_color": "#ffffff",
+        "overlay_color": "#000000",
+        "overlay_opacity": 30
+      }
+    },
+    "reviews_strip": {
+      "type": "rich-text",
+      "blocks": {
+        "strip": {
+          "type": "liquid",
+          "settings": {
+            "liquid": "<style>#shopify-section-{{ section.id }}{--section-spacing-block-start:10px;--section-spacing-block-end:10px}</style><p class=\"text-sm\" style=\"margin:0\"><strong>Excellent</strong> &nbsp;<span style=\"color:#00B67A;letter-spacing:2px\">★★★★★</span>&nbsp; 2,400+ verified reviews</p>"
+          }
+        }
+      },
+      "block_order": [
+        "strip"
+      ],
+      "name": "Reviews strip",
+      "settings": {
+        "full_width": true,
+        "content_width": "small",
+        "text_position": "center",
+        "background": "#0d0d0d",
+        "background_gradient": "",
+        "text_color": "#ffffff"
+      }
+    },
+    "team_selector": {
+      "type": "team-selector",
+      "name": "Team selector",
+      "settings": {
+        "title": "",
+        "title_alignment": "start",
+        "collections": [
+          "atlanta-hawks-jerseys",
+          "boston-celtics-jerseys",
+          "brooklyn-nets-jerseys",
+          "charlotte-hornets-jerseys",
+          "chicago-bulls-jerseys",
+          "cleveland-cavaliers-jerseys",
+          "dallas-mavericks-jerseys",
+          "denver-nuggets-jerseys",
+          "detroit-pistons-jerseys",
+          "golden-state-warriors-jerseys",
+          "houston-rockets-jerseys",
+          "indiana-pacers-jerseys",
+          "la-clippers-jerseys",
+          "los-angeles-lakers-jerseys",
+          "memphis-grizzlies-jerseys",
+          "miami-heat-jerseys",
+          "milwaukee-bucks-jerseys",
+          "minnesota-timberwolves-jerseys",
+          "new-orleans-pelicans-jerseys",
+          "new-york-knicks-jerseys",
+          "oklahoma-city-thunder-jerseys",
+          "orlando-magic-jerseys",
+          "philadelphia-76ers-jerseys",
+          "phoenix-suns-jerseys",
+          "portland-trail-blazers-jerseys",
+          "sacramento-kings-jerseys",
+          "san-antonio-spurs-jerseys",
+          "toronto-raptors-jerseys",
+          "utah-jazz-jerseys",
+          "washington-wizards-jerseys"
+        ],
+        "strip_text": "Jerseys",
+        "circle_size_mobile": 64,
+        "circle_size_desktop": 76,
+        "logo_scale": 70,
+        "show_arrows": true,
+        "padding_top": 16,
+        "padding_bottom": 16,
+        "background": "",
+        "text_color": "",
+        "circle_background": "#f2f2f2",
+        "circle_border": ""
+      }
+    },
+    "best_sellers": {
+      "type": "featured-collection",
+      "name": "Best Sellers",
+      "settings": {
+        "collection": "best-sellers",
+        "products": [],
+        "full_width": true,
+        "stack_products": false,
+        "show_progress_bar": true,
+        "products_count": 10,
+        "products_per_row_mobile": "2",
+        "products_per_row_desktop": 5,
+        "subheading": "",
+        "title": "BEST SELLERS",
+        "content": "",
+        "link_url": "/collections/best-sellers",
+        "link_text": "VIEW ALL",
+        "background": "",
+        "background_gradient": "",
+        "text_color": "",
+        "heading_color": "",
+        "heading_gradient": "",
+        "product_card_background": "",
+        "product_card_text_color": ""
+      }
+    },
+    "nba_2526": {
+      "type": "featured-collection",
+      "name": "Nba 2025/26",
+      "settings": {
+        "collection": "nba-2025-26",
+        "products": [],
+        "full_width": true,
+        "stack_products": false,
+        "show_progress_bar": true,
+        "products_count": 10,
+        "products_per_row_mobile": "2",
+        "products_per_row_desktop": 5,
+        "subheading": "",
+        "title": "NBA 2025/26",
+        "content": "",
+        "link_url": "/collections/nba-2025-26",
+        "link_text": "VIEW ALL",
+        "background": "",
+        "background_gradient": "",
+        "text_color": "",
+        "heading_color": "",
+        "heading_gradient": "",
+        "product_card_background": "",
+        "product_card_text_color": ""
+      }
+    },
+    "lakers": {
+      "type": "featured-collection",
+      "name": "Lakers",
+      "settings": {
+        "collection": "los-angeles-lakers-jerseys",
+        "products": [],
+        "full_width": true,
+        "stack_products": false,
+        "show_progress_bar": true,
+        "products_count": 10,
+        "products_per_row_mobile": "2",
+        "products_per_row_desktop": 5,
+        "subheading": "",
+        "title": "LAKERS",
+        "content": "",
+        "link_url": "/collections/los-angeles-lakers-jerseys",
+        "link_text": "VIEW ALL",
+        "background": "",
+        "background_gradient": "",
+        "text_color": "",
+        "heading_color": "",
+        "heading_gradient": "",
+        "product_card_background": "",
+        "product_card_text_color": ""
+      }
+    },
+    "warriors": {
+      "type": "featured-collection",
+      "name": "Warriors",
+      "settings": {
+        "collection": "golden-state-warriors-jerseys",
+        "products": [],
+        "full_width": true,
+        "stack_products": false,
+        "show_progress_bar": true,
+        "products_count": 10,
+        "products_per_row_mobile": "2",
+        "products_per_row_desktop": 5,
+        "subheading": "",
+        "title": "WARRIORS",
+        "content": "",
+        "link_url": "/collections/golden-state-warriors-jerseys",
+        "link_text": "VIEW ALL",
+        "background": "",
+        "background_gradient": "",
+        "text_color": "",
+        "heading_color": "",
+        "heading_gradient": "",
+        "product_card_background": "",
+        "product_card_text_color": ""
+      }
+    },
+    "bulls": {
+      "type": "featured-collection",
+      "name": "Bulls",
+      "settings": {
+        "collection": "chicago-bulls-jerseys",
+        "products": [],
+        "full_width": true,
+        "stack_products": false,
+        "show_progress_bar": true,
+        "products_count": 10,
+        "products_per_row_mobile": "2",
+        "products_per_row_desktop": 5,
+        "subheading": "",
+        "title": "BULLS",
+        "content": "",
+        "link_url": "/collections/chicago-bulls-jerseys",
+        "link_text": "VIEW ALL",
+        "background": "",
+        "background_gradient": "",
+        "text_color": "",
+        "heading_color": "",
+        "heading_gradient": "",
+        "product_card_background": "",
+        "product_card_text_color": ""
+      }
+    },
+    "closeups": {
+      "type": "video-testimonials",
+      "blocks": {
+        "v1": {
+          "type": "video",
+          "settings": {
+            "video": "shopify://files/videos/ssstik.io_1790100121631 (1).webm",
+            "video_url": "",
+            "rating": 5,
+            "testimonial": "",
+            "attr_1": "",
+            "attr_2": ""
+          }
+        },
+        "v2": {
+          "type": "video",
+          "settings": {
+            "video": "shopify://files/videos/ssstik.io_1790099795471.webm",
+            "video_url": "",
+            "rating": 5,
+            "testimonial": "",
+            "attr_1": "",
+            "attr_2": ""
+          }
+        },
+        "v3": {
+          "type": "video",
+          "settings": {
+            "video": "shopify://files/videos/ssstik.io_1790100075857.webm",
+            "video_url": "",
+            "rating": 5,
+            "testimonial": "",
+            "attr_1": "",
+            "attr_2": ""
+          }
+        },
+        "v4": {
+          "type": "video",
+          "settings": {
+            "video": "shopify://files/videos/ssstik.io_1790099690547.webm",
+            "video_url": "",
+            "rating": 5,
+            "testimonial": "",
+            "attr_1": "",
+            "attr_2": ""
+          }
+        }
+      },
+      "block_order": [
+        "v1",
+        "v2",
+        "v3",
+        "v4"
+      ],
+      "name": "Close-up videos",
+      "settings": {
+        "full_width": true,
+        "badge": "",
+        "title": "See for yourself, no filters",
+        "content": "<p>Mesh, stitching and crests filmed up close. Nothing retouched.</p>",
+        "text_alignment": "center",
+        "heading_style": "theme",
+        "heading_uppercase": false,
+        "subtitle_color": "",
+        "card_ratio": "9 / 16",
+        "desktop_layout": "carousel",
+        "cards_per_row_desktop": 6,
+        "card_gap": "theme",
+        "card_width_mobile": "62",
+        "center_cards_mobile": true,
+        "autoplay_muted": true,
+        "tap_toggles_sound": true,
+        "play_glyph": false,
+        "background": "",
+        "background_gradient": "",
+        "text_color": "",
+        "heading_color": "",
+        "heading_gradient": "",
+        "badge_background": "",
+        "badge_text_color": "",
+        "stars_color": "#00b67a",
+        "hide_captions": true,
+        "caption_text_color": "#ffffff",
+        "caption_overlay_color": "#000000",
+        "caption_overlay_opacity": 85,
+        "card_radius": 12
+      }
+    },
+    "exclusives": {
+      "type": "featured-collection",
+      "name": "Authentic Editions",
+      "settings": {
+        "collection": "coupe-authentic",
+        "products": [],
+        "full_width": true,
+        "stack_products": false,
+        "show_progress_bar": true,
+        "products_count": 10,
+        "products_per_row_mobile": "2",
+        "products_per_row_desktop": 5,
+        "subheading": "",
+        "title": "AUTHENTIC EDITIONS",
+        "content": "",
+        "link_url": "/collections/coupe-authentic",
+        "link_text": "VIEW ALL",
+        "background": "",
+        "background_gradient": "",
+        "text_color": "",
+        "heading_color": "",
+        "heading_gradient": "",
+        "product_card_background": "",
+        "product_card_text_color": ""
+      }
+    },
+    "top_teams": {
+      "type": "featured-collection",
+      "name": "Celtics",
+      "settings": {
+        "collection": "boston-celtics-jerseys",
+        "products": [],
+        "full_width": true,
+        "stack_products": false,
+        "show_progress_bar": true,
+        "products_count": 10,
+        "products_per_row_mobile": "2",
+        "products_per_row_desktop": 5,
+        "subheading": "",
+        "title": "CELTICS",
+        "content": "",
+        "link_url": "/collections/boston-celtics-jerseys",
+        "link_text": "VIEW ALL",
+        "background": "",
+        "background_gradient": "",
+        "text_color": "",
+        "heading_color": "",
+        "heading_gradient": "",
+        "product_card_background": "",
+        "product_card_text_color": ""
+      }
+    },
+    "kids": {
+      "type": "featured-collection",
+      "name": "Women",
+      "settings": {
+        "collection": "maillots-femme",
+        "products": [],
+        "full_width": true,
+        "stack_products": false,
+        "show_progress_bar": true,
+        "products_count": 10,
+        "products_per_row_mobile": "2",
+        "products_per_row_desktop": 5,
+        "subheading": "",
+        "title": "WOMEN",
+        "content": "",
+        "link_url": "/collections/maillots-femme",
+        "link_text": "VIEW ALL",
+        "background": "",
+        "background_gradient": "",
+        "text_color": "",
+        "heading_color": "",
+        "heading_gradient": "",
+        "product_card_background": "",
+        "product_card_text_color": ""
+      }
+    },
+    "throwbacks": {
+      "type": "featured-collection",
+      "name": "Throwback Legends",
+      "settings": {
+        "collection": "throwback-legends",
+        "products": [],
+        "full_width": true,
+        "stack_products": false,
+        "show_progress_bar": true,
+        "products_count": 10,
+        "products_per_row_mobile": "2",
+        "products_per_row_desktop": 5,
+        "subheading": "",
+        "title": "THROWBACK LEGENDS",
+        "content": "",
+        "link_url": "/collections/throwback-legends",
+        "link_text": "VIEW ALL",
+        "background": "",
+        "background_gradient": "",
+        "text_color": "",
+        "heading_color": "",
+        "heading_gradient": "",
+        "product_card_background": "",
+        "product_card_text_color": ""
+      }
+    },
+    "fans_heading": {
+      "type": "rich-text",
+      "blocks": {
+        "h": {
+          "type": "heading",
+          "settings": {
+            "text": "THE BRAND LOVED BY THOUSANDS OF FANS",
+            "heading_tag": "h2",
+            "text_color": "",
+            "gradient": ""
+          }
+        },
+        "t": {
+          "type": "richtext",
+          "settings": {
+            "content": "<p>Real fans, real jerseys. Tag us to be featured.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "h",
+        "t"
+      ],
+      "name": "Fans heading",
+      "settings": {
+        "full_width": true,
+        "content_width": "small",
+        "text_position": "center",
+        "background": "",
+        "background_gradient": "",
+        "text_color": ""
+      }
+    },
+    "fans_grid": {
+      "type": "media-grid",
+      "blocks": {
+        "p1": {
+          "type": "image",
+          "settings": {
+            "title": "",
+            "heading_tag": "h3",
+            "link_url": "",
+            "link_text": "",
+            "mobile_text_position": "place-self-center text-center",
+            "desktop_column_span": 1,
+            "desktop_row_span": 1,
+            "desktop_text_position": "sm:place-self-center sm:text-center",
+            "background": "",
+            "background_gradient": "",
+            "text_color": "",
+            "text_gradient": "",
+            "button_background": "",
+            "button_text_color": "",
+            "overlay_color": "#000000",
+            "overlay_opacity": 0
+          }
+        },
+        "p2": {
+          "type": "image",
+          "settings": {
+            "title": "",
+            "heading_tag": "h3",
+            "link_url": "",
+            "link_text": "",
+            "mobile_text_position": "place-self-center text-center",
+            "desktop_column_span": 1,
+            "desktop_row_span": 1,
+            "desktop_text_position": "sm:place-self-center sm:text-center",
+            "background": "",
+            "background_gradient": "",
+            "text_color": "",
+            "text_gradient": "",
+            "button_background": "",
+            "button_text_color": "",
+            "overlay_color": "#000000",
+            "overlay_opacity": 0
+          }
+        },
+        "p3": {
+          "type": "image",
+          "settings": {
+            "title": "",
+            "heading_tag": "h3",
+            "link_url": "",
+            "link_text": "",
+            "mobile_text_position": "place-self-center text-center",
+            "desktop_column_span": 1,
+            "desktop_row_span": 1,
+            "desktop_text_position": "sm:place-self-center sm:text-center",
+            "background": "",
+            "background_gradient": "",
+            "text_color": "",
+            "text_gradient": "",
+            "button_background": "",
+            "button_text_color": "",
+            "overlay_color": "#000000",
+            "overlay_opacity": 0
+          }
+        },
+        "p4": {
+          "type": "image",
+          "settings": {
+            "title": "",
+            "heading_tag": "h3",
+            "link_url": "",
+            "link_text": "",
+            "mobile_text_position": "place-self-center text-center",
+            "desktop_column_span": 1,
+            "desktop_row_span": 1,
+            "desktop_text_position": "sm:place-self-center sm:text-center",
+            "background": "",
+            "background_gradient": "",
+            "text_color": "",
+            "text_gradient": "",
+            "button_background": "",
+            "button_text_color": "",
+            "overlay_color": "#000000",
+            "overlay_opacity": 0
+          }
+        },
+        "p5": {
+          "type": "image",
+          "settings": {
+            "title": "",
+            "heading_tag": "h3",
+            "link_url": "",
+            "link_text": "",
+            "mobile_text_position": "place-self-center text-center",
+            "desktop_column_span": 1,
+            "desktop_row_span": 1,
+            "desktop_text_position": "sm:place-self-center sm:text-center",
+            "background": "",
+            "background_gradient": "",
+            "text_color": "",
+            "text_gradient": "",
+            "button_background": "",
+            "button_text_color": "",
+            "overlay_color": "#000000",
+            "overlay_opacity": 0
+          }
+        },
+        "p6": {
+          "type": "image",
+          "settings": {
+            "title": "",
+            "heading_tag": "h3",
+            "link_url": "",
+            "link_text": "",
+            "mobile_text_position": "place-self-center text-center",
+            "desktop_column_span": 1,
+            "desktop_row_span": 1,
+            "desktop_text_position": "sm:place-self-center sm:text-center",
+            "background": "",
+            "background_gradient": "",
+            "text_color": "",
+            "text_gradient": "",
+            "button_background": "",
+            "button_text_color": "",
+            "overlay_color": "#000000",
+            "overlay_opacity": 0
+          }
+        },
+        "p7": {
+          "type": "image",
+          "settings": {
+            "title": "",
+            "heading_tag": "h3",
+            "link_url": "",
+            "link_text": "",
+            "mobile_text_position": "place-self-center text-center",
+            "desktop_column_span": 1,
+            "desktop_row_span": 1,
+            "desktop_text_position": "sm:place-self-center sm:text-center",
+            "background": "",
+            "background_gradient": "",
+            "text_color": "",
+            "text_gradient": "",
+            "button_background": "",
+            "button_text_color": "",
+            "overlay_color": "#000000",
+            "overlay_opacity": 0
+          }
+        },
+        "p8": {
+          "type": "image",
+          "settings": {
+            "title": "",
+            "heading_tag": "h3",
+            "link_url": "",
+            "link_text": "",
+            "mobile_text_position": "place-self-center text-center",
+            "desktop_column_span": 1,
+            "desktop_row_span": 1,
+            "desktop_text_position": "sm:place-self-center sm:text-center",
+            "background": "",
+            "background_gradient": "",
+            "text_color": "",
+            "text_gradient": "",
+            "button_background": "",
+            "button_text_color": "",
+            "overlay_color": "#000000",
+            "overlay_opacity": 0
+          }
+        },
+        "p9": {
+          "type": "image",
+          "settings": {
+            "title": "",
+            "heading_tag": "h3",
+            "link_url": "",
+            "link_text": "",
+            "mobile_text_position": "place-self-center text-center",
+            "desktop_column_span": 1,
+            "desktop_row_span": 1,
+            "desktop_text_position": "sm:place-self-center sm:text-center",
+            "background": "",
+            "background_gradient": "",
+            "text_color": "",
+            "text_gradient": "",
+            "button_background": "",
+            "button_text_color": "",
+            "overlay_color": "#000000",
+            "overlay_opacity": 0
+          }
+        },
+        "p10": {
+          "type": "image",
+          "settings": {
+            "title": "",
+            "heading_tag": "h3",
+            "link_url": "",
+            "link_text": "",
+            "mobile_text_position": "place-self-center text-center",
+            "desktop_column_span": 1,
+            "desktop_row_span": 1,
+            "desktop_text_position": "sm:place-self-center sm:text-center",
+            "background": "",
+            "background_gradient": "",
+            "text_color": "",
+            "text_gradient": "",
+            "button_background": "",
+            "button_text_color": "",
+            "overlay_color": "#000000",
+            "overlay_opacity": 0
+          }
+        },
+        "p11": {
+          "type": "image",
+          "settings": {
+            "title": "",
+            "heading_tag": "h3",
+            "link_url": "",
+            "link_text": "",
+            "mobile_text_position": "place-self-center text-center",
+            "desktop_column_span": 1,
+            "desktop_row_span": 1,
+            "desktop_text_position": "sm:place-self-center sm:text-center",
+            "background": "",
+            "background_gradient": "",
+            "text_color": "",
+            "text_gradient": "",
+            "button_background": "",
+            "button_text_color": "",
+            "overlay_color": "#000000",
+            "overlay_opacity": 0
+          }
+        },
+        "p12": {
+          "type": "image",
+          "settings": {
+            "title": "",
+            "heading_tag": "h3",
+            "link_url": "",
+            "link_text": "",
+            "mobile_text_position": "place-self-center text-center",
+            "desktop_column_span": 1,
+            "desktop_row_span": 1,
+            "desktop_text_position": "sm:place-self-center sm:text-center",
+            "background": "",
+            "background_gradient": "",
+            "text_color": "",
+            "text_gradient": "",
+            "button_background": "",
+            "button_text_color": "",
+            "overlay_color": "#000000",
+            "overlay_opacity": 0
+          }
+        },
+        "p13": {
+          "type": "image",
+          "settings": {
+            "title": "",
+            "heading_tag": "h3",
+            "link_url": "",
+            "link_text": "",
+            "mobile_text_position": "place-self-center text-center",
+            "desktop_column_span": 1,
+            "desktop_row_span": 1,
+            "desktop_text_position": "sm:place-self-center sm:text-center",
+            "background": "",
+            "background_gradient": "",
+            "text_color": "",
+            "text_gradient": "",
+            "button_background": "",
+            "button_text_color": "",
+            "overlay_color": "#000000",
+            "overlay_opacity": 0
+          }
+        },
+        "p14": {
+          "type": "image",
+          "settings": {
+            "title": "",
+            "heading_tag": "h3",
+            "link_url": "",
+            "link_text": "",
+            "mobile_text_position": "place-self-center text-center",
+            "desktop_column_span": 1,
+            "desktop_row_span": 1,
+            "desktop_text_position": "sm:place-self-center sm:text-center",
+            "background": "",
+            "background_gradient": "",
+            "text_color": "",
+            "text_gradient": "",
+            "button_background": "",
+            "button_text_color": "",
+            "overlay_color": "#000000",
+            "overlay_opacity": 0
+          }
+        },
+        "p15": {
+          "type": "image",
+          "settings": {
+            "title": "",
+            "heading_tag": "h3",
+            "link_url": "",
+            "link_text": "",
+            "mobile_text_position": "place-self-center text-center",
+            "desktop_column_span": 1,
+            "desktop_row_span": 1,
+            "desktop_text_position": "sm:place-self-center sm:text-center",
+            "background": "",
+            "background_gradient": "",
+            "text_color": "",
+            "text_gradient": "",
+            "button_background": "",
+            "button_text_color": "",
+            "overlay_color": "#000000",
+            "overlay_opacity": 0
+          }
+        },
+        "p16": {
+          "type": "image",
+          "settings": {
+            "title": "",
+            "heading_tag": "h3",
+            "link_url": "",
+            "link_text": "",
+            "mobile_text_position": "place-self-center text-center",
+            "desktop_column_span": 1,
+            "desktop_row_span": 1,
+            "desktop_text_position": "sm:place-self-center sm:text-center",
+            "background": "",
+            "background_gradient": "",
+            "text_color": "",
+            "text_gradient": "",
+            "button_background": "",
+            "button_text_color": "",
+            "overlay_color": "#000000",
+            "overlay_opacity": 0
+          }
+        },
+        "p17": {
+          "type": "image",
+          "settings": {
+            "title": "",
+            "heading_tag": "h3",
+            "link_url": "",
+            "link_text": "",
+            "mobile_text_position": "place-self-center text-center",
+            "desktop_column_span": 1,
+            "desktop_row_span": 1,
+            "desktop_text_position": "sm:place-self-center sm:text-center",
+            "background": "",
+            "background_gradient": "",
+            "text_color": "",
+            "text_gradient": "",
+            "button_background": "",
+            "button_text_color": "",
+            "overlay_color": "#000000",
+            "overlay_opacity": 0
+          }
+        },
+        "p18": {
+          "type": "image",
+          "settings": {
+            "title": "",
+            "heading_tag": "h3",
+            "link_url": "",
+            "link_text": "",
+            "mobile_text_position": "place-self-center text-center",
+            "desktop_column_span": 1,
+            "desktop_row_span": 1,
+            "desktop_text_position": "sm:place-self-center sm:text-center",
+            "background": "",
+            "background_gradient": "",
+            "text_color": "",
+            "text_gradient": "",
+            "button_background": "",
+            "button_text_color": "",
+            "overlay_color": "#000000",
+            "overlay_opacity": 0
+          }
+        },
+        "p19": {
+          "type": "image",
+          "settings": {
+            "title": "",
+            "heading_tag": "h3",
+            "link_url": "",
+            "link_text": "",
+            "mobile_text_position": "place-self-center text-center",
+            "desktop_column_span": 1,
+            "desktop_row_span": 1,
+            "desktop_text_position": "sm:place-self-center sm:text-center",
+            "background": "",
+            "background_gradient": "",
+            "text_color": "",
+            "text_gradient": "",
+            "button_background": "",
+            "button_text_color": "",
+            "overlay_color": "#000000",
+            "overlay_opacity": 0
+          }
+        },
+        "p20": {
+          "type": "image",
+          "settings": {
+            "title": "",
+            "heading_tag": "h3",
+            "link_url": "",
+            "link_text": "",
+            "mobile_text_position": "place-self-center text-center",
+            "desktop_column_span": 1,
+            "desktop_row_span": 1,
+            "desktop_text_position": "sm:place-self-center sm:text-center",
+            "background": "",
+            "background_gradient": "",
+            "text_color": "",
+            "text_gradient": "",
+            "button_background": "",
+            "button_text_color": "",
+            "overlay_color": "#000000",
+            "overlay_opacity": 0
+          }
+        },
+        "p21": {
+          "type": "image",
+          "settings": {
+            "title": "",
+            "heading_tag": "h3",
+            "link_url": "",
+            "link_text": "",
+            "mobile_text_position": "place-self-center text-center",
+            "desktop_column_span": 1,
+            "desktop_row_span": 1,
+            "desktop_text_position": "sm:place-self-center sm:text-center",
+            "background": "",
+            "background_gradient": "",
+            "text_color": "",
+            "text_gradient": "",
+            "button_background": "",
+            "button_text_color": "",
+            "overlay_color": "#000000",
+            "overlay_opacity": 0
+          }
+        },
+        "p22": {
+          "type": "image",
+          "settings": {
+            "title": "",
+            "heading_tag": "h3",
+            "link_url": "",
+            "link_text": "",
+            "mobile_text_position": "place-self-center text-center",
+            "desktop_column_span": 1,
+            "desktop_row_span": 1,
+            "desktop_text_position": "sm:place-self-center sm:text-center",
+            "background": "",
+            "background_gradient": "",
+            "text_color": "",
+            "text_gradient": "",
+            "button_background": "",
+            "button_text_color": "",
+            "overlay_color": "#000000",
+            "overlay_opacity": 0
+          }
+        },
+        "p23": {
+          "type": "image",
+          "settings": {
+            "title": "",
+            "heading_tag": "h3",
+            "link_url": "",
+            "link_text": "",
+            "mobile_text_position": "place-self-center text-center",
+            "desktop_column_span": 1,
+            "desktop_row_span": 1,
+            "desktop_text_position": "sm:place-self-center sm:text-center",
+            "background": "",
+            "background_gradient": "",
+            "text_color": "",
+            "text_gradient": "",
+            "button_background": "",
+            "button_text_color": "",
+            "overlay_color": "#000000",
+            "overlay_opacity": 0
+          }
+        },
+        "p24": {
+          "type": "image",
+          "settings": {
+            "title": "",
+            "heading_tag": "h3",
+            "link_url": "",
+            "link_text": "",
+            "mobile_text_position": "place-self-center text-center",
+            "desktop_column_span": 1,
+            "desktop_row_span": 1,
+            "desktop_text_position": "sm:place-self-center sm:text-center",
+            "background": "",
+            "background_gradient": "",
+            "text_color": "",
+            "text_gradient": "",
+            "button_background": "",
+            "button_text_color": "",
+            "overlay_color": "#000000",
+            "overlay_opacity": 0
+          }
+        }
+      },
+      "block_order": [
+        "p1",
+        "p2",
+        "p3",
+        "p4",
+        "p5",
+        "p6",
+        "p7",
+        "p8",
+        "p9",
+        "p10",
+        "p11",
+        "p12",
+        "p13",
+        "p14",
+        "p15",
+        "p16",
+        "p17",
+        "p18",
+        "p19",
+        "p20",
+        "p21",
+        "p22",
+        "p23",
+        "p24"
+      ],
+      "name": "Fan photos",
+      "settings": {
+        "full_width": true,
+        "reduce_width": false,
+        "subheading": "",
+        "title": "",
+        "content": "",
+        "text_alignment": "center",
+        "columns_desktop": 8,
+        "columns_mobile": 3,
+        "mobile_layout": "row",
+        "grid_gap": 3,
+        "frame": true,
+        "frame_max_width": 1400,
+        "desktop_row_height": 170,
+        "mobile_row_height": 200,
+        "mobile_item_width": 150,
+        "background": "",
+        "background_gradient": ""
+      }
+    },
+    "reviews": {
+      "type": "reviews-carousel",
+      "blocks": {
+        "r1": {
+          "type": "review",
+          "settings": {
+            "author": "Daniel M.",
+            "city": "",
+            "date": "",
+            "title": "Better than I expected",
+            "verified": true,
+            "rating": 5,
+            "content": "<p>Mesh, stitching, lettering — it feels like the jersey I paid four times as much for at the arena store. Arrived in four days.</p>"
+          }
+        },
+        "r2": {
+          "type": "review",
+          "settings": {
+            "author": "Sofia R.",
+            "city": "",
+            "date": "",
+            "title": "Lettering is spot on",
+            "verified": true,
+            "rating": 5,
+            "content": "<p>Got my son's name on the back for his birthday. The stitched-look numbers match the real thing and it survived the washing machine.</p>"
+          }
+        },
+        "r3": {
+          "type": "review",
+          "settings": {
+            "author": "Marcus T.",
+            "city": "",
+            "date": "",
+            "title": "Third order this year",
+            "verified": true,
+            "rating": 5,
+            "content": "<p>Sizes run true to the chart. I ordered a large again and it fits exactly like the last one. Easy returns the one time I got it wrong.</p>"
+          }
+        },
+        "r4": {
+          "type": "review",
+          "settings": {
+            "author": "Ana P.",
+            "city": "",
+            "date": "",
+            "title": "Fast and well packed",
+            "verified": true,
+            "rating": 5,
+            "content": "<p>Ordered on a Thursday, wore it courtside on Sunday. Folded properly in a sealed bag, no creases.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "r1",
+        "r2",
+        "r3",
+        "r4"
+      ],
+      "name": "Customer reviews",
+      "settings": {
+        "full_width": true,
+        "subheading": "",
+        "title": "",
+        "content": "",
+        "link_url": "",
+        "link_text": "",
+        "rating_value": "4.8",
+        "reviews_count": "2,400",
+        "reviews_count_label": "verified reviews",
+        "card_style": "compact",
+        "compact_show_photo": false,
+        "image_ratio": "1 / 1",
+        "card_width_mobile": "62",
+        "center_cards_mobile": true,
+        "autoplay": true,
+        "autoplay_speed": 40,
+        "verified_text": "Verified purchase",
+        "verified_color": "#00b67a",
+        "stars_color": "#00b67a",
+        "background": "#f5f5f5",
+        "background_gradient": "",
+        "text_color": "",
+        "heading_color": "",
+        "heading_gradient": "",
+        "review_card_background": "#ffffff",
+        "review_card_text_color": ""
+      }
+    },
+    "faq": {
+      "type": "faq",
+      "blocks": {
+        "f1": {
+          "type": "item",
+          "settings": {
+            "title": "When will I receive my order?",
+            "content": "<p>We dispatch within 24 hours on working days. Delivery takes 3-6 days worldwide, tracked from the moment it leaves our warehouse.</p>"
+          }
+        },
+        "f2": {
+          "type": "item",
+          "settings": {
+            "title": "What is the quality of your jerseys like?",
+            "content": "<p>Lightweight recycled performance mesh with the oversized basketball cut, heat-pressed stitched-look lettering and team wordmarks. Built like the jerseys worn on court — every one is checked by hand before it ships.</p>"
+          }
+        },
+        "f3": {
+          "type": "item",
+          "settings": {
+            "title": "Can I swap the size if it doesn't fit?",
+            "content": "<p>Yes. You have 30 days to exchange any unworn jersey, and size swaps are free — even on personalised jerseys.</p>"
+          }
+        },
+        "f4": {
+          "type": "item",
+          "settings": {
+            "title": "Is name and number lettering really free?",
+            "content": "<p>Yes. Add any name and number up to 12 characters at checkout and we letter it at no extra cost, in the correct font for that team.</p>"
+          }
+        },
+        "f5": {
+          "type": "item",
+          "settings": {
+            "title": "How does the \"buy 3, get 1 free\" offer work?",
+            "content": "<p>Add four jerseys to your cart: you pay for three and the cheapest one is free. The discount is applied automatically at checkout.</p>"
+          }
+        },
+        "f6": {
+          "type": "item",
+          "settings": {
+            "title": "Is my payment secure?",
+            "content": "<p>Every payment runs through Shopify's encrypted checkout. We never see or store your card details.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "f1",
+        "f2",
+        "f3",
+        "f4",
+        "f5",
+        "f6"
+      ],
+      "name": "FAQ",
+      "settings": {
+        "full_width": true,
+        "layout": "current",
+        "column_max_width": 600,
+        "show_support": true,
+        "subheading": "",
+        "title": "FREQUENTLY ASKED QUESTIONS",
+        "content": "",
+        "team_avatar_width": 160,
+        "support_hours": "Monday to Saturday, 9am-6pm",
+        "answer_time": "We reply within 2 hours",
+        "button_text": "Contact us",
+        "button_url": "/pages/contact",
+        "text_position": "center",
+        "background": "",
+        "background_gradient": "",
+        "text_color": "",
+        "heading_color": "",
+        "heading_gradient": "",
+        "button_background": "#121212",
+        "button_text_color": "#ffffff",
+        "accordion_background": "",
+        "accordion_text_color": ""
+      }
+    }
+  },
+  "order": [
+    "hero",
+    "reviews_strip",
+    "team_selector",
+    "best_sellers",
+    "nba_2526",
+    "lakers",
+    "warriors",
+    "bulls",
+    "closeups",
+    "exclusives",
+    "top_teams",
+    "kids",
+    "throwbacks",
+    "fans_heading",
+    "fans_grid",
+    "reviews",
+    "faq"
+  ]
+}

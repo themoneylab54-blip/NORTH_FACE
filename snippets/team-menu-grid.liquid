@@ -1,0 +1,73 @@
+{%- comment -%}
+----------------------------------------------------------------------------------------------------------------------
+TEAM MENU GRID
+----------------------------------------------------------------------------------------------------------------------
+
+Grid of team logos (collection image + name) with a search field that filters it. Shown in the mobile menu drawer and
+in the desktop mega menu when the header's "Team grid" menu item is opened. The styles and the <team-menu-grid>
+element are output once by sections/header.liquid.
+
+********************************************
+Supported variables
+********************************************
+
+* teams: the collections to show (header setting "team_collections"); the collection image is the logo
+* strip_text: text removed from the collection titles (e.g. "Jerseys")
+* context: "drawer" (mobile menu) or "mega" (desktop mega menu)
+* title: optional heading above the grid
+* search_placeholder: placeholder (and accessible label) of the search field
+* no_results_text: shown when the search matches no team
+* view_all_url, view_all_text: optional link under the grid
+{%- endcomment -%}
+
+<team-menu-grid class="team-menu-grid team-menu-grid--{{ context }}">
+  <div class="team-menu-grid__head">
+    {%- if title != blank -%}
+      <p class="team-menu-grid__title h6">{{ title | escape }}</p>
+    {%- endif -%}
+
+    <label class="team-menu-grid__search">
+      <span class="sr-only">{{ search_placeholder | escape }}</span>
+      {%- render 'icon' with 'search', width: 16, height: 16 -%}
+      <input type="search" placeholder="{{ search_placeholder | escape }}" autocomplete="off" enterkeyhint="go" data-team-search>
+    </label>
+  </div>
+
+  <ul class="team-menu-grid__list" role="list">
+    {%- for team in teams -%}
+      {%- liquid
+        assign team_name = team.title
+        if strip_text != blank
+          assign team_name = team_name | remove: strip_text | strip
+        endif
+
+        assign team_words = team_name | split: ' '
+        assign team_initials = team_words.first | slice: 0
+        if team_words.size > 1
+          assign team_last_initial = team_words.last | slice: 0
+          assign team_initials = team_initials | append: team_last_initial
+        endif
+      -%}
+
+      <li class="team-menu-grid__item" data-team-name="{{ team_name | downcase | escape }} {{ team.handle | replace: '-', ' ' | escape }}">
+        <a href="{{ team.url }}" class="team-menu-grid__card">
+          <span class="team-menu-grid__logo">
+            {%- if team.image != blank -%}
+              {{- team.image | image_url: width: 144 | image_tag: loading: 'lazy', sizes: '48px', widths: '96,144', alt: '' -}}
+            {%- else -%}
+              <span class="team-menu-grid__initials" aria-hidden="true">{{ team_initials | upcase }}</span>
+            {%- endif -%}
+          </span>
+
+          <span class="team-menu-grid__name">{{ team_name | escape }}</span>
+        </a>
+      </li>
+    {%- endfor -%}
+  </ul>
+
+  <p class="team-menu-grid__empty" data-team-empty hidden>{{ no_results_text | escape }}</p>
+
+  {%- if view_all_url != blank and view_all_text != blank -%}
+    <a href="{{ view_all_url }}" class="team-menu-grid__all">{{ view_all_text | escape }}</a>
+  {%- endif -%}
+</team-menu-grid>

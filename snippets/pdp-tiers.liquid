@@ -1,0 +1,154 @@
+{%- comment -%}
+----------------------------------------------------------------------------------------------------------------------
+PDP TIERS (block type "pdp_tiers")
+----------------------------------------------------------------------------------------------------------------------
+
+Buy-box item 12: a boxed panel (bg rgba(245,245,245,.3), 1px border #F0F0F0, radius 6px, padding 12px) with an
+uppercase 12px title and FIVE equal tiles in a row (wrapping 3 + 2 on mobile). Each tile shows
+"Take N" (12px 600), "Pay M" (11px #737373) and "-P%" (13px 700 #DC2626).
+
+Display only: no form input, no JS. Everything is Liquid-driven so it re-renders cleanly through <product-rerender>.
+Tiers whose quantity is 0 / blank are skipped. The discount percentage is a setting; when it is left at 0 it is
+computed from quantity / pay (e.g. 3 / 2 -> 33%).
+
+********************************************
+Supported variables
+********************************************
+
+* block: the section block (settings: title, tierN_quantity, tierN_pay, tierN_percent for N = 1..5)
+* product: the product being rendered (unused, kept for signature consistency)
+* product_form_id: the ID of the product form (unused, display only)
+* section: the current section
+{%- endcomment -%}
+
+{%- liquid
+  assign pt_title = block.settings.title
+  if pt_title == blank
+    assign pt_title = 'The more you take, the more you save'
+  endif
+
+  assign pt_take_label = block.settings.take_label | default: 'Take'
+  assign pt_pay_label = block.settings.pay_label | default: 'Pay'
+
+  assign pt_visible = 0
+  for i in (1..5)
+    assign pt_qty_key = 'tier' | append: i | append: '_quantity'
+    if block.settings[pt_qty_key] > 0
+      assign pt_visible = pt_visible | plus: 1
+    endif
+  endfor
+-%}
+
+{%- if pt_visible > 0 -%}
+  <style>
+    .pdp-tiers-{{ block.id }} {
+      box-sizing: border-box;
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #F0F0F0;
+      border-radius: 6px;
+      background: rgba(245, 245, 245, .3);
+      color: #121212;
+      font-family: Inter, -apple-system, "Segoe UI", sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .pdp-tiers-{{ block.id }} .pdp-tiers__title {
+      margin: 0 0 10px;
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1.25;
+      letter-spacing: .24px;
+      text-transform: uppercase;
+      text-align: center;
+    }
+
+    .pdp-tiers-{{ block.id }} .pdp-tiers__grid {
+      display: grid;
+      grid-template-columns: repeat({{ pt_visible }}, minmax(0, 1fr));
+      gap: 6px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .pdp-tiers-{{ block.id }} .pdp-tiers__tile {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      min-height: 62px;
+      padding: 8px 4px;
+      border: 1px solid #F0F0F0;
+      border-radius: 6px;
+      background: #FFFFFF;
+      text-align: center;
+    }
+
+    .pdp-tiers-{{ block.id }} .pdp-tiers__take {
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 1.2;
+      color: #121212;
+      white-space: nowrap;
+    }
+
+    .pdp-tiers-{{ block.id }} .pdp-tiers__pay {
+      font-size: 11px;
+      font-weight: 400;
+      line-height: 1.2;
+      color: #737373;
+      white-space: nowrap;
+    }
+
+    .pdp-tiers-{{ block.id }} .pdp-tiers__percent {
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.2;
+      color: #DC2626;
+      white-space: nowrap;
+    }
+
+    @media screen and (max-width: 699px) {
+      .pdp-tiers-{{ block.id }} .pdp-tiers__grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+  </style>
+
+  <div class="product-info__tiers pdp-tiers-{{ block.id }}" {{ block.shopify_attributes }}>
+    <p class="pdp-tiers__title">{{ pt_title | escape }}</p>
+
+    <ul class="pdp-tiers__grid" aria-label="{{ pt_title | escape }}">
+      {%- for i in (1..5) -%}
+        {%- liquid
+          assign pt_qty_key = 'tier' | append: i | append: '_quantity'
+          assign pt_pay_key = 'tier' | append: i | append: '_pay'
+          assign pt_pct_key = 'tier' | append: i | append: '_percent'
+
+          assign pt_qty = block.settings[pt_qty_key] | default: 0
+          assign pt_pay = block.settings[pt_pay_key] | default: 0
+          assign pt_pct = block.settings[pt_pct_key] | default: 0
+
+          if pt_pct <= 0 and pt_qty > 0 and pt_pay > 0 and pt_pay < pt_qty
+            assign pt_saved = pt_qty | minus: pt_pay
+            assign pt_pct = pt_saved | times: 100.0 | divided_by: pt_qty | round
+          endif
+        -%}
+
+        {%- if pt_qty > 0 -%}
+          <li class="pdp-tiers__tile">
+            <span class="pdp-tiers__take">{{ pt_take_label | escape }} {{ pt_qty }}</span>
+            {%- if pt_pay > 0 -%}
+              <span class="pdp-tiers__pay">{{ pt_pay_label | escape }} {{ pt_pay }}</span>
+            {%- endif -%}
+            {%- if pt_pct > 0 -%}
+              <span class="pdp-tiers__percent">-{{ pt_pct }}%</span>
+            {%- endif -%}
+          </li>
+        {%- endif -%}
+      {%- endfor -%}
+    </ul>
+  </div>
+{%- endif -%}

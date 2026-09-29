@@ -1,0 +1,54 @@
+{%- comment -%}
+  pdp-payment-icons: centred row of payment method logos under the add to cart button.
+  "icons_source" = custom (default) shows the names in "icons_list" (the most used methods in the US);
+  "store" shows only the methods enabled in the Shopify payment settings.
+  Receives: block, product, product_form_id, section.
+{%- endcomment -%}
+
+{%- liquid
+  assign ppi_align = block.settings.alignment | default: 'center'
+  assign ppi_justify = 'center'
+  if ppi_align == 'start'
+    assign ppi_justify = 'flex-start'
+  endif
+
+  assign ppi_source = block.settings.icons_source | default: 'custom'
+-%}
+
+{%- capture ppi_icons -%}
+  {%- render 'payment-icon-list', source: ppi_source, list: block.settings.icons_list, icon_class: 'pdp-payment-icon', wrapper: 'li' -%}
+{%- endcapture -%}
+
+{%- if ppi_icons != blank -%}
+  <style>
+    .pdp-payment-icons-{{ block.id }} {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: {{ ppi_justify }};
+      gap: 8px;
+      margin: 12px 0;
+      list-style: none;
+      padding: 0;
+    }
+
+    .pdp-payment-icons-{{ block.id }} li {
+      display: inline-flex;
+      margin: 0;
+      padding: 0;
+    }
+
+    .pdp-payment-icons-{{ block.id }} .pdp-payment-icon {
+      display: block;
+      width: 38px;
+      height: 24px;
+      border-radius: 3px;
+    }
+  </style>
+
+  <ul class="pdp-payment-icons-{{ block.id }}" aria-label="Accepted payment methods" {{ block.shopify_attributes }}>
+    {{- ppi_icons -}}
+  </ul>
+{%- else -%}
+  <div class="pdp-payment-icons-{{ block.id }}" {{ block.shopify_attributes }} hidden></div>
+{%- endif -%}

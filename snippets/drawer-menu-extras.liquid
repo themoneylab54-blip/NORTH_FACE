@@ -1,0 +1,84 @@
+{%- comment -%}
+----------------------------------------------------------------------------------------------------------------------
+DRAWER MENU EXTRAS
+----------------------------------------------------------------------------------------------------------------------
+
+Extra content of the mobile menu drawer, around the menu links (see snippets/navigation-panel.liquid). Every part is
+driven by the header's "Mobile navigation" settings and hides itself when its settings are empty. The styles live in
+sections/header.liquid.
+
+********************************************
+Supported variables
+********************************************
+
+* part: "top" (search bar + popular team logos) or "bottom" (offer card + help links)
+{%- endcomment -%}
+
+{%- if part == 'top' -%}
+  {%- if section.settings.drawer_show_search -%}
+    <form action="{{ routes.search_url }}" method="get" role="search" class="drawer-menu__search">
+      <input type="hidden" name="type" value="product">
+      {%- render 'icon' with 'search', width: 18, height: 18 -%}
+      <input type="search" name="q" placeholder="{{ section.settings.inline_search_placeholder | default: 'Search' | escape }}" aria-label="{{ 'header.general.search' | t | escape }}" autocomplete="off" enterkeyhint="search">
+    </form>
+  {%- endif -%}
+
+  {%- if section.settings.drawer_featured_teams != blank -%}
+    <div class="drawer-menu__teams">
+      {%- if section.settings.drawer_featured_title != blank -%}
+        <p class="drawer-menu__label">{{ section.settings.drawer_featured_title | escape }}</p>
+      {%- endif -%}
+
+      <ul class="drawer-menu__team-list scroll-area" role="list">
+        {%- for team in section.settings.drawer_featured_teams -%}
+          {%- liquid
+            assign team_name = team.title
+            if section.settings.team_strip_text != blank
+              assign team_name = team_name | remove: section.settings.team_strip_text | strip
+            endif
+            comment
+              The row is narrow: show the nickname (last word), e.g. "Los Angeles Lakers" -> "Lakers"
+            endcomment
+            assign team_nickname = team_name | split: ' ' | last
+          -%}
+
+          <li>
+            <a href="{{ team.url }}" class="drawer-menu__team">
+              <span class="drawer-menu__team-logo">
+                {%- if team.image != blank -%}
+                  {{- team.image | image_url: width: 144 | image_tag: loading: 'lazy', sizes: '40px', widths: '80,120', alt: '' -}}
+                {%- else -%}
+                  <span class="drawer-menu__team-initial" aria-hidden="true">{{ team_nickname | slice: 0 | upcase }}</span>
+                {%- endif -%}
+              </span>
+              <span class="drawer-menu__team-name" title="{{ team_name | escape }}">{{ team_nickname | escape }}</span>
+            </a>
+          </li>
+        {%- endfor -%}
+      </ul>
+    </div>
+  {%- endif -%}
+{%- elsif part == 'bottom' -%}
+  {%- if section.settings.drawer_offer_title != blank -%}
+    <a href="{{ section.settings.drawer_offer_url | default: routes.all_products_collection_url }}" class="drawer-menu__offer">
+      <span class="drawer-menu__offer-icon" aria-hidden="true">{%- render 'icon' with 'picto-gift', width: 22, height: 22 -%}</span>
+      <span class="drawer-menu__offer-text">
+        <span class="drawer-menu__offer-title">{{ section.settings.drawer_offer_title | escape }}</span>
+        {%- if section.settings.drawer_offer_text != blank -%}
+          <span class="drawer-menu__offer-subtitle">{{ section.settings.drawer_offer_text | escape }}</span>
+        {%- endif -%}
+      </span>
+      {%- render 'icon' with 'chevron-right-small', direction_aware: true -%}
+    </a>
+  {%- endif -%}
+
+  {%- if section.settings.drawer_help_menu.links.size > 0 -%}
+    <nav class="drawer-menu__help" aria-label="{{ section.settings.drawer_help_menu.title | escape }}">
+      <ul class="drawer-menu__help-list" role="list">
+        {%- for link in section.settings.drawer_help_menu.links -%}
+          <li><a href="{{ link.url }}">{{ link.title | escape }}</a></li>
+        {%- endfor -%}
+      </ul>
+    </nav>
+  {%- endif -%}
+{%- endif -%}

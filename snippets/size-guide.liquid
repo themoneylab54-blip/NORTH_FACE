@@ -1,0 +1,502 @@
+{%- comment -%}
+----------------------------------------------------------------------------------------------------------------------
+SIZE GUIDE — basketball jerseys
+----------------------------------------------------------------------------------------------------------------------
+
+Single source of truth for the size guide. Rendered by:
+* the product page modal ("size_guide" block in product-info) — context: 'modal'
+* the /pages/size-guide page (size-guide-page section)          — context: 'page'
+
+Supported variables
+* context: 'modal' (rows are clickable and select the variant) or 'page' (rows only highlight)
+* reassurance_text: sentence shown under the guide (default below)
+
+Without JavaScript every measurement stays readable: automatic selection is a bonus.
+{%- endcomment -%}
+
+{%- liquid
+  comment
+    ------------------------------------------------------------------
+    CONFIGURATION — size data
+    Row format: size|chest cm|body length cm|height cm|EU equivalent
+    Rows are separated by ";".
+
+    // TO VALIDATE: this chart is a generic replica-jersey chart. Replace
+    // every value with your supplier's measurements before going live.
+
+    To hide a size without breaking the layout, add it to hidden_sizes
+    (e.g. '3XL' or '2XL,3XL'). Sizes listed in estimated_sizes are
+    flagged "estimated".
+    ------------------------------------------------------------------
+  endcomment
+
+  assign size_rows = 'S|96–101|74|165–172|46;M|101–106|76|172–178|48–50;L|106–111|79|178–183|52;XL|111–116|81|183–188|54–56;2XL|116–121|84|188–193|58;3XL|121–127|86|193–198|60' | split: ';'
+  assign hidden_sizes = '' | split: ','
+  assign estimated_sizes = '' | split: ','
+
+  assign context = context | default: 'page'
+  assign reassurance_text = reassurance_text | default: 'Between two sizes? Size down for a fitted look, up for the classic oversized look.'
+-%}
+
+<style>
+  .size-guide {
+    --sg-accent: rgb(var(--button-background, 20 36 30));
+    --sg-accent-text: rgb(var(--button-text-color, 255 255 255));
+    --sg-border: rgb(var(--text-color, 20 36 30) / .12);
+    --sg-soft: rgb(var(--text-color, 20 36 30) / .05);
+    --sg-muted: rgb(var(--text-color, 20 36 30) / .65);
+    background: rgb(var(--background, 255 255 255));
+    color: rgb(var(--text-color, 20 36 30));
+    border-radius: 12px;
+    padding: 1.25rem;
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+
+  .size-guide__rule {
+    background: var(--sg-soft);
+    border-radius: 10px;
+    padding: 0.85rem 1rem;
+    margin-block-end: 1rem;
+    font-size: 1rem;
+  }
+
+  .size-guide__list {
+    display: grid;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .size-guide__row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    width: 100%;
+    min-height: 48px;
+    padding: 0.75rem 1rem;
+    background: rgb(var(--background, 255 255 255));
+    border: 1px solid var(--sg-border);
+    border-radius: 10px;
+    font-size: 1rem;
+    text-align: left;
+    color: inherit;
+    cursor: pointer;
+    transition: border-color .15s ease, background-color .15s ease;
+  }
+
+  .size-guide__row:hover,
+  .size-guide__row:focus-visible {
+    border-color: var(--sg-accent);
+  }
+
+  .size-guide__row:focus-visible {
+    outline: 2px solid var(--sg-accent);
+    outline-offset: 2px;
+  }
+
+  .size-guide__row.is-selected {
+    border-color: var(--sg-accent);
+    box-shadow: 0 0 0 1px var(--sg-accent);
+    background: var(--sg-soft);
+  }
+
+  .size-guide__combo {
+    flex-grow: 1;
+  }
+
+  .size-guide__size {
+    flex-shrink: 0;
+    min-width: 3.2rem;
+    padding: 0.35rem 0.75rem;
+    border-radius: 999px;
+    background: var(--sg-accent);
+    color: var(--sg-accent-text);
+    font-weight: 700;
+    font-size: 1.05rem;
+    text-align: center;
+  }
+
+  .size-guide__estimated {
+    font-size: 0.9rem;
+    color: var(--sg-muted);
+  }
+
+  .size-guide details {
+    margin-block-start: 1rem;
+    border: 1px solid var(--sg-border);
+    border-radius: 10px;
+    background: rgb(var(--background, 255 255 255));
+  }
+
+  .size-guide summary {
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .size-guide summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .size-guide summary::after {
+    content: "+";
+    font-size: 1.4rem;
+    line-height: 1;
+    color: var(--sg-accent);
+    flex-shrink: 0;
+  }
+
+  .size-guide details[open] summary::after {
+    content: "–";
+  }
+
+  .size-guide summary:focus-visible {
+    outline: 2px solid var(--sg-accent);
+    outline-offset: -2px;
+    border-radius: 10px;
+  }
+
+  .size-guide__details-body {
+    padding: 0 1rem 1rem;
+  }
+
+  .size-guide table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 1rem;
+  }
+
+  .size-guide th,
+  .size-guide td {
+    padding: 0.7rem 0.6rem;
+    text-align: left;
+    border-block-start: 1px solid var(--sg-border);
+  }
+
+  .size-guide thead th {
+    border-block-start: none;
+    background: var(--sg-soft);
+    font-weight: 700;
+  }
+
+  .size-guide tbody tr:nth-child(even) td,
+  .size-guide tbody tr:nth-child(even) th {
+    background: var(--sg-soft);
+  }
+
+  .size-guide__steps {
+    display: grid;
+    gap: 1rem;
+    margin-block-end: 1rem;
+  }
+
+  .size-guide__step {
+    display: flex;
+    gap: 0.85rem;
+    align-items: flex-start;
+  }
+
+  .size-guide__step svg {
+    flex-shrink: 0;
+    width: 56px;
+    height: 72px;
+  }
+
+  .size-guide__step-number {
+    font-weight: 700;
+    color: var(--sg-accent);
+  }
+
+  .size-guide__footnotes {
+    margin-block-start: 1rem;
+    font-size: 0.9rem;
+    color: var(--sg-muted);
+  }
+
+  .size-guide__footnotes p {
+    margin: 0.15rem 0;
+  }
+
+  .size-guide__reassurance {
+    margin-block-start: 1rem;
+    padding: 0.85rem 1rem;
+    border-radius: 10px;
+    background: var(--sg-soft);
+    font-size: 1rem;
+    text-align: center;
+  }
+
+  .size-guide__reassurance a {
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .size-guide__toast {
+    position: fixed;
+    inset-inline: 0;
+    bottom: calc(1.25rem + env(safe-area-inset-bottom, 0px));
+    z-index: 60;
+    display: flex;
+    justify-content: center;
+    pointer-events: none;
+  }
+
+  .size-guide__toast > span {
+    background: rgb(var(--text-color, 20 36 30));
+    color: rgb(var(--background, 255 255 255));
+    padding: 0.7rem 1.25rem;
+    border-radius: 999px;
+    font-size: 1rem;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity .2s ease, transform .2s ease;
+  }
+
+  .size-guide__toast.is-visible > span {
+    opacity: 1;
+    transform: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .size-guide__row,
+    .size-guide__toast > span {
+      transition: none;
+    }
+  }
+</style>
+
+<size-guide class="size-guide" data-context="{{ context }}">
+  <div class="size-guide__rule">
+    <strong>Your chest measurement decides the size.</strong>
+    Basketball jerseys are cut long and loose: size down for a fitted look, stay true to size for the classic on-court look.
+  </div>
+
+  <h3 class="text-sm bold" style="margin: 0 0 0.5rem; font-size: 1rem;">My jersey size</h3>
+
+  <ul class="size-guide__list">
+    {%- for row in size_rows -%}
+      {%- assign parts = row | split: '|' -%}
+      {%- assign size = parts[0] -%}
+      {%- if hidden_sizes contains size -%}{%- continue -%}{%- endif -%}
+      <li>
+        <button type="button" class="size-guide__row" data-size-select="{{ size }}">
+          <span class="size-guide__combo">
+            Chest {{ parts[1] }}&nbsp;cm · Height {{ parts[3] }}&nbsp;cm
+            {%- if estimated_sizes contains size -%}
+              <span class="size-guide__estimated"> — estimated*</span>
+            {%- endif -%}
+          </span>
+          <span class="size-guide__size" aria-hidden="true">{{ size }}</span>
+          <span class="sr-only">Select size {{ size }}</span>
+        </button>
+      </li>
+    {%- endfor -%}
+  </ul>
+
+  <details>
+    <summary>My usual size</summary>
+    <div class="size-guide__details-body">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">You usually wear (US / EU)&dagger;</th>
+            <th scope="col">Jersey size</th>
+          </tr>
+        </thead>
+        <tbody>
+          {%- for row in size_rows -%}
+            {%- assign parts = row | split: '|' -%}
+            {%- assign size = parts[0] -%}
+            {%- if hidden_sizes contains size -%}{%- continue -%}{%- endif -%}
+            <tr>
+              <th scope="row" style="font-weight: 400;">{{ size }} / {{ parts[4] }}</th>
+              <td><strong>{{ size }}</strong>{% if estimated_sizes contains size %}<span class="size-guide__estimated">*</span>{% endif %}</td>
+            </tr>
+          {%- endfor -%}
+        </tbody>
+      </table>
+    </div>
+  </details>
+
+  <details>
+    <summary>How to measure</summary>
+    <div class="size-guide__details-body">
+      <div class="size-guide__steps">
+        <div class="size-guide__step">
+          <svg viewBox="0 0 56 72" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M14 8h8c2 5 10 5 12 0h8l5 14-6 3v41H15V25l-6-3z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+            <line x1="8" y1="38" x2="48" y2="38" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+          </svg>
+          <p style="margin: 0;">
+            <span class="size-guide__step-number">1.</span>
+            <strong>Chest:</strong> wrap a tape around the fullest part of your chest, under the arms, keeping it level. Note the measurement in cm.
+          </p>
+        </div>
+
+        <div class="size-guide__step">
+          <svg viewBox="0 0 56 72" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M14 8h8c2 5 10 5 12 0h8l5 14-6 3v41H15V25l-6-3z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+            <line x1="50" y1="8" x2="50" y2="66" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+          </svg>
+          <p style="margin: 0;">
+            <span class="size-guide__step-number">2.</span>
+            <strong>Body length:</strong> measure from the highest point of the shoulder straight down to where you want the hem to sit.
+          </p>
+        </div>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">Size</th>
+            <th scope="col">Chest (cm)</th>
+            <th scope="col">Length (cm)</th>
+            <th scope="col">Height (cm)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {%- for row in size_rows -%}
+            {%- assign parts = row | split: '|' -%}
+            {%- assign size = parts[0] -%}
+            {%- if hidden_sizes contains size -%}{%- continue -%}{%- endif -%}
+            <tr>
+              <th scope="row"><strong>{{ size }}</strong>{% if estimated_sizes contains size %}<span class="size-guide__estimated">*</span>{% endif %}</th>
+              <td>{{ parts[1] }}</td>
+              <td>{{ parts[2] }}</td>
+              <td>{{ parts[3] }}</td>
+            </tr>
+          {%- endfor -%}
+        </tbody>
+      </table>
+    </div>
+  </details>
+
+  <div class="size-guide__footnotes">
+    {%- assign has_estimated = false -%}
+    {%- for row in size_rows -%}
+      {%- assign parts = row | split: '|' -%}
+      {%- if hidden_sizes contains parts[0] -%}{%- continue -%}{%- endif -%}
+      {%- if estimated_sizes contains parts[0] -%}{%- assign has_estimated = true -%}{%- endif -%}
+    {%- endfor -%}
+    {%- if has_estimated -%}
+      <p>* Estimated measurements, pending confirmation.</p>
+    {%- endif -%}
+    <p>&dagger; EU equivalence is indicative only.</p>
+  </div>
+
+  <p class="size-guide__reassurance">
+    {{ reassurance_text | escape }}
+    {%- if shop.refund_policy != blank %}
+    <a href="{{ shop.refund_policy.url }}">See our returns policy</a>
+    {%- endif %}
+  </p>
+
+  <div class="size-guide__toast" role="status" aria-live="polite"><span></span></div>
+</size-guide>
+
+<script>
+  if (!window.customElements.get('size-guide')) {
+    window.customElements.define('size-guide', class extends HTMLElement {
+      connectedCallback() {
+        window.dataLayer = window.dataLayer || [];
+
+        this.addEventListener('click', (event) => {
+          const row = event.target.closest('[data-size-select]');
+          if (!row) {
+            return;
+          }
+          this._select(row);
+        });
+
+        // Analytics open event: listen to the trigger of the drawer that contains us.
+        const drawer = this.closest('x-drawer');
+        if (drawer && drawer.id && !drawer.hasAttribute('data-sg-tracked')) {
+          drawer.setAttribute('data-sg-tracked', '');
+          document.addEventListener('click', (event) => {
+            if (event.target.closest('[aria-controls="' + drawer.id + '"]:not([is="close-button"])')) {
+              window.dataLayer.push({ event: 'size_guide_open' });
+            }
+          });
+        }
+      }
+
+      _select(row) {
+        const size = row.getAttribute('data-size-select');
+
+        this.querySelectorAll('.size-guide__row').forEach((r) => r.classList.remove('is-selected'));
+        row.classList.add('is-selected');
+        window.dataLayer.push({ event: 'size_guide_select', size_guide_size: size });
+
+        if (this.getAttribute('data-context') !== 'modal') {
+          return;
+        }
+
+        const applied = this._applyToThemePicker(size) || this._applyToBundleWidget(size);
+        this._toast('Size ' + size + (applied ? ' selected' : ' — pick it in the size selector'));
+
+        setTimeout(() => {
+          this.closest('x-drawer')?.querySelector('button[is="close-button"]')?.click();
+        }, applied ? 350 : 1200);
+      }
+
+      /* Native theme mechanism: check the matching option and let the variant picker react to the change event. */
+      _applyToThemePicker(size) {
+        try {
+          const input = Array.from(document.querySelectorAll('input[data-option-position]'))
+            .find((i) => i.value.trim().toUpperCase() === size.toUpperCase());
+
+          if (input) {
+            input.checked = true;
+            input.dispatchEvent(new Event('change', { bubbles: true }));
+            return true;
+          }
+        } catch (error) {}
+
+        return false;
+      }
+
+      /* Best effort: pre-fill the first size menu of a bundle widget if one is present. Harmless if it changes. */
+      _applyToBundleWidget(size) {
+        try {
+          const selects = Array.from(document.querySelectorAll('select')).filter((select) => {
+            if (!select.closest('[class*="kaching" i], [id*="kaching" i], [data-kaching]')) {
+              return false;
+            }
+            return Array.from(select.options).some((option) => (option.text || option.value).trim().toUpperCase() === size.toUpperCase());
+          });
+
+          const target = selects[0];
+
+          if (target) {
+            const option = Array.from(target.options).find((o) => (o.text || o.value).trim().toUpperCase() === size.toUpperCase());
+            target.value = option.value;
+            target.dispatchEvent(new Event('input', { bubbles: true }));
+            target.dispatchEvent(new Event('change', { bubbles: true }));
+            return true;
+          }
+        } catch (error) {}
+
+        return false;
+      }
+
+      _toast(message) {
+        const toast = this.querySelector('.size-guide__toast');
+        toast.querySelector('span').textContent = message;
+        toast.classList.add('is-visible');
+        clearTimeout(this._toastTimer);
+        this._toastTimer = setTimeout(() => toast.classList.remove('is-visible'), 2500);
+      }
+    });
+  }
+</script>
