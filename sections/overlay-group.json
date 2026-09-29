@@ -136,9 +136,6 @@
         "guarantee",
         "payment_icons"
       ],
-      "custom_css": [
-        "p.ba-checkout-note {display: none;}"
-      ],
       "settings": {
         "show_cart_note": false,
         "show_shipping_text": false,
