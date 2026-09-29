@@ -157,84 +157,91 @@ LIQUID
 ------------------------------------------------------------------------------------------------------------------------
 {%- endcomment -%}
 
+{%- comment -%}
+  Tiles are built first: when none has content (see below) the whole section, heading included, is left out on the
+  store, so an unfilled community grid never shows a lone title.
+{%- endcomment -%}
+{%- capture media_grid_items -%}
+  {%- for block in section.blocks -%}
+    {%- liquid
+      comment
+        An image tile with nothing in it (no image, text, button or color) would show as an empty box: it only appears
+        in the theme editor, so it can still be selected and filled.
+      endcomment
+      if block.type == 'image' and request.design_mode == false
+        if block.settings.image == blank and block.settings.title == blank and block.settings.link_text == blank and block.settings.background == blank and block.settings.background_gradient == blank
+          continue
+        endif
+      endif
+    -%}
+
+    <a {% if block.settings.link_url != blank %}href="{{ block.settings.link_url }}"{% endif %} class="media-grid__item shadow group" reveal-js style="--media-grid-column-span: {{ block.settings.desktop_column_span }}; --media-grid-row-span: {{ block.settings.desktop_row_span }}" {{ block.shopify_attributes }}>
+      <div id="media-grid-{{ block.id }}" {% render 'surface', class: 'content-over-media rounded', background: block.settings.background, background_gradient: block.settings.background_gradient, text_color: block.settings.text_color %}>
+        {%- liquid
+          assign loading_strategy = nil
+
+          if section.index > 3 or forloop.index > 3
+            assign loading_strategy = 'lazy'
+          endif
+        -%}
+        
+        {%- case block.type -%}
+          {%- when 'image' -%}
+            {%- if block.settings.image -%}
+              {%- capture sizes -%}(max-width: 699px) {% if mobile_row %}{{ mobile_item_width }}px{% else %}100vw{% endif %}, min({{ sizes_px | times: block.settings.desktop_column_span }}px, {{ sizes_vw | times: block.settings.desktop_column_span | round: 2 }}vw){%- endcapture -%}
+              {{- block.settings.image | image_url: width: block.settings.image.width | image_tag: loading: loading_strategy, sizes: sizes, widths: '200,300,400,500,600,700,800,1000,1200,1400,1600,1800,2000,2200,2400', class: 'content-over-media__media zoom-image' -}}
+            {%- endif -%}
+
+          {%- when 'video' -%}
+            {%- if block.settings.video -%}
+              <video-media autoplay style="--aspect-ratio: auto">
+                {%- if block.settings.show_video_controls -%}
+                  {%- assign loop_video = false -%}
+                {%- else -%}
+                  {%- assign loop_video = true -%}
+                {%- endif -%}
+
+                {{- block.settings.video | video_tag: playsinline: true, muted: true, loop: loop_video, controls: block.settings.show_video_controls, preload: 'metadata', class: 'object-fill' -}}
+              </video-media>
+            {%- else -%}
+              <video-media host="{{ block.settings.external_video_url.type }}" autoplay style="--aspect-ratio: auto">
+                <template>
+                  {%- if block.settings.external_video_url.type == 'youtube' -%}
+                    <iframe src="https://www.youtube.com/embed/{{ block.settings.external_video_url.id }}?playsinline=1&autoplay=1&controls=0&mute=1&loop=1&playlist={{ block.settings.external_video_url.id }}&enablejsapi=1&rel=0&modestbranding=1&origin={{ 'https://' | append: request.host | url_encode }}" allow="autoplay; encrypted-media" allowfullscreen="allowfullscreen"></iframe>
+                  {%- elsif block.settings.external_video_url.type == 'vimeo' -%}
+                    <iframe src="https://player.vimeo.com/video/{{ block.settings.external_video_url.id }}?autoplay=1&autopause=1&background=1&loop=1&muted=1&transparent=0&responsive=1&portrait=0&title=0&byline=0&color={{ settings.text_color | remove_first: '#' }}" allow="autoplay; encrypted-media;" allowfullscreen="allowfullscreen"></iframe>
+                  {%- endif -%}
+                </template>
+              </video-media>
+            {%- endif -%}
+        {%- endcase -%}
+
+        {%- if block.settings.title != blank or block.settings.link_text != blank -%}
+          <div class="{{ block.settings.mobile_text_position }} {{ block.settings.desktop_text_position }}">
+            <div class="prose">
+              {%- if block.settings.title != blank -%}
+                <p class="{{ block.settings.heading_tag }}">
+                  {% render 'styled-text', content: block.settings.title, gradient: block.settings.text_gradient %}
+                </p>
+              {%- endif -%}
+
+              {%- if block.settings.link_text != blank -%}
+                {%- render 'button', size: 'lg', content: block.settings.link_text, background: block.settings.button_background, text_color: block.settings.button_text_color -%}
+              {%- endif -%}
+            </div>
+          </div>
+        {%- endif -%}
+      </div>
+    </a>
+  {%- endfor -%}
+{%- endcapture -%}
+
+{%- if media_grid_items != blank or request.design_mode -%}
 <div {% render 'section-properties', narrow: section.settings.reduce_width %}>
   <div class="section-stack">
     {%- render 'section-header', subheading: section.settings.subheading, heading: section.settings.title, content: section.settings.content, text_alignment: section.settings.text_alignment -%}
 
-  {%- capture media_grid_items -%}
-    {%- for block in section.blocks -%}
-      {%- liquid
-        comment
-          An image tile with nothing in it (no image, text, button or color) would show as an empty box: it only appears
-          in the theme editor, so it can still be selected and filled.
-        endcomment
-        if block.type == 'image' and request.design_mode == false
-          if block.settings.image == blank and block.settings.title == blank and block.settings.link_text == blank and block.settings.background == blank and block.settings.background_gradient == blank
-            continue
-          endif
-        endif
-      -%}
 
-      <a {% if block.settings.link_url != blank %}href="{{ block.settings.link_url }}"{% endif %} class="media-grid__item shadow group" reveal-js style="--media-grid-column-span: {{ block.settings.desktop_column_span }}; --media-grid-row-span: {{ block.settings.desktop_row_span }}" {{ block.shopify_attributes }}>
-        <div id="media-grid-{{ block.id }}" {% render 'surface', class: 'content-over-media rounded', background: block.settings.background, background_gradient: block.settings.background_gradient, text_color: block.settings.text_color %}>
-          {%- liquid
-            assign loading_strategy = nil
-  
-            if section.index > 3 or forloop.index > 3
-              assign loading_strategy = 'lazy'
-            endif
-          -%}
-          
-          {%- case block.type -%}
-            {%- when 'image' -%}
-              {%- if block.settings.image -%}
-                {%- capture sizes -%}(max-width: 699px) {% if mobile_row %}{{ mobile_item_width }}px{% else %}100vw{% endif %}, min({{ sizes_px | times: block.settings.desktop_column_span }}px, {{ sizes_vw | times: block.settings.desktop_column_span | round: 2 }}vw){%- endcapture -%}
-                {{- block.settings.image | image_url: width: block.settings.image.width | image_tag: loading: loading_strategy, sizes: sizes, widths: '200,300,400,500,600,700,800,1000,1200,1400,1600,1800,2000,2200,2400', class: 'content-over-media__media zoom-image' -}}
-              {%- endif -%}
-
-            {%- when 'video' -%}
-              {%- if block.settings.video -%}
-                <video-media autoplay style="--aspect-ratio: auto">
-                  {%- if block.settings.show_video_controls -%}
-                    {%- assign loop_video = false -%}
-                  {%- else -%}
-                    {%- assign loop_video = true -%}
-                  {%- endif -%}
-
-                  {{- block.settings.video | video_tag: playsinline: true, muted: true, loop: loop_video, controls: block.settings.show_video_controls, preload: 'metadata', class: 'object-fill' -}}
-                </video-media>
-              {%- else -%}
-                <video-media host="{{ block.settings.external_video_url.type }}" autoplay style="--aspect-ratio: auto">
-                  <template>
-                    {%- if block.settings.external_video_url.type == 'youtube' -%}
-                      <iframe src="https://www.youtube.com/embed/{{ block.settings.external_video_url.id }}?playsinline=1&autoplay=1&controls=0&mute=1&loop=1&playlist={{ block.settings.external_video_url.id }}&enablejsapi=1&rel=0&modestbranding=1&origin={{ 'https://' | append: request.host | url_encode }}" allow="autoplay; encrypted-media" allowfullscreen="allowfullscreen"></iframe>
-                    {%- elsif block.settings.external_video_url.type == 'vimeo' -%}
-                      <iframe src="https://player.vimeo.com/video/{{ block.settings.external_video_url.id }}?autoplay=1&autopause=1&background=1&loop=1&muted=1&transparent=0&responsive=1&portrait=0&title=0&byline=0&color={{ settings.text_color | remove_first: '#' }}" allow="autoplay; encrypted-media;" allowfullscreen="allowfullscreen"></iframe>
-                    {%- endif -%}
-                  </template>
-                </video-media>
-              {%- endif -%}
-          {%- endcase -%}
-
-          {%- if block.settings.title != blank or block.settings.link_text != blank -%}
-            <div class="{{ block.settings.mobile_text_position }} {{ block.settings.desktop_text_position }}">
-              <div class="prose">
-                {%- if block.settings.title != blank -%}
-                  <p class="{{ block.settings.heading_tag }}">
-                    {% render 'styled-text', content: block.settings.title, gradient: block.settings.text_gradient %}
-                  </p>
-                {%- endif -%}
-
-                {%- if block.settings.link_text != blank -%}
-                  {%- render 'button', size: 'lg', content: block.settings.link_text, background: block.settings.button_background, text_color: block.settings.button_text_color -%}
-                {%- endif -%}
-              </div>
-            </div>
-          {%- endif -%}
-        </div>
-      </a>
-    {%- endfor -%}
-  {%- endcapture -%}
 
   {%- if media_grid_items != blank -%}
     <media-grid class="media-grid">
@@ -243,6 +250,7 @@ LIQUID
   {%- endif -%}
   </div>
 </div>
+{%- endif -%}
 
 {% schema %}
 {

@@ -27,7 +27,22 @@ Deux rendus cohabitent, pilotés par les réglages de section :
   démarrait pas sur l'accueil (la rangée vidéo y précède les avis).
 {%- endcomment -%}
 
-{%- if section.blocks.size > 0 -%}
+{%- liquid
+  comment
+    Real reviews only: a review block without text is skipped on the store (it still shows in the theme editor so it
+    can be filled). With no review filled in, the section renders nothing.
+  endcomment
+  assign rc_count = 0
+  assign rc_rating_total = 0
+  for block in section.blocks
+    if block.settings.content != blank or request.design_mode
+      assign rc_count = rc_count | plus: 1
+      assign rc_rating_total = rc_rating_total | plus: block.settings.rating
+    endif
+  endfor
+-%}
+
+{%- if rc_count > 0 -%}
   {%- render 'section-spacing-collapsing' -%}
 
   {%- liquid
@@ -41,7 +56,7 @@ Deux rendus cohabitent, pilotés par les réglages de section :
       assign verified_color = section.settings.verified_color
     endif
 
-    assign stars_color = '#0DA558'
+    assign stars_color = '#111111'
     if section.settings.stars_color != blank and section.settings.stars_color.alpha != 0
       assign stars_color = section.settings.stars_color
     endif
@@ -69,7 +84,7 @@ Deux rendus cohabitent, pilotés par les réglages de section :
     assign autoplay_speed = section.settings.autoplay_speed | default: 40
 
     assign loop_enabled = false
-    if section.blocks.size >= 2
+    if rc_count >= 2
       assign loop_enabled = true
     endif
 
@@ -77,7 +92,7 @@ Deux rendus cohabitent, pilotés par les réglages de section :
     # (clone_sets + 0,5) jeux + une carte. Au moins 12 cartes clonees de chaque cote
     # (~4 000 px en 320 px) couvrent les ecrans courants sans attendre le script, qui
     # complete ensuite pour les fenetres encore plus larges.
-    assign clone_sets = 12.0 | divided_by: section.blocks.size | ceil | at_least: 1
+    assign clone_sets = 12.0 | divided_by: rc_count | ceil | at_least: 1
   -%}
 
   <style>
@@ -251,8 +266,8 @@ Deux rendus cohabitent, pilotés par les réglages de section :
     /* Hauteur égale : la carte (grid) étire son unique rangée, le corps remplit la carte. */
     #shopify-section-{{ section.id }} .testimonial {
       align-content: stretch;
-      border-radius: 12px;
-      border: 1px solid #F3F4F6;
+      border-radius: 4px;
+      border: 1px solid #E4E2DD;
       scroll-snap-align: start;
     }
 
@@ -369,13 +384,7 @@ Deux rendus cohabitent, pilotés par les réglages de section :
   </style>
 
   {%- liquid
-    assign total_rating = 0
-
-    for block in section.blocks
-      assign total_rating = total_rating | plus: block.settings.rating
-    endfor
-
-    assign average_rating = total_rating | times: 1.0 | divided_by: section.blocks.size | round: 1
+    assign average_rating = rc_rating_total | times: 1.0 | divided_by: rc_count | round: 1
     assign average_rating_stars = average_rating | round
   -%}
 
@@ -434,19 +443,23 @@ Deux rendus cohabitent, pilotés par les réglages de section :
             </div>
           </div>
 
-          <p class="text-subdued text-sm">{{ 'general.rating.info' | t: rating_value: average_rating, rating_max: 5 }} &middot; {{ section.blocks.size }} avis</p>
+          <p class="text-subdued text-sm">{{ 'general.rating.info' | t: rating_value: average_rating, rating_max: 5 }} &middot; {{ rc_count }} avis</p>
         {%- endif -%}
       </div>
 
       <div class="floating-controls-container">
         {%- assign scroll_area_id = 'scroll-area-' | append: section.id -%}
 
-        <reviews-marquee id="{{ scroll_area_id }}" {% if loop_enabled %}loop lead-sets="{{ clone_sets }}"{% endif %} {% if autoplay_enabled and loop_enabled %}autoplay autoplay-speed="{{ autoplay_speed }}"{% endif %} per-set="{{ section.blocks.size }}" class="testimonial-list scroll-area bleed is-scrollable">
+        <reviews-marquee id="{{ scroll_area_id }}" {% if loop_enabled %}loop lead-sets="{{ clone_sets }}"{% endif %} {% if autoplay_enabled and loop_enabled %}autoplay autoplay-speed="{{ autoplay_speed }}"{% endif %} per-set="{{ rc_count }}" class="testimonial-list scroll-area bleed is-scrollable">
           {%- capture real_cards -%}{%- endcapture -%}
           {%- capture clone_cards -%}{%- endcapture -%}
 
           {%- for block in section.blocks -%}
             {%- liquid
+              if block.settings.content == blank and request.design_mode == false
+                continue
+              endif
+
               assign loading_strategy = nil
 
               if section.index > 3 or forloop.index > 3

@@ -37,14 +37,30 @@ Supported variables
   endif
   assign psv_slots = '1,2,3' | split: ','
   assign psv_origin = 'https://' | append: request.host | url_encode
+
+  comment
+    Nothing to show (no video, link or poster in any slot): render nothing on the store, keep the grey tiles in the
+    theme editor so the block can be filled.
+  endcomment
+  assign psv_filled = 0
+  for psv_index in psv_slots
+    assign psv_video_key = 'video_' | append: psv_index
+    assign psv_url_key = 'video_url_' | append: psv_index
+    assign psv_poster_key = 'poster_' | append: psv_index
+    if block.settings[psv_video_key] != blank or block.settings[psv_url_key] != blank or block.settings[psv_poster_key] != blank
+      assign psv_filled = psv_filled | plus: 1
+    endif
+  endfor
 -%}
+
+{%- if psv_filled > 0 or request.design_mode -%}
 
 <style>
   .pdp-social-videos-{{ block.id }} {
     --psv-text: #121212;
-    --psv-muted-bg: #F5F5F5;
+    --psv-muted-bg: #F4F3F0;
     --psv-tag-bg: rgba(0, 0, 0, .6);
-    --psv-radius: 8px;
+    --psv-radius: 2px;
     --psv-gap: 8px;
     display: block;
     font-family: var(--text-font-family), -apple-system, "Segoe UI", sans-serif;
@@ -383,3 +399,4 @@ Supported variables
     });
   }
 </script>
+{%- endif -%}

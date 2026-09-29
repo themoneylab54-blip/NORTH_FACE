@@ -1,4 +1,25 @@
-{%- if section.blocks.size > 0 -%}
+{%- liquid
+  comment
+    Only cards with something to play or show are rendered on the store; empty cards stay visible in the theme editor
+    so they can be filled. With nothing filled in, the section renders nothing.
+  endcomment
+  assign vt_count = 0
+  for block in section.blocks
+    assign vt_shows = request.design_mode
+    if block.type == 'video'
+      if block.settings.video != blank or block.settings.video_url != blank or block.settings.poster_image != blank
+        assign vt_shows = true
+      endif
+    elsif block.settings.image != blank
+      assign vt_shows = true
+    endif
+    if vt_shows
+      assign vt_count = vt_count | plus: 1
+    endif
+  endfor
+-%}
+
+{%- if vt_count > 0 -%}
   {%- render 'section-spacing-collapsing' -%}
 
   {%- comment -%}
@@ -13,7 +34,7 @@
     assign card_gap = section.settings.card_gap | default: 'theme'
     assign fits_desktop = false
 
-    if desktop_layout == 'row' and section.blocks.size <= cards_per_row
+    if desktop_layout == 'row' and vt_count <= cards_per_row
       assign fits_desktop = true
     endif
 
@@ -355,11 +376,11 @@
           {%- assign tap_mode = 'pause' -%}
         {%- endunless -%}
         {%- assign loop_enabled = false -%}
-        {%- if section.blocks.size >= 2 -%}
+        {%- if vt_count >= 2 -%}
           {%- assign loop_enabled = true -%}
         {%- endif -%}
 
-        <loop-carousel id="{{ scroll_area_id }}" {% if loop_enabled %}loop{% endif %} per-set="{{ section.blocks.size }}" class="video-testimonials__list scroll-area bleed is-scrollable">
+        <loop-carousel id="{{ scroll_area_id }}" {% if loop_enabled %}loop{% endif %} per-set="{{ vt_count }}" class="video-testimonials__list scroll-area bleed is-scrollable">
           {%- capture real_cards -%}{%- endcapture -%}
           {%- capture clone_cards -%}{%- endcapture -%}
 
@@ -375,6 +396,14 @@
               if block.type == 'video'
                 if block.settings.video != blank or block.settings.video_url != blank
                   assign has_source = true
+                endif
+              endif
+
+              if request.design_mode == false
+                if block.type == 'video' and has_source == false and block.settings.poster_image == blank
+                  continue
+                elsif block.type != 'video' and block.settings.image == blank
+                  continue
                 endif
               endif
 
@@ -1117,8 +1146,7 @@
         {
           "type": "inline_richtext",
           "id": "testimonial",
-          "label": "Témoignage",
-          "default": "Je n'aurais jamais cru qu'un produit puisse changer autant ma routine !"
+          "label": "Témoignage"
         },
         {
           "type": "image_picker",
@@ -1128,14 +1156,12 @@
         {
           "type": "inline_richtext",
           "id": "attr_1",
-          "label": "Nom",
-          "default": "DeAnn"
+          "label": "Nom"
         },
         {
           "type": "inline_richtext",
           "id": "attr_2",
-          "label": "Détail",
-          "default": "64 ans"
+          "label": "Détail"
         }
       ]
     },
@@ -1176,8 +1202,7 @@
         {
           "type": "inline_richtext",
           "id": "testimonial",
-          "label": "Témoignage",
-          "default": "Je n'aurais jamais cru qu'un produit puisse changer autant ma routine !"
+          "label": "Témoignage"
         },
         {
           "type": "image_picker",
@@ -1187,14 +1212,12 @@
         {
           "type": "inline_richtext",
           "id": "attr_1",
-          "label": "Nom",
-          "default": "DeAnn"
+          "label": "Nom"
         },
         {
           "type": "inline_richtext",
           "id": "attr_2",
-          "label": "Détail",
-          "default": "64 ans"
+          "label": "Détail"
         }
       ]
     }

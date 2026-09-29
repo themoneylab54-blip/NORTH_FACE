@@ -140,12 +140,11 @@
           "settings": {
             "label": "Worn by our customers",
             "verified_text": "Verified",
-            "show_verified": true,
+            "show_verified": false,
             "video_url_1": "",
             "video_url_2": "",
             "video_url_3": ""
-          },
-          "disabled": true
+          }
         },
         "bundle": {
           "type": "pdp_bundle_builder",
@@ -544,7 +543,6 @@
         "v1": {
           "type": "video",
           "settings": {
-            "video_url": "",
             "rating": 5,
             "testimonial": "",
             "attr_1": "",
@@ -554,7 +552,6 @@
         "v2": {
           "type": "video",
           "settings": {
-            "video_url": "",
             "rating": 5,
             "testimonial": "",
             "attr_1": "",
@@ -564,7 +561,6 @@
         "v3": {
           "type": "video",
           "settings": {
-            "video_url": "",
             "rating": 5,
             "testimonial": "",
             "attr_1": "",
@@ -574,7 +570,6 @@
         "v4": {
           "type": "video",
           "settings": {
-            "video_url": "",
             "rating": 5,
             "testimonial": "",
             "attr_1": "",
@@ -592,16 +587,16 @@
       "settings": {
         "full_width": true,
         "badge": "",
-        "title": "Up close",
-        "content": "<p>Seams, baffles and finishes, filmed as they are.</p>",
+        "title": "SEE IT UP CLOSE",
+        "content": "<p>Filmed as it is: seams, baffles and finishes, nothing retouched.</p>",
         "text_alignment": "center",
         "heading_style": "theme",
-        "heading_uppercase": false,
+        "heading_uppercase": true,
         "subtitle_color": "",
         "card_ratio": "9 / 16",
         "desktop_layout": "carousel",
         "cards_per_row_desktop": 6,
-        "card_gap": "theme",
+        "card_gap": "8",
         "card_width_mobile": "62",
         "center_cards_mobile": true,
         "autoplay_muted": true,
@@ -620,13 +615,66 @@
         "caption_overlay_color": "#000000",
         "caption_overlay_opacity": 85,
         "card_radius": 2
-      },
-      "disabled": true
+      }
     },
     "reviews": {
       "type": "reviews-carousel",
-      "blocks": {},
-      "block_order": [],
+      "blocks": {
+        "r1": {
+          "type": "review",
+          "settings": {
+            "author": "",
+            "city": "",
+            "date": "",
+            "title": "",
+            "verified": false,
+            "rating": 5,
+            "content": ""
+          }
+        },
+        "r2": {
+          "type": "review",
+          "settings": {
+            "author": "",
+            "city": "",
+            "date": "",
+            "title": "",
+            "verified": false,
+            "rating": 5,
+            "content": ""
+          }
+        },
+        "r3": {
+          "type": "review",
+          "settings": {
+            "author": "",
+            "city": "",
+            "date": "",
+            "title": "",
+            "verified": false,
+            "rating": 5,
+            "content": ""
+          }
+        },
+        "r4": {
+          "type": "review",
+          "settings": {
+            "author": "",
+            "city": "",
+            "date": "",
+            "title": "",
+            "verified": false,
+            "rating": 5,
+            "content": ""
+          }
+        }
+      },
+      "block_order": [
+        "r1",
+        "r2",
+        "r3",
+        "r4"
+      ],
       "name": "Customer reviews",
       "settings": {
         "full_width": true,
@@ -654,7 +702,7 @@
         "heading_color": "",
         "heading_gradient": "",
         "review_card_background": "#f4f3f0",
-        "review_card_text_color": ""
+        "review_card_text_color": "#111111"
       }
     },
     "fans_heading": {
@@ -1049,19 +1097,18 @@
         "p15",
         "p16"
       ],
-      "disabled": true,
       "name": "Fan photos",
       "settings": {
         "full_width": true,
         "reduce_width": false,
         "subheading": "",
-        "title": "",
-        "content": "",
+        "title": "WORN BY OUR COMMUNITY",
+        "content": "<p>Tag us wearing yours to be featured.</p>",
         "text_alignment": "center",
         "columns_desktop": 8,
         "columns_mobile": 3,
         "mobile_layout": "grid",
-        "grid_gap": 3,
+        "grid_gap": 8,
         "frame": true,
         "frame_max_width": 1400,
         "desktop_row_height": 170,
@@ -1224,10 +1271,10 @@
   },
   "order": [
     "main",
-    "trust_bar",
     "reviews",
-    "complete_look",
+    "trust_bar",
     "closeups",
+    "complete_look",
     "fans_heading",
     "fans_grid",
     "faq"

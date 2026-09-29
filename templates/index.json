@@ -263,7 +263,6 @@
         "v1": {
           "type": "video",
           "settings": {
-            "video_url": "",
             "rating": 5,
             "testimonial": "",
             "attr_1": "",
@@ -273,7 +272,6 @@
         "v2": {
           "type": "video",
           "settings": {
-            "video_url": "",
             "rating": 5,
             "testimonial": "",
             "attr_1": "",
@@ -283,7 +281,6 @@
         "v3": {
           "type": "video",
           "settings": {
-            "video_url": "",
             "rating": 5,
             "testimonial": "",
             "attr_1": "",
@@ -293,7 +290,6 @@
         "v4": {
           "type": "video",
           "settings": {
-            "video_url": "",
             "rating": 5,
             "testimonial": "",
             "attr_1": "",
@@ -311,16 +307,16 @@
       "settings": {
         "full_width": true,
         "badge": "",
-        "title": "UP CLOSE",
-        "content": "<p>Baffles, seams and finishes, filmed as they are.</p>",
+        "title": "SEE IT UP CLOSE",
+        "content": "<p>Filmed as it is: seams, baffles and finishes, nothing retouched.</p>",
         "text_alignment": "center",
         "heading_style": "theme",
-        "heading_uppercase": false,
+        "heading_uppercase": true,
         "subtitle_color": "",
         "card_ratio": "9 / 16",
         "desktop_layout": "carousel",
         "cards_per_row_desktop": 6,
-        "card_gap": "theme",
+        "card_gap": "8",
         "card_width_mobile": "62",
         "center_cards_mobile": true,
         "autoplay_muted": true,
@@ -338,9 +334,8 @@
         "caption_text_color": "#ffffff",
         "caption_overlay_color": "#000000",
         "caption_overlay_opacity": 85,
-        "card_radius": 12
-      },
-      "disabled": true
+        "card_radius": 2
+      }
     },
     "exclusives": {
       "type": "featured-collection",
@@ -1021,13 +1016,13 @@
         "full_width": true,
         "reduce_width": false,
         "subheading": "",
-        "title": "",
-        "content": "",
+        "title": "WORN BY OUR COMMUNITY",
+        "content": "<p>Tag us wearing yours to be featured.</p>",
         "text_alignment": "center",
         "columns_desktop": 8,
         "columns_mobile": 3,
         "mobile_layout": "row",
-        "grid_gap": 3,
+        "grid_gap": 8,
         "frame": true,
         "frame_max_width": 1400,
         "desktop_row_height": 170,
@@ -1035,8 +1030,7 @@
         "mobile_item_width": 150,
         "background": "",
         "background_gradient": ""
-      },
-      "disabled": true
+      }
     },
     "reviews": {
       "type": "reviews-carousel",
@@ -1044,49 +1038,49 @@
         "r1": {
           "type": "review",
           "settings": {
-            "author": "Customer name",
+            "author": "",
             "city": "",
             "date": "",
-            "title": "Review title",
+            "title": "",
             "verified": false,
             "rating": 5,
-            "content": "<p>Paste a real customer review here.</p>"
+            "content": ""
           }
         },
         "r2": {
           "type": "review",
           "settings": {
-            "author": "Customer name",
+            "author": "",
             "city": "",
             "date": "",
-            "title": "Review title",
+            "title": "",
             "verified": false,
             "rating": 5,
-            "content": "<p>Paste a real customer review here.</p>"
+            "content": ""
           }
         },
         "r3": {
           "type": "review",
           "settings": {
-            "author": "Customer name",
+            "author": "",
             "city": "",
             "date": "",
-            "title": "Review title",
+            "title": "",
             "verified": false,
             "rating": 5,
-            "content": "<p>Paste a real customer review here.</p>"
+            "content": ""
           }
         },
         "r4": {
           "type": "review",
           "settings": {
-            "author": "Customer name",
+            "author": "",
             "city": "",
             "date": "",
-            "title": "Review title",
+            "title": "",
             "verified": false,
             "rating": 5,
-            "content": "<p>Paste a real customer review here.</p>"
+            "content": ""
           }
         }
       },
@@ -1100,13 +1094,13 @@
       "settings": {
         "full_width": true,
         "subheading": "",
-        "title": "",
+        "title": "What our customers say",
         "content": "",
         "link_url": "",
         "link_text": "",
         "rating_value": "",
         "reviews_count": "",
-        "reviews_count_label": "verified reviews",
+        "reviews_count_label": "reviews",
         "card_style": "compact",
         "compact_show_photo": false,
         "image_ratio": "1 / 1",
@@ -1115,17 +1109,16 @@
         "autoplay": true,
         "autoplay_speed": 40,
         "verified_text": "Verified purchase",
-        "verified_color": "#00b67a",
-        "stars_color": "#00b67a",
-        "background": "#f5f5f5",
+        "verified_color": "#1e6b45",
+        "stars_color": "#111111",
+        "background": "",
         "background_gradient": "",
         "text_color": "",
         "heading_color": "",
         "heading_gradient": "",
-        "review_card_background": "#ffffff",
-        "review_card_text_color": ""
-      },
-      "disabled": true
+        "review_card_background": "#f4f3f0",
+        "review_card_text_color": "#111111"
+      }
     },
     "faq": {
       "type": "faq",
