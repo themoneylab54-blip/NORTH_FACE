@@ -850,14 +850,12 @@ Deux rendus cohabitent, pilotés par les réglages de section :
     {
       "type": "text",
       "id": "rating_value",
-      "label": "Note affichée",
-      "default": "4.8"
+      "label": "Note affichée"
     },
     {
       "type": "text",
       "id": "reviews_count",
-      "label": "Nombre d'avis",
-      "default": "2,400"
+      "label": "Nombre d'avis"
     },
     {
       "type": "text",
@@ -1068,7 +1066,7 @@ Deux rendus cohabitent, pilotés par les réglages de section :
           "id": "verified",
           "label": "Avis vérifié",
           "info": "Décochez pour masquer la mention sur cet avis précis.",
-          "default": true
+          "default": false
         },
         {
           "type": "range",
@@ -1083,7 +1081,7 @@ Deux rendus cohabitent, pilotés par les réglages de section :
           "type": "richtext",
           "id": "content",
           "label": "Texte de l'avis",
-          "default": "<p>Partagez ici ce que vos clients pensent de vos produits, de votre service client ou de vos délais de livraison.</p>"
+          "default": "<p>Paste a real customer review here.</p>"
         }
       ]
     }
@@ -1095,52 +1093,7 @@ Deux rendus cohabitent, pilotés par les réglages de section :
         "card_style": "compact",
         "autoplay": true
       },
-      "blocks": [
-        {
-          "type": "review",
-          "settings": {
-            "author": "Jordan K.",
-            "city": "Manchester",
-            "date": "2 days ago",
-            "title": "Arrived faster than expected",
-            "rating": 5,
-            "content": "<p>Ordered on Monday, wearing it by Wednesday. The print is sharp and the fabric feels premium for the price.</p>"
-          }
-        },
-        {
-          "type": "review",
-          "settings": {
-            "author": "Priya S.",
-            "city": "Dublin",
-            "date": "1 week ago",
-            "title": "Sizing was spot on",
-            "rating": 5,
-            "content": "<p>Followed the size chart and it fits perfectly. Colours match the photos and the stitching is clean.</p>"
-          }
-        },
-        {
-          "type": "review",
-          "settings": {
-            "author": "Mateo R.",
-            "city": "Lisbon",
-            "date": "2 weeks ago",
-            "title": "Great value for the quality",
-            "rating": 4,
-            "content": "<p>Looks exactly like the listing and came well packed. Would have liked one more colour option, but very happy overall.</p>"
-          }
-        },
-        {
-          "type": "review",
-          "settings": {
-            "author": "Lena W.",
-            "city": "Berlin",
-            "date": "3 weeks ago",
-            "title": "Second order, still impressed",
-            "rating": 5,
-            "content": "<p>Bought one for my brother after loving mine. Customer service answered my question within the hour.</p>"
-          }
-        }
-      ]
+      "blocks": []
     }
   ]
 }

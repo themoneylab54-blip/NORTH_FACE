@@ -30,29 +30,19 @@ Supported variables
 
 {%- liquid
   assign gr_uid = 'pdp-gallery-reviews-' | append: block.id
-  assign gr_rating = block.settings.rating | default: '4.6'
+  assign gr_rating = block.settings.rating | strip
   assign gr_count = block.settings.count | default: 0
-  assign gr_count_str = gr_count | append: ''
   assign gr_bought_label = block.settings.bought_label | default: 'Bought:'
   assign gr_helpful_label = block.settings.helpful_label | default: 'Helpful'
   assign gr_tab_recommended = block.settings.tab_recommended_label | default: 'Recommended'
   assign gr_tab_recent = block.settings.tab_recent_label | default: 'Most recent'
-  assign gr_see_all = block.settings.see_all_text | default: 'See all [count] reviews' | replace: '[count]', gr_count_str
-
-  assign gr_rating_rounded = gr_rating | times: 1.0 | round
-  if gr_rating_rounded < 0
-    assign gr_rating_rounded = 0
-  endif
-  if gr_rating_rounded > 5
-    assign gr_rating_rounded = 5
-  endif
 
   assign gr_border = '#f0f0f0'
   assign gr_card_border = '#f3f4f6'
   assign gr_muted_bg = '#f5f5f5'
   assign gr_muted_text = '#737373'
   assign gr_text = '#121212'
-  assign gr_green = '#00b67a'
+  assign gr_green = '#111111'
   assign gr_star_empty = '#dcdce6'
 -%}
 
@@ -314,6 +304,108 @@ Supported variables
   }
 </style>
 
+{%- comment -%}
+  Real reviews only: the cards are built first. With no review filled in, nothing is rendered (a short note shows in the
+  theme editor). The score and count default to the reviews actually filled in; fill "rating" and "count" only to show
+  the figures from your reviews app.
+{%- endcomment -%}
+{%- assign gr_real_count = 0 -%}
+{%- assign gr_real_total = 0 -%}
+{%- capture gr_cards -%}
+  {%- for i in (1..10) -%}
+    {%- liquid
+      assign k_author = 'review_' | append: i | append: '_author'
+      assign k_city = 'review_' | append: i | append: '_city'
+      assign k_flag = 'review_' | append: i | append: '_flag'
+      assign k_date = 'review_' | append: i | append: '_date'
+      assign k_rating = 'review_' | append: i | append: '_rating'
+      assign k_size = 'review_' | append: i | append: '_size'
+      assign k_fit = 'review_' | append: i | append: '_fit'
+      assign k_body = 'review_' | append: i | append: '_body'
+      assign k_helpful = 'review_' | append: i | append: '_helpful'
+
+      assign r_author = block.settings[k_author]
+      assign r_city = block.settings[k_city]
+      assign r_flag = block.settings[k_flag]
+      assign r_date = block.settings[k_date]
+      assign r_rating = block.settings[k_rating] | default: 5
+      assign r_size = block.settings[k_size]
+      assign r_fit = block.settings[k_fit]
+      assign r_body = block.settings[k_body]
+      assign r_helpful = block.settings[k_helpful] | default: 0
+
+      if r_author == blank and r_body == blank
+        continue
+      endif
+
+      assign gr_real_count = gr_real_count | plus: 1
+      assign gr_real_total = gr_real_total | plus: r_rating
+
+      assign r_initial = r_author | strip | slice: 0, 1 | upcase
+    -%}
+    <li class="{{ gr_uid }}__card" data-index="{{ i }}" data-date="{{ r_date | escape }}" data-helpful="{{ r_helpful }}">
+      <div class="{{ gr_uid }}__who">
+        <span class="{{ gr_uid }}__avatar" aria-hidden="true">{{ r_initial }}</span>
+        <div class="{{ gr_uid }}__meta">
+          <span class="{{ gr_uid }}__name">{{ r_author | escape }}</span>
+          <span class="{{ gr_uid }}__place">
+            {%- if r_flag != blank -%}<span aria-hidden="true">{{ r_flag | escape }}</span>{%- endif -%}
+            {%- if r_city != blank -%}<span>{{ r_city | escape }}</span>{%- endif -%}
+            {%- if r_city != blank and r_date != blank -%}<span aria-hidden="true">·</span>{%- endif -%}
+            {%- if r_date != blank -%}<time>{{ r_date | escape }}</time>{%- endif -%}
+          </span>
+        </div>
+      </div>
+
+      <span class="{{ gr_uid }}__stars {{ gr_uid }}__stars--sm" role="img" aria-label="{{ r_rating }} out of 5 stars">
+        {%- for s in (1..5) -%}
+          <span class="{% if s > r_rating %}is-empty{% endif %}">{{ gr_star_svg }}</span>
+        {%- endfor -%}
+      </span>
+
+      {%- if r_size != blank or r_fit != blank -%}
+        <ul class="{{ gr_uid }}__chips">
+          {%- if r_size != blank -%}
+            <li class="{{ gr_uid }}__chip">{{ gr_bought_label | escape }} {{ r_size | escape }}</li>
+          {%- endif -%}
+          {%- if r_fit != blank -%}
+            <li class="{{ gr_uid }}__chip">{{ r_fit | escape }}</li>
+          {%- endif -%}
+        </ul>
+      {%- endif -%}
+
+      {%- if r_body != blank -%}
+        <div class="{{ gr_uid }}__body">{{ r_body }}</div>
+      {%- endif -%}
+
+      <span class="{{ gr_uid }}__helpful">{{ gr_helpful_label | escape }} ({{ r_helpful }})</span>
+    </li>
+  {%- endfor -%}
+{%- endcapture -%}
+{%- liquid
+  if gr_rating == blank and gr_real_count > 0
+    assign gr_rating = gr_real_total | times: 1.0 | divided_by: gr_real_count | round: 1
+  endif
+  if gr_count <= 0
+    assign gr_count = gr_real_count
+  endif
+  assign gr_count_str = gr_count | append: ''
+  assign gr_see_all = block.settings.see_all_text | default: 'See all [count] reviews' | replace: '[count]', gr_count_str
+
+  assign gr_rating_rounded = gr_rating | times: 1.0 | round
+  if gr_rating_rounded < 0
+    assign gr_rating_rounded = 0
+  endif
+  if gr_rating_rounded > 5
+    assign gr_rating_rounded = 5
+  endif
+-%}
+
+{%- if gr_real_count == 0 -%}
+  {%- if request.design_mode -%}
+    <p class="text-sm" style="opacity:.7" {{ block.shopify_attributes }}>Customer reviews: paste real reviews in this block and they will show here. Hidden on the store while empty.</p>
+  {%- endif -%}
+{%- else -%}
 <pdp-gallery-reviews class="{{ gr_uid }}" data-block-id="{{ block.id }}" {{ block.shopify_attributes }}>
   <p class="{{ gr_uid }}__header">
     <span class="{{ gr_uid }}__score">{{ gr_rating | escape }}</span>
@@ -332,75 +424,6 @@ Supported variables
     </div>
   {%- endif -%}
 
-  {%- capture gr_cards -%}
-    {%- for i in (1..10) -%}
-      {%- liquid
-        assign k_author = 'review_' | append: i | append: '_author'
-        assign k_city = 'review_' | append: i | append: '_city'
-        assign k_flag = 'review_' | append: i | append: '_flag'
-        assign k_date = 'review_' | append: i | append: '_date'
-        assign k_rating = 'review_' | append: i | append: '_rating'
-        assign k_size = 'review_' | append: i | append: '_size'
-        assign k_fit = 'review_' | append: i | append: '_fit'
-        assign k_body = 'review_' | append: i | append: '_body'
-        assign k_helpful = 'review_' | append: i | append: '_helpful'
-
-        assign r_author = block.settings[k_author]
-        assign r_city = block.settings[k_city]
-        assign r_flag = block.settings[k_flag]
-        assign r_date = block.settings[k_date]
-        assign r_rating = block.settings[k_rating] | default: 5
-        assign r_size = block.settings[k_size]
-        assign r_fit = block.settings[k_fit]
-        assign r_body = block.settings[k_body]
-        assign r_helpful = block.settings[k_helpful] | default: 0
-
-        if r_author == blank and r_body == blank
-          continue
-        endif
-
-        assign r_initial = r_author | strip | slice: 0, 1 | upcase
-      -%}
-      <li class="{{ gr_uid }}__card" data-index="{{ i }}" data-date="{{ r_date | escape }}" data-helpful="{{ r_helpful }}">
-        <div class="{{ gr_uid }}__who">
-          <span class="{{ gr_uid }}__avatar" aria-hidden="true">{{ r_initial }}</span>
-          <div class="{{ gr_uid }}__meta">
-            <span class="{{ gr_uid }}__name">{{ r_author | escape }}</span>
-            <span class="{{ gr_uid }}__place">
-              {%- if r_flag != blank -%}<span aria-hidden="true">{{ r_flag | escape }}</span>{%- endif -%}
-              {%- if r_city != blank -%}<span>{{ r_city | escape }}</span>{%- endif -%}
-              {%- if r_city != blank and r_date != blank -%}<span aria-hidden="true">·</span>{%- endif -%}
-              {%- if r_date != blank -%}<time>{{ r_date | escape }}</time>{%- endif -%}
-            </span>
-          </div>
-        </div>
-
-        <span class="{{ gr_uid }}__stars {{ gr_uid }}__stars--sm" role="img" aria-label="{{ r_rating }} out of 5 stars">
-          {%- for s in (1..5) -%}
-            <span class="{% if s > r_rating %}is-empty{% endif %}">{{ gr_star_svg }}</span>
-          {%- endfor -%}
-        </span>
-
-        {%- if r_size != blank or r_fit != blank -%}
-          <ul class="{{ gr_uid }}__chips">
-            {%- if r_size != blank -%}
-              <li class="{{ gr_uid }}__chip">{{ gr_bought_label | escape }} {{ r_size | escape }}</li>
-            {%- endif -%}
-            {%- if r_fit != blank -%}
-              <li class="{{ gr_uid }}__chip">{{ r_fit | escape }}</li>
-            {%- endif -%}
-          </ul>
-        {%- endif -%}
-
-        {%- if r_body != blank -%}
-          <div class="{{ gr_uid }}__body">{{ r_body }}</div>
-        {%- endif -%}
-
-        <span class="{{ gr_uid }}__helpful">{{ gr_helpful_label | escape }} ({{ r_helpful }})</span>
-      </li>
-    {%- endfor -%}
-  {%- endcapture -%}
-
   {%- if gr_cards contains '__card' -%}
     <div class="{{ gr_uid }}__tabs" role="tablist" aria-label="Sort reviews">
       <button type="button" class="{{ gr_uid }}__tab" role="tab" data-sort="recommended" aria-selected="true">{{ gr_tab_recommended | escape }}</button>
@@ -416,6 +439,7 @@ Supported variables
     <a class="{{ gr_uid }}__all" href="{{ block.settings.reviews_url }}">{{ gr_see_all | escape }}</a>
   {%- endif -%}
 </pdp-gallery-reviews>
+{%- endif -%}
 
 <script>
   if (!window.customElements.get('pdp-gallery-reviews')) {

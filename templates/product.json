@@ -239,21 +239,21 @@
           "settings": {
             "rating": "",
             "count": 0,
-            "banner_text": "All reviews are from verified purchases",
+            "banner_text": "",
             "reviews_url": "",
             "see_all_text": "See all [count] reviews",
             "tab_recommended_label": "Recommended",
             "tab_recent_label": "Most recent",
             "bought_label": "Bought:",
             "helpful_label": "Helpful",
-            "review_1_author": "Customer name",
+            "review_1_author": "",
             "review_1_city": "",
             "review_1_flag": "",
             "review_1_date": "",
             "review_1_rating": 5,
             "review_1_size": "",
             "review_1_fit": "",
-            "review_1_body": "<p>Paste a real customer review here, or connect a reviews app.</p>",
+            "review_1_body": "",
             "review_1_helpful": 0,
             "review_2_author": "",
             "review_2_city": "",
@@ -336,8 +336,7 @@
             "review_10_fit": "",
             "review_10_body": "",
             "review_10_helpful": 0
-          },
-          "disabled": true
+          }
         },
         "sticky": {
           "type": "pdp_sticky_bar",
@@ -430,6 +429,42 @@
             "content": "<p>Dispatched within 24 hours on working days, delivered in 3-6 days with tracking. Free shipping on every jacket. 30 days to return or exchange any unworn item.</p>",
             "page": ""
           }
+        },
+        "guarantee": {
+          "type": "offer",
+          "settings": {
+            "text_alignment": "start",
+            "icon_position": "aligned",
+            "icon": "picto-shield",
+            "icon_width": 24,
+            "title": "Our 30-day promise",
+            "content": "<p>Try it at home. If it's not right, exchange it or return it within 30 days for a full refund.</p>",
+            "background": "#f4f3f0",
+            "text_color": "#111111"
+          }
+        },
+        "help": {
+          "type": "offer",
+          "settings": {
+            "text_alignment": "start",
+            "icon_position": "aligned",
+            "icon": "picto-customer-support",
+            "icon_width": 24,
+            "title": "Need help choosing?",
+            "content": "<p>Questions about sizing or warmth? <a href=\"/pages/contact\">Write to our team</a>, we'll help you pick the right jacket.</p>",
+            "background": "#f4f3f0",
+            "text_color": "#111111"
+          }
+        },
+        "ct_payment": {
+          "type": "collapsible_text",
+          "settings": {
+            "icon": "picto-lock",
+            "icon_width": 20,
+            "title": "Secure payment",
+            "content": "<p>Payments go through Shopify's encrypted checkout (SSL). We never see or store your card details. Pay by card or with the express payment options shown at checkout.</p>",
+            "page": ""
+          }
         }
       },
       "block_order": [
@@ -447,14 +482,17 @@
         "buy_buttons",
         "payment",
         "delivery",
+        "trust",
+        "guarantee",
+        "help",
         "tiers",
         "social",
         "bundle",
-        "trust",
         "description",
         "ct_details",
         "ct_care",
         "ct_shipping",
+        "ct_payment",
         "reviews_left",
         "sticky"
       ],
@@ -587,73 +625,19 @@
     },
     "reviews": {
       "type": "reviews-carousel",
-      "blocks": {
-        "r1": {
-          "type": "review",
-          "settings": {
-            "author": "Customer name",
-            "city": "",
-            "date": "",
-            "title": "Review title",
-            "verified": false,
-            "rating": 5,
-            "content": "<p>Paste a real customer review here.</p>"
-          }
-        },
-        "r2": {
-          "type": "review",
-          "settings": {
-            "author": "Customer name",
-            "city": "",
-            "date": "",
-            "title": "Review title",
-            "verified": false,
-            "rating": 5,
-            "content": "<p>Paste a real customer review here.</p>"
-          }
-        },
-        "r3": {
-          "type": "review",
-          "settings": {
-            "author": "Customer name",
-            "city": "",
-            "date": "",
-            "title": "Review title",
-            "verified": false,
-            "rating": 5,
-            "content": "<p>Paste a real customer review here.</p>"
-          }
-        },
-        "r4": {
-          "type": "review",
-          "settings": {
-            "author": "Customer name",
-            "city": "",
-            "date": "",
-            "title": "Review title",
-            "verified": false,
-            "rating": 5,
-            "content": "<p>Paste a real customer review here.</p>"
-          }
-        }
-      },
-      "block_order": [
-        "r1",
-        "r2",
-        "r3",
-        "r4"
-      ],
+      "blocks": {},
+      "block_order": [],
       "name": "Customer reviews",
       "settings": {
         "full_width": true,
         "subheading": "",
-        "title": "",
+        "title": "What our customers say",
         "content": "",
         "link_url": "",
         "link_text": "",
         "rating_value": "",
         "reviews_count": "",
-        "reviews_count_label": "verified reviews",
+        "reviews_count_label": "reviews",
         "card_style": "compact",
         "compact_show_photo": false,
         "image_ratio": "1 / 1",
@@ -664,15 +648,14 @@
         "verified_text": "Verified purchase",
         "verified_color": "#1e6b45",
         "stars_color": "#111111",
-        "background": "#f4f3f0",
+        "background": "",
         "background_gradient": "",
         "text_color": "",
         "heading_color": "",
         "heading_gradient": "",
-        "review_card_background": "#ffffff",
+        "review_card_background": "#f4f3f0",
         "review_card_text_color": ""
-      },
-      "disabled": true
+      }
     },
     "fans_heading": {
       "type": "rich-text",
@@ -705,7 +688,8 @@
         "background": "",
         "background_gradient": "",
         "text_color": ""
-      }
+      },
+      "disabled": true
     },
     "fans_grid": {
       "type": "media-grid",
@@ -1146,13 +1130,13 @@
         "full_width": true,
         "layout": "centered_column",
         "column_max_width": 600,
-        "show_support": false,
+        "show_support": true,
         "subheading": "",
         "title": "FREQUENTLY ASKED QUESTIONS",
-        "content": "",
+        "content": "<p>Can't find your answer? Our team is here to help.</p>",
         "team_avatar_width": 160,
-        "support_hours": "Monday to Saturday, 9am-6pm",
-        "answer_time": "We reply within 2 hours",
+        "support_hours": "",
+        "answer_time": "",
         "button_text": "Contact us",
         "button_url": "/pages/contact",
         "text_position": "center",
@@ -1166,13 +1150,84 @@
         "accordion_background": "",
         "accordion_text_color": ""
       }
+    },
+    "trust_bar": {
+      "type": "text-with-icons",
+      "name": "Trust bar",
+      "blocks": {
+        "t1": {
+          "type": "item",
+          "settings": {
+            "icon": "picto-truck",
+            "mobile_icon_width": 24,
+            "icon_width": 32,
+            "icon_background_type": "none",
+            "icon_color": "#111111",
+            "title": "Free shipping",
+            "content": "<p>On every jacket, tracked from our warehouse to your door.</p>"
+          }
+        },
+        "t2": {
+          "type": "item",
+          "settings": {
+            "icon": "picto-return",
+            "mobile_icon_width": 24,
+            "icon_width": 32,
+            "icon_background_type": "none",
+            "icon_color": "#111111",
+            "title": "30-day returns",
+            "content": "<p>Not the right fit? Exchange or return it within 30 days.</p>"
+          }
+        },
+        "t3": {
+          "type": "item",
+          "settings": {
+            "icon": "picto-lock",
+            "mobile_icon_width": 24,
+            "icon_width": 32,
+            "icon_background_type": "none",
+            "icon_color": "#111111",
+            "title": "Secure payment",
+            "content": "<p>Encrypted checkout powered by Shopify.</p>"
+          }
+        },
+        "t4": {
+          "type": "item",
+          "settings": {
+            "icon": "picto-customer-support",
+            "mobile_icon_width": 24,
+            "icon_width": 32,
+            "icon_background_type": "none",
+            "icon_color": "#111111",
+            "title": "Real support",
+            "content": "<p>Questions about sizing or an order? Our team replies personally.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "t1",
+        "t2",
+        "t3",
+        "t4"
+      ],
+      "settings": {
+        "full_width": true,
+        "stack_on_mobile": false,
+        "title": "",
+        "heading_tag": "h5",
+        "text_alignment": "center",
+        "icon_spacing": "medium",
+        "background": "#f4f3f0",
+        "text_color": "#111111"
+      }
     }
   },
   "order": [
     "main",
+    "trust_bar",
+    "reviews",
     "complete_look",
     "closeups",
-    "reviews",
     "fans_heading",
     "fans_grid",
     "faq"
