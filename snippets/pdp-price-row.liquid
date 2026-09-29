@@ -33,7 +33,7 @@ Accepted variables:
     assign pr_show_badge = false
   endif
 
-  assign pr_badge_bg = block.settings.badge_background | default: '#f04242'
+  assign pr_badge_bg = block.settings.badge_background | default: '#c8102e'
   assign pr_badge_color = block.settings.badge_text_color | default: '#ffffff'
 -%}
 
@@ -44,23 +44,23 @@ Accepted variables:
       flex-wrap: wrap;
       align-items: baseline;
       gap: 8px;
-      font-family: Inter, -apple-system, "Segoe UI", sans-serif;
+      font-family: var(--text-font-family), -apple-system, "Segoe UI", sans-serif;
       color: #121212;
       line-height: 1.2;
     }
 
     .pdp-price-row-{{ block.id }} .pdp-price-row__compare {
-      font-size: 14px;
+      font-size: 15px;
       font-weight: 500;
-      color: rgba(115, 115, 115, .5);
+      color: #8A8A8A;
       text-decoration: line-through;
       text-decoration-thickness: 1px;
     }
 
     .pdp-price-row-{{ block.id }} .pdp-price-row__price {
-      font-size: 23px;
+      font-size: 24px;
       font-weight: 700;
-      letter-spacing: -0.2px;
+      letter-spacing: 0;
       color: #121212;
     }
 
@@ -68,14 +68,14 @@ Accepted variables:
       display: inline-flex;
       align-items: center;
       align-self: center;
-      padding: 2px 6px;
-      border-radius: 3px;
+      padding: 3px 7px;
+      border-radius: 2px;
       background: {{ pr_badge_bg }};
       color: {{ pr_badge_color }};
-      font-size: 10.5px;
+      font-size: 12px;
       font-weight: 700;
       line-height: 1.3;
-      letter-spacing: 0;
+      letter-spacing: .04em;
       white-space: nowrap;
     }
   </style>

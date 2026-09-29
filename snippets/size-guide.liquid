@@ -1,6 +1,6 @@
 {%- comment -%}
 ----------------------------------------------------------------------------------------------------------------------
-SIZE GUIDE — basketball jerseys
+SIZE GUIDE — puffer jackets
 ----------------------------------------------------------------------------------------------------------------------
 
 Single source of truth for the size guide. Rendered by:
@@ -21,7 +21,7 @@ Without JavaScript every measurement stays readable: automatic selection is a bo
     Row format: size|chest cm|body length cm|height cm|EU equivalent
     Rows are separated by ";".
 
-    // TO VALIDATE: this chart is a generic replica-jersey chart. Replace
+    // TO VALIDATE: this chart is a generic regular-fit puffer jacket chart. Replace
     // every value with your supplier's measurements before going live.
 
     To hide a size without breaking the layout, add it to hidden_sizes
@@ -30,12 +30,12 @@ Without JavaScript every measurement stays readable: automatic selection is a bo
     ------------------------------------------------------------------
   endcomment
 
-  assign size_rows = 'S|96–101|74|165–172|46;M|101–106|76|172–178|48–50;L|106–111|79|178–183|52;XL|111–116|81|183–188|54–56;2XL|116–121|84|188–193|58;3XL|121–127|86|193–198|60' | split: ';'
+  assign size_rows = 'S|92–97|70|165–172|46;M|97–102|72|172–178|48;L|102–107|74|178–183|50–52;XL|107–112|76|183–188|54;2XL|112–118|78|188–193|56;3XL|118–124|80|193–198|58' | split: ';'
   assign hidden_sizes = '' | split: ','
   assign estimated_sizes = '' | split: ','
 
   assign context = context | default: 'page'
-  assign reassurance_text = reassurance_text | default: 'Between two sizes? Size down for a fitted look, up for the classic oversized look.'
+  assign reassurance_text = reassurance_text | default: 'Between two sizes? Take the larger one if you layer underneath.'
 -%}
 
 <style>
@@ -47,7 +47,7 @@ Without JavaScript every measurement stays readable: automatic selection is a bo
     --sg-muted: rgb(var(--text-color, 20 36 30) / .65);
     background: rgb(var(--background, 255 255 255));
     color: rgb(var(--text-color, 20 36 30));
-    border-radius: 12px;
+    border-radius: 4px;
     padding: 1.25rem;
     font-size: 1rem;
     line-height: 1.5;
@@ -55,7 +55,7 @@ Without JavaScript every measurement stays readable: automatic selection is a bo
 
   .size-guide__rule {
     background: var(--sg-soft);
-    border-radius: 10px;
+    border-radius: 2px;
     padding: 0.85rem 1rem;
     margin-block-end: 1rem;
     font-size: 1rem;
@@ -79,7 +79,7 @@ Without JavaScript every measurement stays readable: automatic selection is a bo
     padding: 0.75rem 1rem;
     background: rgb(var(--background, 255 255 255));
     border: 1px solid var(--sg-border);
-    border-radius: 10px;
+    border-radius: 2px;
     font-size: 1rem;
     text-align: left;
     color: inherit;
@@ -111,7 +111,7 @@ Without JavaScript every measurement stays readable: automatic selection is a bo
     flex-shrink: 0;
     min-width: 3.2rem;
     padding: 0.35rem 0.75rem;
-    border-radius: 999px;
+    border-radius: 2px;
     background: var(--sg-accent);
     color: var(--sg-accent-text);
     font-weight: 700;
@@ -127,7 +127,7 @@ Without JavaScript every measurement stays readable: automatic selection is a bo
   .size-guide details {
     margin-block-start: 1rem;
     border: 1px solid var(--sg-border);
-    border-radius: 10px;
+    border-radius: 2px;
     background: rgb(var(--background, 255 255 255));
   }
 
@@ -163,7 +163,7 @@ Without JavaScript every measurement stays readable: automatic selection is a bo
   .size-guide summary:focus-visible {
     outline: 2px solid var(--sg-accent);
     outline-offset: -2px;
-    border-radius: 10px;
+    border-radius: 2px;
   }
 
   .size-guide__details-body {
@@ -230,7 +230,7 @@ Without JavaScript every measurement stays readable: automatic selection is a bo
   .size-guide__reassurance {
     margin-block-start: 1rem;
     padding: 0.85rem 1rem;
-    border-radius: 10px;
+    border-radius: 2px;
     background: var(--sg-soft);
     font-size: 1rem;
     text-align: center;
@@ -256,7 +256,7 @@ Without JavaScript every measurement stays readable: automatic selection is a bo
     background: rgb(var(--text-color, 20 36 30));
     color: rgb(var(--background, 255 255 255));
     padding: 0.7rem 1.25rem;
-    border-radius: 999px;
+    border-radius: 2px;
     font-size: 1rem;
     opacity: 0;
     transform: translateY(8px);
@@ -279,10 +279,10 @@ Without JavaScript every measurement stays readable: automatic selection is a bo
 <size-guide class="size-guide" data-context="{{ context }}">
   <div class="size-guide__rule">
     <strong>Your chest measurement decides the size.</strong>
-    Basketball jerseys are cut long and loose: size down for a fitted look, stay true to size for the classic on-court look.
+    Our jackets have a regular fit with room for a mid-layer: stay true to size, or size up if you wear thick layers underneath.
   </div>
 
-  <h3 class="text-sm bold" style="margin: 0 0 0.5rem; font-size: 1rem;">My jersey size</h3>
+  <h3 class="text-sm bold" style="margin: 0 0 0.5rem; font-size: 1rem;">My jacket size</h3>
 
   <ul class="size-guide__list">
     {%- for row in size_rows -%}
@@ -311,7 +311,7 @@ Without JavaScript every measurement stays readable: automatic selection is a bo
         <thead>
           <tr>
             <th scope="col">You usually wear (US / EU)&dagger;</th>
-            <th scope="col">Jersey size</th>
+            <th scope="col">Jacket size</th>
           </tr>
         </thead>
         <tbody>
@@ -351,7 +351,7 @@ Without JavaScript every measurement stays readable: automatic selection is a bo
           </svg>
           <p style="margin: 0;">
             <span class="size-guide__step-number">2.</span>
-            <strong>Body length:</strong> measure from the highest point of the shoulder straight down to where you want the hem to sit.
+            <strong>Body length:</strong> measure from the highest point of the shoulder straight down to the bottom of the jacket's back.
           </p>
         </div>
       </div>

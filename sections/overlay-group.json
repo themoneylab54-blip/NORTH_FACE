@@ -19,9 +19,9 @@
         "show_only_on_index": false,
         "show_only_for_visitors": true,
         "show_only_once": true,
-        "title": "10% off your first jersey",
+        "title": "10% off your first jacket",
         "button_text": "Send my code",
-        "subtext": "Restock alerts and new drops. One email a week, unsubscribe any time."
+        "subtext": "New drops and subscriber-only offers. One email a week, unsubscribe any time."
       }
     },
     "privacy-banner": {
@@ -47,24 +47,26 @@
             "border_color": "",
             "radius": 12,
             "full_width": true
-          }
+          },
+          "disabled": true
         },
         "offer_gauge": {
           "type": "offer_gauge",
           "settings": {
-            "collection": "all-jerseys",
-            "buy_quantity": 3,
+            "collection": "",
+            "buy_quantity": 2,
             "free_quantity": "1",
-            "text_progress": "Add [count] more jerseys to get [free] FREE",
-            "text_last": "Just 1 more jersey to get [free] FREE!",
-            "text_unlocked": "You've unlocked [free] FREE jersey!",
+            "text_progress": "Add [count] more jacket to get [free] FREE",
+            "text_last": "Just 1 more jacket to get [free] FREE!",
+            "text_unlocked": "You've unlocked [free] FREE jacket!",
             "free_label": "Free",
             "fill_color": "",
-            "accent_color": "#ffd014",
+            "accent_color": "#c8102e",
             "show_shipping": true,
             "shipping_text": "Free shipping unlocked",
             "shipping_icon": "picto-truck"
-          }
+          },
+          "disabled": true
         },
         "progress_goals": {
           "type": "progress_goals",
@@ -91,15 +93,16 @@
             "position": "header",
             "style": "stars",
             "rating": 5,
-            "stars_color": "#0da558",
+            "stars_color": "#111111",
             "layout": "stacked",
             "icon": "rating-star",
-            "text": "Rated 4.8/5 by 2,400+ fans",
+            "text": "Add your real rating here",
             "background": "",
             "text_color": "",
             "border_color": "",
             "radius": 12
-          }
+          },
+          "disabled": true
         },
         "guarantee": {
           "type": "guarantee",
@@ -107,11 +110,11 @@
             "style": "compact",
             "icon": "picto-return",
             "title": "30-day free returns",
-            "text": "Wrong size? Swap it free, no questions asked.",
+            "text": "Wrong size? Exchange it for free.",
             "alignment": "left",
             "background": "",
             "text_color": "",
-            "icon_color": "#12866a",
+            "icon_color": "#111111",
             "border_color": "",
             "radius": 12
           }
@@ -121,7 +124,7 @@
           "settings": {
             "title": "100% secure payment",
             "icons_source": "custom",
-            "icons_list": "visa, master, american_express, discover, paypal, apple_pay, google_pay, shopify_pay, venmo, klarna, afterpay"
+            "icons_list": "visa, master, american_express, paypal, apple_pay, google_pay, shopify_pay, klarna"
           }
         }
       },
@@ -143,9 +146,9 @@
         "show_checkout_button": true,
         "show_savings": true,
         "savings_include_compare_at": true,
-        "recommendations_title": "Complete the fit",
+        "recommendations_title": "Complete your look",
         "products": [],
-        "product_card_background": "#f2f2f2",
+        "product_card_background": "#f4f3f0",
         "product_card_text_color": ""
       }
     },

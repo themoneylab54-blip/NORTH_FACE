@@ -2,16 +2,17 @@
   "sections": {
     "main": {
       "type": "main-product",
-      "name": "Product (simple)",
+      "name": "Product (premium)",
       "blocks": {
         "rating_line": {
           "type": "rating_line",
           "settings": {
             "rating": 5,
-            "stars_color": "#0DA558",
-            "text": "4.8/5 · 2,400+ jerseys shipped",
+            "stars_color": "#111111",
+            "text": "Add your real rating here",
             "link": ""
-          }
+          },
+          "disabled": true
         },
         "title": {
           "type": "title",
@@ -28,21 +29,22 @@
         "stock_alert": {
           "type": "stock_alert",
           "settings": {
-            "text": "Almost gone — fewer than 12 left in this size",
-            "color": "#C62828"
-          }
+            "text": "Black Friday prices — only while stock lasts",
+            "color": "#c8102e"
+          },
+          "disabled": true
         },
         "ib1": {
           "type": "icon_benefit",
           "settings": {
-            "icon": "picto-award-gift",
+            "icon": "picto-box",
             "icon_size": 24,
             "icon_gap": 10,
             "text_size": "text-sm",
             "vertical_alignment": "center",
             "icon_background": "",
-            "icon_color": "#12866A",
-            "text": "<p>Free name &amp; number lettering included</p>"
+            "icon_color": "#111111",
+            "text": "<p>Free shipping on every jacket</p>"
           }
         },
         "ib2": {
@@ -54,8 +56,8 @@
             "text_size": "text-sm",
             "vertical_alignment": "center",
             "icon_background": "",
-            "icon_color": "#12866A",
-            "text": "<p>Ships in 24h · free over $79</p>"
+            "icon_color": "#111111",
+            "text": "<p>Ships in 24h · delivered in 3-6 days</p>"
           }
         },
         "ib3": {
@@ -67,8 +69,8 @@
             "text_size": "text-sm",
             "vertical_alignment": "center",
             "icon_background": "",
-            "icon_color": "#12866A",
-            "text": "<p>30-day free returns and size swaps</p>"
+            "icon_color": "#111111",
+            "text": "<p>30-day free returns and size exchanges</p>"
           }
         },
         "variant_picker": {
@@ -87,7 +89,7 @@
           "settings": {
             "text": "Size guide",
             "use_integrated_guide": true,
-            "reassurance_text": "Between two sizes? Size down for fitted, up for oversized.",
+            "reassurance_text": "Between two sizes? Take the larger one if you layer underneath.",
             "page": "",
             "image": "",
             "style": "outline",
@@ -95,7 +97,7 @@
             "size": "sm",
             "border_color": "",
             "border_width": 1,
-            "border_radius": 8,
+            "border_radius": 2,
             "background": "",
             "text_color": ""
           }
@@ -103,7 +105,7 @@
         "inventory": {
           "type": "inventory",
           "settings": {
-            "low_inventory_threshold": 12
+            "low_inventory_threshold": 10
           }
         },
         "buy_buttons": {
@@ -111,7 +113,7 @@
           "settings": {
             "show_payment_button": true,
             "show_gift_card_recipient": false,
-            "atc_button_background": "#14241E",
+            "atc_button_background": "#111111",
             "atc_button_text_color": "#FFFFFF",
             "payment_button_background": "",
             "payment_button_text_color": ""
@@ -140,7 +142,7 @@
             "icon": "picto-question",
             "icon_width": 20,
             "title": "Fit & sizing",
-            "content": "<p>Oversized basketball cut with standard US sizing. Size down for a fitted look; stay true to size for the classic on-court look.</p>",
+            "content": "<p>Regular fit with room for a mid-layer underneath. If you are between two sizes, take the larger one for layering or the smaller one for a closer fit.</p>",
             "page": ""
           }
         },
@@ -150,7 +152,7 @@
             "icon": "picto-plane",
             "icon_width": 20,
             "title": "Shipping & returns",
-            "content": "<p>Dispatched within 24 hours on working days, delivered in 3-6 days with tracking. Free shipping over $79. 30 days to return or exchange any unworn jersey — size swaps are free.</p>",
+            "content": "<p>Dispatched within 24 hours on working days, delivered in 3-6 days with tracking. Free shipping on every jacket. 30 days to return or exchange any unworn item.</p>",
             "page": ""
           }
         },
@@ -161,24 +163,85 @@
             "show_image": true,
             "mobile_only": true,
             "background": "#FFFFFF",
-            "text_color": "#14241E",
-            "button_background": "#14241E",
+            "text_color": "#111111",
+            "button_background": "#111111",
             "button_text_color": "#FFFFFF"
+          }
+        },
+        "rating": {
+          "type": "rating",
+          "settings": {
+            "show_empty": false
+          }
+        },
+        "countdown_bf": {
+          "type": "pdp_countdown",
+          "settings": {
+            "mode": "fixed",
+            "timezone": "",
+            "start_date": "2026-11-20",
+            "end_date": "2026-11-30",
+            "end_time": "23:59",
+            "window_start": "23:30",
+            "window_end": "01:00",
+            "badge": "Black Friday",
+            "title": "Up to 50% off — ends in",
+            "text": "Discount already applied to the price shown.",
+            "show_days": true,
+            "label_days": "Days",
+            "label_hours": "Hrs",
+            "label_minutes": "Min",
+            "label_seconds": "Sec",
+            "discount_code": "",
+            "code_price_label": "Your price: ",
+            "background": "#111111",
+            "text_color": "#ffffff",
+            "accent_color": "#c8102e"
+          }
+        },
+        "countdown_midnight": {
+          "type": "pdp_countdown",
+          "disabled": true,
+          "settings": {
+            "mode": "window",
+            "timezone": "",
+            "start_date": "",
+            "end_date": "2026-11-30",
+            "end_time": "23:59",
+            "window_start": "23:30",
+            "window_end": "01:00",
+            "badge": "Midnight sale",
+            "title": "Extra 15% off tonight only — ends in",
+            "text": "Code [code] applied automatically at checkout.",
+            "show_days": false,
+            "label_days": "Days",
+            "label_hours": "Hrs",
+            "label_minutes": "Min",
+            "label_seconds": "Sec",
+            "discount_code": "MIDNIGHT15",
+            "code_percent": 15,
+            "code_price_label": "Your price tonight: ",
+            "background": "#0b0b0b",
+            "text_color": "#ffffff",
+            "accent_color": "#c8102e"
           }
         }
       },
       "block_order": [
         "rating_line",
         "title",
+        "rating",
         "price",
+        "countdown_bf",
+        "countdown_midnight",
         "stock_alert",
-        "ib1",
-        "ib2",
-        "ib3",
         "variant_picker",
         "size_guide",
         "inventory",
         "buy_buttons",
+        "ib1",
+        "ib2",
+        "ib3",
         "delivery",
         "description",
         "ct1",
@@ -213,8 +276,8 @@
         "show_progress_bar": false,
         "products_per_row_mobile": "2",
         "products_per_row_desktop": 4,
-        "subheading": "Complete the fit",
-        "title": "Fans who bought this also took",
+        "subheading": "Complete your winter look",
+        "title": "You may also like",
         "content": "",
         "background": "",
         "background_gradient": "",

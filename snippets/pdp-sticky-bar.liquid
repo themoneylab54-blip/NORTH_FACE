@@ -98,7 +98,7 @@ Supported variables
     background: #FFFFFF;
     color: #121212;
     border-top: 1px solid rgba(240, 240, 240, .7);
-    font-family: Inter, var(--text-font-family), -apple-system, "Segoe UI", sans-serif;
+    font-family: var(--text-font-family), -apple-system, "Segoe UI", sans-serif;
     -webkit-font-smoothing: antialiased;
     transform: translateY(110%);
     transition: transform .25s ease;
@@ -122,7 +122,7 @@ Supported variables
     width: 44px;
     height: 44px;
     object-fit: cover;
-    border-radius: 6px;
+    border-radius: 2px;
     background: #F5F5F5;
   }
 
@@ -184,8 +184,8 @@ Supported variables
     min-width: 96px;
     margin: 0;
     padding: 0 34px 0 12px;
-    border: 1px solid #F0F0F0;
-    border-radius: 6px;
+    border: 1px solid #D9D9D6;
+    border-radius: 2px;
     background-color: #FFFFFF;
     background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16' fill='none'%3E%3Cpath d='M4 6l4 4 4-4' stroke='%23121212' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
@@ -215,9 +215,11 @@ Supported variables
     margin: 0;
     padding: 0 22px;
     border: 0;
-    border-radius: 9999px;
-    background: #FFD014;
-    color: #000000;
+    border-radius: 2px;
+    background: #111111;
+    color: #FFFFFF;
+    text-transform: uppercase;
+    letter-spacing: .06em;
     font-family: inherit;
     font-size: 14px;
     line-height: 1;
@@ -229,7 +231,7 @@ Supported variables
 
   @media (hover: hover) {
     .{{ psb_class }} .pdp-sticky-bar__button:hover:not(:disabled) {
-      background: #F5C700;
+      background: #333333;
     }
   }
 

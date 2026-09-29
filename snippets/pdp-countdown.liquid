@@ -1,0 +1,443 @@
+{%- comment -%}
+----------------------------------------------------------------------------------------------------------------------
+PDP COUNTDOWN (block type "pdp_countdown")
+----------------------------------------------------------------------------------------------------------------------
+
+A promo banner for the buy box with a real deadline. Two modes:
+
+* "fixed": counts down to a fixed end date/time (e.g. the last minute of Black Friday). Optionally only shown from a
+  start date. Hidden before the start and after the end.
+* "window": shown every day during a time window (e.g. a midnight sale from 23:30 to 01:00) and counts down to the end
+  of that window. Hidden outside the window. Every visitor sees the same banner on the same page.
+
+Times are read in the store's timezone (UTC offset rendered by Liquid), or in the IANA timezone set on the block
+(e.g. "Europe/Paris", "America/New_York"), which also follows daylight saving time. In "window" mode an empty block
+timezone falls back to the A/B test timezone (Theme settings), so the banner and the A/B switch share the same clock.
+
+When a discount code is set, it is applied automatically (through Shopify's /discount/CODE link) while the banner is
+visible, so the price promised on the page is the price charged at checkout. The code must exist in
+Shopify admin > Discounts.
+
+The block is rendered hidden and revealed by JS once the deadline is known, so it never flashes outside its window.
+In the theme editor it is always shown so it can be styled.
+
+Accepted variables:
+* block: the section block
+* product: the product
+* section: the current section
+{%- endcomment -%}
+
+{%- liquid
+  assign pc_variant = product.selected_or_first_available_variant
+  assign pc_shop_offset = 'now' | date: '%z'
+  assign pc_class = 'pdp-countdown-' | append: block.id
+
+  assign pc_bg = block.settings.background | default: '#111111'
+  assign pc_text = block.settings.text_color | default: '#ffffff'
+  assign pc_accent = block.settings.accent_color | default: '#c8102e'
+
+  assign pc_timezone = block.settings.timezone | strip
+  if pc_timezone == blank and block.settings.mode == 'window'
+    assign pc_timezone = settings.ab_timezone | strip
+  endif
+
+  assign pc_code = block.settings.discount_code | strip
+  assign pc_percent = block.settings.code_percent | default: 0
+
+  assign pc_code_price = nil
+  if pc_percent > 0 and pc_percent < 100 and pc_variant != nil
+    assign pc_keep = 100 | minus: pc_percent
+    assign pc_code_price = pc_variant.price | times: pc_keep | divided_by: 100
+  endif
+-%}
+
+<style>
+  .{{ pc_class }} {
+    --pc-bg: {{ pc_bg }};
+    --pc-text: {{ pc_text }};
+    --pc-accent: {{ pc_accent }};
+    display: grid;
+    gap: 12px;
+    padding: 16px;
+    border-radius: var(--pdp-radius-card, 4px);
+    background: var(--pc-bg);
+    color: var(--pc-text);
+    font-family: var(--text-font-family);
+  }
+
+  .{{ pc_class }}[hidden] {
+    display: none;
+  }
+
+  .{{ pc_class }} .pdp-countdown__top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px 16px;
+  }
+
+  .{{ pc_class }} .pdp-countdown__copy {
+    display: grid;
+    gap: 4px;
+    min-width: 0;
+  }
+
+  .{{ pc_class }} .pdp-countdown__badge {
+    justify-self: start;
+    padding: 3px 8px;
+    border-radius: 2px;
+    background: var(--pc-accent);
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.3;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+  }
+
+  .{{ pc_class }} .pdp-countdown__title {
+    margin: 0;
+    font-family: var(--heading-font-family);
+    font-size: 17px;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+  }
+
+  .{{ pc_class }} .pdp-countdown__clock {
+    display: flex;
+    align-items: flex-start;
+    gap: 4px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .{{ pc_class }} .pdp-countdown__unit {
+    display: grid;
+    justify-items: center;
+    gap: 2px;
+    min-width: 40px;
+  }
+
+  .{{ pc_class }} .pdp-countdown__value {
+    display: block;
+    min-width: 40px;
+    padding: 6px 4px;
+    border: 1px solid color-mix(in srgb, var(--pc-text) 22%, transparent);
+    border-radius: 2px;
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1;
+    text-align: center;
+  }
+
+  .{{ pc_class }} .pdp-countdown__label {
+    font-size: 10px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    opacity: .7;
+  }
+
+  .{{ pc_class }} .pdp-countdown__sep {
+    padding-block-start: 6px;
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1;
+    opacity: .5;
+  }
+
+  .{{ pc_class }} .pdp-countdown__footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px 16px;
+    padding-block-start: 12px;
+    border-block-start: 1px solid color-mix(in srgb, var(--pc-text) 18%, transparent);
+    font-size: 13px;
+    line-height: 1.4;
+  }
+
+  .{{ pc_class }} .pdp-countdown__code {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 10px;
+    border: 1px dashed color-mix(in srgb, var(--pc-text) 55%, transparent);
+    border-radius: 2px;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    font-weight: 700;
+    letter-spacing: .1em;
+    cursor: pointer;
+  }
+
+  .{{ pc_class }} .pdp-countdown__code-price {
+    font-weight: 700;
+  }
+
+  .{{ pc_class }} .pdp-countdown__code-price .money-accent {
+    color: var(--pc-accent);
+    filter: brightness(1.25);
+  }
+
+  .{{ pc_class }} .pdp-countdown__editor-note {
+    font-size: 11px;
+    opacity: .7;
+  }
+
+  @media screen and (max-width: 699px) {
+    .{{ pc_class }} .pdp-countdown__value {
+      min-width: 36px;
+      font-size: 18px;
+    }
+  }
+</style>
+
+<pdp-countdown
+  class="pdp-countdown {{ pc_class }}"
+  data-mode="{{ block.settings.mode | default: 'fixed' }}"
+  data-start-date="{{ block.settings.start_date | strip | escape }}"
+  data-end-date="{{ block.settings.end_date | strip | escape }}"
+  data-end-time="{{ block.settings.end_time | default: '23:59' | strip | escape }}"
+  data-window-start="{{ block.settings.window_start | default: '23:30' | strip | escape }}"
+  data-window-end="{{ block.settings.window_end | default: '01:00' | strip | escape }}"
+  data-timezone="{{ pc_timezone | escape }}"
+  data-shop-offset="{{ pc_shop_offset }}"
+  data-code="{{ pc_code | escape }}"
+  data-hide-days="{% if block.settings.show_days %}false{% else %}true{% endif %}"
+  {% if request.design_mode %}data-editor{% else %}hidden{% endif %}
+>
+  <div class="pdp-countdown__top">
+    <div class="pdp-countdown__copy">
+      {%- if block.settings.badge != blank -%}
+        <span class="pdp-countdown__badge">{{ block.settings.badge | escape }}</span>
+      {%- endif -%}
+
+      {%- if block.settings.title != blank -%}
+        <p class="pdp-countdown__title">{{ block.settings.title | escape }}</p>
+      {%- endif -%}
+    </div>
+
+    <div class="pdp-countdown__clock" role="timer" aria-live="off">
+      {%- if block.settings.show_days -%}
+        <span class="pdp-countdown__unit"><span class="pdp-countdown__value" data-days>00</span><span class="pdp-countdown__label">{{ block.settings.label_days | escape }}</span></span>
+        <span class="pdp-countdown__sep" aria-hidden="true">:</span>
+      {%- endif -%}
+      <span class="pdp-countdown__unit"><span class="pdp-countdown__value" data-hours>00</span><span class="pdp-countdown__label">{{ block.settings.label_hours | escape }}</span></span>
+      <span class="pdp-countdown__sep" aria-hidden="true">:</span>
+      <span class="pdp-countdown__unit"><span class="pdp-countdown__value" data-minutes>00</span><span class="pdp-countdown__label">{{ block.settings.label_minutes | escape }}</span></span>
+      <span class="pdp-countdown__sep" aria-hidden="true">:</span>
+      <span class="pdp-countdown__unit"><span class="pdp-countdown__value" data-seconds>00</span><span class="pdp-countdown__label">{{ block.settings.label_seconds | escape }}</span></span>
+    </div>
+  </div>
+
+  {%- if block.settings.text != blank or pc_code != blank -%}
+    <div class="pdp-countdown__footer">
+      {%- if block.settings.text != blank -%}
+        <span>{{ block.settings.text | escape | replace: '[code]', pc_code | replace: '[percent]', pc_percent }}</span>
+      {%- endif -%}
+
+      {%- if pc_code_price != nil -%}
+        {%- comment -%}
+          "price" is one of the block types theme.js swaps on variant change, so this figure follows the selected size.
+        {%- endcomment -%}
+        <span class="pdp-countdown__code-price" data-block-type="price" data-block-id="{{ block.id }}-code-price">
+          {{- block.settings.code_price_label | escape }}
+          <span class="money-accent">
+            {%- if settings.currency_code_enabled -%}{{ pc_code_price | money_with_currency }}{%- else -%}{{ pc_code_price | money }}{%- endif -%}
+          </span>
+        </span>
+      {%- elsif pc_code != blank -%}
+        <button type="button" class="pdp-countdown__code" data-copy-code aria-label="{{ pc_code | escape }}">{{ pc_code | escape }}</button>
+      {%- endif -%}
+    </div>
+  {%- endif -%}
+
+  {%- if request.design_mode -%}
+    <p class="pdp-countdown__editor-note" data-editor-note>Theme editor preview: on the live store this banner only shows while the offer is running.</p>
+  {%- endif -%}
+</pdp-countdown>
+
+<script>
+  if (!window.customElements.get('pdp-countdown')) {
+    window.customElements.define('pdp-countdown', class extends HTMLElement {
+      connectedCallback() {
+        this.units = {
+          days: this.querySelector('[data-days]'),
+          hours: this.querySelector('[data-hours]'),
+          minutes: this.querySelector('[data-minutes]'),
+          seconds: this.querySelector('[data-seconds]')
+        };
+        this.hideDays = this.dataset.hideDays === 'true';
+        this.editor = this.hasAttribute('data-editor');
+        this.formatter = this.buildFormatter(this.dataset.timezone);
+        this.offsetMinutes = this.parseOffset(this.dataset.shopOffset);
+
+        const copy = this.querySelector('[data-copy-code]');
+        if (copy) {
+          copy.addEventListener('click', () => {
+            if (navigator.clipboard) navigator.clipboard.writeText(this.dataset.code).catch(() => {});
+          });
+        }
+
+        this.tick();
+        this.interval = setInterval(() => this.tick(), 1000);
+      }
+
+      disconnectedCallback() {
+        clearInterval(this.interval);
+      }
+
+      /* ---------- Time zone helpers ---------- */
+
+      buildFormatter(timezone) {
+        if (!timezone) return null;
+        try {
+          return new Intl.DateTimeFormat('en-US', {
+            timeZone: timezone, hourCycle: 'h23',
+            year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric'
+          });
+        } catch (error) {
+          console.warn('pdp-countdown: unknown timezone "' + timezone + '", using the store timezone instead.');
+          return null;
+        }
+      }
+
+      parseOffset(value) {
+        const match = /^([+-])(\d{2}):?(\d{2})$/.exec(value || '');
+        if (!match) return 0;
+        const minutes = parseInt(match[2], 10) * 60 + parseInt(match[3], 10);
+        return match[1] === '-' ? -minutes : minutes;
+      }
+
+      // Wall-clock parts (in the configured zone) of an instant.
+      partsAt(epoch) {
+        if (this.formatter) {
+          const parts = {};
+          this.formatter.formatToParts(new Date(epoch)).forEach((part) => { parts[part.type] = parseInt(part.value, 10); });
+          return { y: parts.year, m: parts.month, d: parts.day, h: parts.hour % 24, min: parts.minute, s: parts.second };
+        }
+        const shifted = new Date(epoch + this.offsetMinutes * 60000);
+        return { y: shifted.getUTCFullYear(), m: shifted.getUTCMonth() + 1, d: shifted.getUTCDate(), h: shifted.getUTCHours(), min: shifted.getUTCMinutes(), s: shifted.getUTCSeconds() };
+      }
+
+      // Instant of a wall-clock time in the configured zone (day may overflow, e.g. d + 1).
+      epochOf(y, m, d, h, min) {
+        const naive = Date.UTC(y, m - 1, d, h, min, 0);
+        if (!this.formatter) return naive - this.offsetMinutes * 60000;
+        let guess = naive;
+        for (let i = 0; i < 2; i++) {
+          const p = this.partsAt(guess);
+          const offset = Date.UTC(p.y, p.m - 1, p.d, p.h, p.min, p.s) - guess;
+          guess = naive - offset;
+        }
+        return guess;
+      }
+
+      parseDate(value) {
+        const match = /^(\d{4})-(\d{1,2})-(\d{1,2})$/.exec(value || '');
+        return match ? { y: +match[1], m: +match[2], d: +match[3] } : null;
+      }
+
+      parseTime(value, fallback) {
+        const match = /^(\d{1,2}):(\d{2})$/.exec(value || '');
+        return match ? { h: Math.min(+match[1], 23), min: Math.min(+match[2], 59) } : fallback;
+      }
+
+      /* ---------- Deadline ---------- */
+
+      // Returns the end of the running offer (epoch ms), or null when no offer is running right now.
+      currentDeadline(now) {
+        if (this.dataset.mode === 'window') {
+          const start = this.parseTime(this.dataset.windowStart, { h: 23, min: 30 });
+          const end = this.parseTime(this.dataset.windowEnd, { h: 1, min: 0 });
+          const p = this.partsAt(now);
+          const nowMin = p.h * 60 + p.min;
+          const startMin = start.h * 60 + start.min;
+          const endMin = end.h * 60 + end.min;
+          if (startMin === endMin) return null;
+
+          if (startMin < endMin) {
+            return nowMin >= startMin && nowMin < endMin ? this.epochOf(p.y, p.m, p.d, end.h, end.min) : null;
+          }
+
+          // Window crossing midnight (e.g. 23:30 → 01:00).
+          if (nowMin >= startMin) return this.epochOf(p.y, p.m, p.d + 1, end.h, end.min);
+          if (nowMin < endMin) return this.epochOf(p.y, p.m, p.d, end.h, end.min);
+          return null;
+        }
+
+        const endDate = this.parseDate(this.dataset.endDate);
+        if (!endDate) return null;
+        const endTime = this.parseTime(this.dataset.endTime, { h: 23, min: 59 });
+        const deadline = this.epochOf(endDate.y, endDate.m, endDate.d, endTime.h, endTime.min);
+
+        const startDate = this.parseDate(this.dataset.startDate);
+        if (startDate && now < this.epochOf(startDate.y, startDate.m, startDate.d, 0, 0)) return null;
+
+        return now < deadline ? deadline : null;
+      }
+
+      /* ---------- Render ---------- */
+
+      tick() {
+        const now = Date.now();
+        const deadline = this.currentDeadline(now);
+
+        if (!deadline) {
+          if (this.editor) {
+            this.paint(0);
+          } else {
+            this.hidden = true;
+          }
+          return;
+        }
+
+        this.paint(deadline - now);
+
+        if (this.hidden) {
+          this.hidden = false;
+          this.applyCode();
+        }
+      }
+
+      paint(remaining) {
+        const total = Math.max(0, Math.floor(remaining / 1000));
+        let hours = Math.floor(total / 3600);
+
+        if (!this.hideDays && this.units.days) {
+          this.units.days.textContent = this.pad(Math.floor(hours / 24));
+          hours = hours % 24;
+        }
+
+        this.units.hours.textContent = this.pad(hours);
+        this.units.minutes.textContent = this.pad(Math.floor((total % 3600) / 60));
+        this.units.seconds.textContent = this.pad(total % 60);
+      }
+
+      pad(value) {
+        return String(value).padStart(2, '0');
+      }
+
+      // Puts the code in the checkout cookie so the promised price is the one charged. Once per session and code.
+      applyCode() {
+        const code = this.dataset.code;
+        if (!code || this.editor) return;
+
+        const key = 'pdp-countdown-code:' + code;
+        try {
+          if (sessionStorage.getItem(key)) return;
+          sessionStorage.setItem(key, '1');
+        } catch (error) {
+          // Storage unavailable: apply anyway, it is idempotent.
+        }
+
+        const root = (window.Shopify && window.Shopify.routes && window.Shopify.routes.root) || '/';
+        fetch(root + 'discount/' + encodeURIComponent(code) + '?redirect=' + encodeURIComponent(root + 'cart.js'), { credentials: 'same-origin' }).catch(() => {});
+      }
+    });
+  }
+</script>

@@ -13,21 +13,21 @@
   "sections": {
     "offer-bar": {
       "type": "countdown-timer",
-      "name": "Offer bar (countdown)",
+      "name": "Offer bar (Black Friday)",
       "settings": {
         "full_width": true,
         "layout": "bar",
         "sticky": true,
-        "countdown_mode": "evergreen",
-        "end_date": "2026-09-27",
+        "countdown_mode": "fixed",
+        "end_date": "2026-11-30",
         "end_time": "23:59",
         "daily_reset_hour": 0,
         "evergreen_minutes": 420,
         "evergreen_scope": "session",
-        "on_expiry": "restart",
-        "expired_text": "This offer has ended.",
+        "on_expiry": "hide",
+        "expired_text": "",
         "subheading": "",
-        "title": "BUY 3, GET 1 FREE — LAST CHANCE",
+        "title": "BLACK FRIDAY — UP TO 50% OFF · ENDS IN",
         "heading_tag": "p",
         "content": "",
         "button_text": "",
@@ -38,16 +38,19 @@
         "label_hours": "Hours",
         "label_minutes": "Min",
         "label_seconds": "Sec",
-        "background": "#000000",
+        "background": "#111111",
         "background_gradient": "",
         "text_color": "#ffffff",
         "digit_background": "",
         "digit_text_color": "#ffffff",
-        "digit_radius": 4,
+        "digit_radius": 2,
         "button_background": "",
         "button_text_color": "",
         "spacing_block_start": 8,
-        "spacing_block_end": 8
+        "spacing_block_end": 8,
+        "start_date": "2026-11-20",
+        "start_time": "00:00",
+        "teaser_title": "BLACK FRIDAY STARTS IN"
       }
     },
     "announcement-bar": {
@@ -56,35 +59,35 @@
         "m1": {
           "type": "message",
           "settings": {
-            "text": "FLASH SALE — UP TO 50% OFF, ENDS AT MIDNIGHT",
+            "text": "FREE SHIPPING ON EVERY JACKET",
             "url": "/collections/all"
           }
         },
         "m2": {
           "type": "message",
           "settings": {
-            "text": "FREE NAME & NUMBER LETTERING ON EVERY JERSEY",
+            "text": "30-DAY FREE RETURNS & EXCHANGES",
             "url": "/collections/all"
           }
         },
         "m3": {
           "type": "message",
           "settings": {
-            "text": "FREE WORLDWIDE SHIPPING OVER $79",
+            "text": "BLACK FRIDAY: 20–30 NOVEMBER",
             "url": "/collections/all"
           }
         },
         "m4": {
           "type": "message",
           "settings": {
-            "text": "LOW STOCK ON 2025/26 CITY EDITIONS — SIZES SELLING OUT",
+            "text": "SECURE CHECKOUT",
             "url": "/collections/all"
           }
         },
         "m5": {
           "type": "message",
           "settings": {
-            "text": "30-DAY FREE RETURNS & SIZE SWAPS",
+            "text": "NEW WINTER COLLECTION",
             "url": "/collections/all"
           }
         }
@@ -104,9 +107,9 @@
         "text_size": "text-xs",
         "navigation_mode": "scrolling",
         "scrolling_speed": 12,
-        "background": "#14241e",
+        "background": "#f2f0eb",
         "background_gradient": "",
-        "text_color": "#ffffff"
+        "text_color": "#111111"
       }
     },
     "header": {
@@ -143,9 +146,9 @@
         "enable_sticky": true,
         "hide_on_scroll": false,
         "show_inline_search": true,
-        "inline_search_placeholder": "Search a team, player or season",
+        "inline_search_placeholder": "Search a jacket, colour or style",
         "search_placeholder_prefix": "Search",
-        "search_placeholder_terms": "Lakers\nWarriors\nThrowback jerseys\nYour team\nKids sizes",
+        "search_placeholder_terms": "Puffer jackets\nLong puffers\nVests\nHooded jackets\nKids",
         "logo": "shopify://shop_images/LOGO.webp",
         "logo_max_width": 195,
         "logo_mobile_max_width": 125,
@@ -153,67 +156,23 @@
         "menu": "main-menu",
         "sidebar_menu": "",
         "secondary_menu": "",
-        "nav_highlight_item": "NBA 2025/26",
+        "nav_highlight_item": "Black Friday",
         "menu_open_trigger": "hover",
-        "team_menu_item": "Teams, Shop by team",
-        "team_collections": [
-          "atlanta-hawks-jerseys",
-          "boston-celtics-jerseys",
-          "brooklyn-nets-jerseys",
-          "charlotte-hornets-jerseys",
-          "chicago-bulls-jerseys",
-          "cleveland-cavaliers-jerseys",
-          "dallas-mavericks-jerseys",
-          "denver-nuggets-jerseys",
-          "detroit-pistons-jerseys",
-          "golden-state-warriors-jerseys",
-          "houston-rockets-jerseys",
-          "indiana-pacers-jerseys",
-          "la-clippers-jerseys",
-          "los-angeles-lakers-jerseys",
-          "memphis-grizzlies-jerseys",
-          "miami-heat-jerseys",
-          "milwaukee-bucks-jerseys",
-          "minnesota-timberwolves-jerseys",
-          "new-orleans-pelicans-jerseys",
-          "new-york-knicks-jerseys",
-          "oklahoma-city-thunder-jerseys",
-          "orlando-magic-jerseys",
-          "philadelphia-76ers-jerseys",
-          "phoenix-suns-jerseys",
-          "portland-trail-blazers-jerseys",
-          "sacramento-kings-jerseys",
-          "san-antonio-spurs-jerseys",
-          "toronto-raptors-jerseys",
-          "utah-jazz-jerseys",
-          "washington-wizards-jerseys"
-        ],
-        "team_strip_text": "Jerseys",
-        "team_grid_title": "Shop by team",
-        "team_search_placeholder": "Search a team",
-        "team_no_results_text": "No team found",
-        "team_view_all_text": "View all jerseys",
+        "team_menu_item": "",
+        "team_collections": [],
+        "team_strip_text": "",
+        "team_grid_title": "Shop by category",
+        "team_search_placeholder": "Search a category",
+        "team_no_results_text": "No category found",
+        "team_view_all_text": "View all jackets",
         "opening_from": "left",
         "drawer_compact_links": true,
         "drawer_show_search": true,
-        "drawer_featured_teams": [
-          "los-angeles-lakers-jerseys",
-          "golden-state-warriors-jerseys",
-          "boston-celtics-jerseys",
-          "chicago-bulls-jerseys",
-          "new-york-knicks-jerseys",
-          "miami-heat-jerseys",
-          "philadelphia-76ers-jerseys",
-          "milwaukee-bucks-jerseys",
-          "dallas-mavericks-jerseys",
-          "denver-nuggets-jerseys",
-          "oklahoma-city-thunder-jerseys",
-          "san-antonio-spurs-jerseys"
-        ],
-        "drawer_featured_title": "Popular teams",
-        "drawer_offer_title": "Buy 3, get 1 free",
-        "drawer_offer_text": "Discount applied automatically at checkout",
-        "drawer_offer_url": "/collections/all-jerseys",
+        "drawer_featured_teams": [],
+        "drawer_featured_title": "Shop by category",
+        "drawer_offer_title": "Free shipping on every jacket",
+        "drawer_offer_text": "30-day free returns and exchanges",
+        "drawer_offer_url": "/collections/all",
         "drawer_help_menu": "help-menu",
         "layout": "logo_left_navigation_center",
         "show_social_media": false,

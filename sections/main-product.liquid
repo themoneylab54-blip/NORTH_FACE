@@ -3881,6 +3881,180 @@ quick buy information in a template, that will be extracted in JS, but ensure it
       ]
     },
     {
+      "type": "pdp_countdown",
+      "name": "Promo countdown",
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "A promo banner with a real deadline. Hidden before the offer starts and once it ends. Every visitor sees the same banner."
+        },
+        {
+          "type": "select",
+          "id": "mode",
+          "label": "Offer type",
+          "options": [
+            {
+              "value": "fixed",
+              "label": "Until a fixed date (e.g. Black Friday)"
+            },
+            {
+              "value": "window",
+              "label": "Every day during a time window (e.g. midnight sale)"
+            }
+          ],
+          "default": "fixed"
+        },
+        {
+          "type": "text",
+          "id": "timezone",
+          "label": "Timezone",
+          "info": "Leave empty to use your store's timezone (for a time window: the A/B test timezone if set in Theme settings). Otherwise an IANA name such as Europe/Paris or America/New_York (daylight saving time is handled)."
+        },
+        {
+          "type": "header",
+          "content": "Fixed date"
+        },
+        {
+          "type": "text",
+          "id": "start_date",
+          "label": "Show from (optional)",
+          "info": "Format YYYY-MM-DD. Empty = show right away."
+        },
+        {
+          "type": "text",
+          "id": "end_date",
+          "label": "End date",
+          "default": "2026-11-30",
+          "info": "Format YYYY-MM-DD."
+        },
+        {
+          "type": "text",
+          "id": "end_time",
+          "label": "End time",
+          "default": "23:59",
+          "info": "Format HH:MM."
+        },
+        {
+          "type": "header",
+          "content": "Daily time window"
+        },
+        {
+          "type": "text",
+          "id": "window_start",
+          "label": "Starts at",
+          "default": "23:30",
+          "info": "Format HH:MM."
+        },
+        {
+          "type": "text",
+          "id": "window_end",
+          "label": "Ends at",
+          "default": "01:00",
+          "info": "Format HH:MM. Can be after midnight."
+        },
+        {
+          "type": "header",
+          "content": "Content"
+        },
+        {
+          "type": "text",
+          "id": "badge",
+          "label": "Badge",
+          "default": "Black Friday"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Heading",
+          "default": "Up to 50% off — ends in"
+        },
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text",
+          "default": "Discount already applied to the price.",
+          "info": "Use [code] and [percent] to insert the discount code and percentage."
+        },
+        {
+          "type": "checkbox",
+          "id": "show_days",
+          "label": "Show days",
+          "default": true
+        },
+        {
+          "type": "text",
+          "id": "label_days",
+          "label": "Days label",
+          "default": "Days"
+        },
+        {
+          "type": "text",
+          "id": "label_hours",
+          "label": "Hours label",
+          "default": "Hrs"
+        },
+        {
+          "type": "text",
+          "id": "label_minutes",
+          "label": "Minutes label",
+          "default": "Min"
+        },
+        {
+          "type": "text",
+          "id": "label_seconds",
+          "label": "Seconds label",
+          "default": "Sec"
+        },
+        {
+          "type": "header",
+          "content": "Discount code"
+        },
+        {
+          "type": "paragraph",
+          "content": "Create the code first in Shopify admin > Discounts. It is applied automatically to the visitor's checkout while the banner is showing."
+        },
+        {
+          "type": "text",
+          "id": "discount_code",
+          "label": "Discount code"
+        },
+        {
+          "type": "number",
+          "id": "code_percent",
+          "label": "Code percentage",
+          "info": "Shows the price with the code for the selected size. Leave empty to only show the code."
+        },
+        {
+          "type": "text",
+          "id": "code_price_label",
+          "label": "Price with code label",
+          "default": "Your price tonight: "
+        },
+        {
+          "type": "header",
+          "content": "Colors"
+        },
+        {
+          "type": "color",
+          "id": "background",
+          "label": "Background",
+          "default": "#111111"
+        },
+        {
+          "type": "color",
+          "id": "text_color",
+          "label": "Text",
+          "default": "#ffffff"
+        },
+        {
+          "type": "color",
+          "id": "accent_color",
+          "label": "Accent",
+          "default": "#c8102e"
+        }
+      ]
+    },
+    {
       "type": "pdp_trust_icons",
       "name": "Trust icons",
       "limit": 1,

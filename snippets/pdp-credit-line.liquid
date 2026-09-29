@@ -46,7 +46,7 @@ Supported variables
       border-radius: 6px;
       background: {% if block.settings.background.alpha != 0 and block.settings.background != blank %}{{ block.settings.background }}{% else %}#F5F5F5{% endif %};
       color: {% if block.settings.text_color.alpha != 0 and block.settings.text_color != blank %}{{ block.settings.text_color }}{% else %}#121212{% endif %};
-      font-family: Inter, -apple-system, "Segoe UI", sans-serif;
+      font-family: var(--text-font-family), -apple-system, "Segoe UI", sans-serif;
       font-size: 13px;
       font-weight: 500;
       line-height: 1.2;
@@ -60,7 +60,7 @@ Supported variables
       flex-shrink: 0;
       width: 18px;
       height: 18px;
-      color: {% if block.settings.icon_color.alpha != 0 and block.settings.icon_color != blank %}{{ block.settings.icon_color }}{% else %}#FFD014{% endif %};
+      color: {% if block.settings.icon_color.alpha != 0 and block.settings.icon_color != blank %}{{ block.settings.icon_color }}{% else %}#111111{% endif %};
     }
 
     .pdp-credit-line-{{ block.id }} .pdp-credit-line__icon svg {

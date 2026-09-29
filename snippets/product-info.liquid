@@ -842,6 +842,8 @@ Supported variables
           {%- render 'pdp-tiers', block: block, product: product, product_form_id: product_form_id, section: section -%}
         {%- when 'pdp_trust_icons' -%}
           {%- render 'pdp-trust-icons', block: block, product: product, product_form_id: product_form_id, section: section -%}
+        {%- when 'pdp_countdown' -%}
+          {%- render 'pdp-countdown', block: block, product: product, section: section -%}
 
       {%- endcase -%}
     {%- endcapture -%}

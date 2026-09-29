@@ -19,26 +19,27 @@ Supported variables:
   {{ pdp_scope }} {
     /* Reference design tokens (measured on the reference product page) */
     --pdp-bg: #FFFFFF;
-    --pdp-text: #121212;
-    --pdp-muted-bg: #F5F5F5;
-    --pdp-muted-text: #737373;
-    --pdp-border: #F0F0F0;
-    --pdp-input-border: #E6E6E6;
-    --pdp-cta: #FFD014;
-    --pdp-cta-text: #000000;
-    --pdp-sale: #F04242;
+    --pdp-text: #111111;
+    --pdp-muted-bg: #F4F3F0;
+    --pdp-muted-text: #6E6E6E;
+    --pdp-border: #E4E2DD;
+    --pdp-input-border: #D9D9D6;
+    --pdp-cta: #111111;
+    --pdp-cta-text: #FFFFFF;
+    --pdp-sale: #C8102E;
     --pdp-sale-text: #FFFFFF;
-    --pdp-tier: #DC2626;
-    --pdp-verified: #00B67A;
-    --pdp-radius: 6px;
-    --pdp-radius-card: 12px;
-    --pdp-radius-badge: 3px;
-    --pdp-shadow-card: 0 1px 6px rgba(0, 0, 0, .08);
-    --pdp-font: "Inter", var(--text-font-family), -apple-system, "Segoe UI", sans-serif;
+    --pdp-tier: #C8102E;
+    --pdp-verified: #1E6B45;
+    --pdp-radius: 2px;
+    --pdp-radius-card: 4px;
+    --pdp-radius-badge: 2px;
+    --pdp-shadow-card: none;
+    --pdp-font: var(--text-font-family), -apple-system, "Segoe UI", sans-serif;
+    --pdp-heading-font: var(--heading-font-family), var(--text-font-family), sans-serif;
   }
 
   /* ------------------------------------------------------------------
-     Column: Inter everywhere, 14px gap between blocks
+     Column: theme text font everywhere, 14px gap between blocks
      ------------------------------------------------------------------ */
   {{ pdp_scope }} .product-info {
     --product-info-block-spacing: 14px;
@@ -66,22 +67,22 @@ Supported variables:
   }
 
   /* ------------------------------------------------------------------
-     Title: Inter 22px 700, letter-spacing -0.44px
+     Title: heading font, 26px 700, uppercase, light tracking (outdoor premium look)
      ------------------------------------------------------------------ */
   {{ pdp_scope }} h1.product-info__title,
   {{ pdp_scope }} .product-info__title {
-    font-family: var(--pdp-font);
-    font-size: 22px;
+    font-family: var(--pdp-heading-font);
+    font-size: 26px;
     font-weight: 700;
-    line-height: 1.25;
-    letter-spacing: -0.44px;
-    text-transform: none;
+    line-height: 1.15;
+    letter-spacing: .02em;
+    text-transform: uppercase;
     color: var(--pdp-text);
     margin: 0;
   }
 
   /* ------------------------------------------------------------------
-     Add to cart: yellow pill, 62px tall, full width
+     Add to cart: black rectangle, 58px tall, full width, uppercase
      ------------------------------------------------------------------ */
   {{ pdp_scope }} .product-info__buy-buttons .buy-buttons {
     grid-template-columns: minmax(0, 1fr);
@@ -89,28 +90,28 @@ Supported variables:
 
   {{ pdp_scope }} .product-info__buy-buttons .button,
   {{ pdp_scope }} .product-info__buy-buttons [type="submit"] {
-    --button-background: 255 208 20 / 1;
-    --button-text-color: 0 0 0;
-    --button-outline-color: 255 208 20;
+    --button-background: 17 17 17 / 1;
+    --button-text-color: 255 255 255;
+    --button-outline-color: 17 17 17;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     box-sizing: border-box;
     width: 100%;
-    min-height: 62px;
-    height: 62px;
+    min-height: 58px;
+    height: 58px;
     padding-block: 0;
     padding-inline: 24px;
     border: 0;
-    border-radius: 9999px;
+    border-radius: var(--pdp-radius);
     background-color: var(--pdp-cta);
     color: var(--pdp-cta-text);
     font-family: var(--pdp-font);
-    font-size: 16px;
-    font-weight: 500;
+    font-size: 15px;
+    font-weight: 700;
     line-height: 1.2;
-    letter-spacing: 0;
-    text-transform: none;
+    letter-spacing: .08em;
+    text-transform: uppercase;
     box-shadow: none;
     transition: filter .15s ease-in-out, background-color .15s ease-in-out, color .15s ease-in-out;
   }
@@ -125,7 +126,7 @@ Supported variables:
   @media screen and (pointer: fine) {
     {{ pdp_scope }} .product-info__buy-buttons .button:not([disabled]):hover,
     {{ pdp_scope }} .product-info__buy-buttons [type="submit"]:not([disabled]):hover {
-      filter: brightness(.97);
+      background-color: #333333;
       box-shadow: none;
     }
   }
@@ -133,13 +134,13 @@ Supported variables:
   /* The theme's loader/feedback layers are absolutely positioned inside the button: keep them centred in the pill */
   {{ pdp_scope }} .product-info__buy-buttons .button .button__loader,
   {{ pdp_scope }} .product-info__buy-buttons .button .button__feedback {
-    border-radius: 9999px;
+    border-radius: var(--pdp-radius);
   }
 
-  /* Dynamic checkout button (if enabled): match the pill shape only, keep its own colours */
+  /* Dynamic checkout button (if enabled): match the button shape only, keep its own colours */
   {{ pdp_scope }} .product-info__buy-buttons .shopify-payment-button__button--unbranded {
-    border-radius: 9999px !important;
-    min-height: 62px;
+    border-radius: var(--pdp-radius) !important;
+    min-height: 58px;
     font-family: var(--pdp-font) !important;
     font-weight: 500 !important;
     font-size: 16px !important;
@@ -151,7 +152,7 @@ Supported variables:
   {{ pdp_scope }} .product-info__accordion {
     --accordion-spacing: 16px;
     border-block-start-width: 0;
-    border-block-end: 1px solid rgba(240, 240, 240, .6);
+    border-block-end: 1px solid var(--pdp-border);
     font-family: var(--pdp-font);
     font-size: 16px;
     color: var(--pdp-text);
@@ -165,10 +166,10 @@ Supported variables:
   }
 
   {{ pdp_scope }} .product-info__accordion .accordion__toggle .h6 {
-    font-size: 16px;
-    font-weight: 500;
-    letter-spacing: 0;
-    text-transform: none;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
   }
 
   {{ pdp_scope }} .product-info__accordion .accordion__content {

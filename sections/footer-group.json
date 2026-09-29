@@ -9,7 +9,7 @@
           "type": "text",
           "settings": {
             "title": "",
-            "content": "<p>Game-ready basketball jerseys at a price that makes sense — lettered right, shipped fast, and backed by a 30-day size-swap guarantee.</p>",
+            "content": "<p>Premium puffer jackets designed for real winters: warm, light and built to last. Shipped fast and backed by 30-day free returns.</p>",
             "enable_follow_on_shop": false
           }
         },
@@ -17,8 +17,8 @@
           "type": "newsletter",
           "settings": {
             "image": "",
-            "title": "Join the community and unlock exclusive offers",
-            "content": "<p>Restock alerts, new drops and subscriber-only discounts. One email a week, unsubscribe any time.</p>"
+            "title": "Join the club and unlock exclusive offers",
+            "content": "<p>New drops, restocks and subscriber-only offers. One email a week, unsubscribe any time.</p>"
           }
         },
         "help": {
@@ -66,7 +66,7 @@
         "show_social_media": true,
         "show_payment_icons": true,
         "payment_icons_source": "custom",
-        "payment_icons_list": "visa, master, american_express, discover, paypal, apple_pay, google_pay, shopify_pay, venmo, klarna, afterpay",
+        "payment_icons_list": "visa, master, american_express, paypal, apple_pay, google_pay, shopify_pay, klarna",
         "show_policy_links": false,
         "show_country_selector": false,
         "show_country_flag": false,

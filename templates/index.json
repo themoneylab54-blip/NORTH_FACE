@@ -15,20 +15,20 @@
         "display_font": {
           "type": "liquid",
           "settings": {
-            "liquid": "<style>#shopify-section-{{ section.id }} h1{font-family:'Anton','Bebas Neue',Impact,'Haettenschweiler','Arial Narrow Bold',sans-serif;font-weight:400;letter-spacing:.005em;line-height:.94;text-shadow:0 2px 24px rgba(0,0,0,.45)}</style>"
+            "liquid": "<style>#shopify-section-{{ section.id }} h1{font-family:var(--heading-font-family);font-weight:700;letter-spacing:.03em;line-height:.98;text-transform:uppercase;text-shadow:0 2px 24px rgba(0,0,0,.35)}</style>"
           }
         },
         "heading": {
           "type": "heading",
           "settings": {
-            "text": "BUY 3 JERSEYS. GET 1 FREE.",
+            "text": "WARMTH, REDEFINED.",
             "heading_tag": "h1"
           }
         },
         "subtitle": {
           "type": "richtext",
           "settings": {
-            "content": "<p>2025/26 kits, throwbacks and kids. Ends when the clock hits zero.</p>"
+            "content": "<p>Premium puffer jackets, light as air and made for every winter.</p>"
           }
         },
         "button": {
@@ -36,10 +36,10 @@
           "settings": {
             "style": "fill",
             "size": "lg",
-            "text": "SHOP 2025/26 JERSEYS",
-            "url": "/collections/nba-2025-26",
+            "text": "SHOP MEN",
+            "url": "/collections/men",
             "background": "#ffffff",
-            "text_color": "#121212"
+            "text_color": "#111111"
           }
         },
         "button2": {
@@ -47,16 +47,16 @@
           "settings": {
             "style": "fill",
             "size": "lg",
-            "text": "BUY 3, GET 1 FREE",
-            "url": "/collections/best-sellers",
-            "background": "#ffd014",
-            "text_color": "#000000"
+            "text": "SHOP WOMEN",
+            "url": "/collections/women",
+            "background": "#111111",
+            "text_color": "#ffffff"
           }
         },
         "trust": {
           "type": "richtext",
           "settings": {
-            "content": "<p><strong>✓ Free shipping &nbsp;·&nbsp; ✓ 30-day returns &nbsp;·&nbsp; ✓ Secure checkout</strong></p>"
+            "content": "<p><strong>Free shipping &nbsp;·&nbsp; 30-day returns &nbsp;·&nbsp; Secure checkout</strong></p>"
           }
         }
       },
@@ -80,7 +80,7 @@
         "desktop_text_position": "sm:place-self-center sm:text-center",
         "text_color": "#ffffff",
         "overlay_color": "#000000",
-        "overlay_opacity": 30
+        "overlay_opacity": 25
       }
     },
     "reviews_strip": {
@@ -89,14 +89,14 @@
         "strip": {
           "type": "liquid",
           "settings": {
-            "liquid": "<style>#shopify-section-{{ section.id }}{--section-spacing-block-start:10px;--section-spacing-block-end:10px}</style><p class=\"text-sm\" style=\"margin:0\"><strong>Excellent</strong> &nbsp;<span style=\"color:#00B67A;letter-spacing:2px\">★★★★★</span>&nbsp; 2,400+ verified reviews</p>"
+            "liquid": "<style>#shopify-section-{{ section.id }}{--section-spacing-block-start:10px;--section-spacing-block-end:10px}</style><p class=\"text-sm\" style=\"margin:0;letter-spacing:.08em;text-transform:uppercase\"><strong>Free shipping on every jacket</strong> &nbsp;·&nbsp; 30-day free returns &nbsp;·&nbsp; Secure checkout</p>"
           }
         }
       },
       "block_order": [
         "strip"
       ],
-      "name": "Reviews strip",
+      "name": "Reassurance strip",
       "settings": {
         "full_width": true,
         "content_width": "small",
@@ -112,39 +112,8 @@
       "settings": {
         "title": "",
         "title_alignment": "start",
-        "collections": [
-          "atlanta-hawks-jerseys",
-          "boston-celtics-jerseys",
-          "brooklyn-nets-jerseys",
-          "charlotte-hornets-jerseys",
-          "chicago-bulls-jerseys",
-          "cleveland-cavaliers-jerseys",
-          "dallas-mavericks-jerseys",
-          "denver-nuggets-jerseys",
-          "detroit-pistons-jerseys",
-          "golden-state-warriors-jerseys",
-          "houston-rockets-jerseys",
-          "indiana-pacers-jerseys",
-          "la-clippers-jerseys",
-          "los-angeles-lakers-jerseys",
-          "memphis-grizzlies-jerseys",
-          "miami-heat-jerseys",
-          "milwaukee-bucks-jerseys",
-          "minnesota-timberwolves-jerseys",
-          "new-orleans-pelicans-jerseys",
-          "new-york-knicks-jerseys",
-          "oklahoma-city-thunder-jerseys",
-          "orlando-magic-jerseys",
-          "philadelphia-76ers-jerseys",
-          "phoenix-suns-jerseys",
-          "portland-trail-blazers-jerseys",
-          "sacramento-kings-jerseys",
-          "san-antonio-spurs-jerseys",
-          "toronto-raptors-jerseys",
-          "utah-jazz-jerseys",
-          "washington-wizards-jerseys"
-        ],
-        "strip_text": "Jerseys",
+        "collections": [],
+        "strip_text": "",
         "circle_size_mobile": 64,
         "circle_size_desktop": 76,
         "logo_scale": 70,
@@ -155,11 +124,12 @@
         "text_color": "",
         "circle_background": "#f2f2f2",
         "circle_border": ""
-      }
+      },
+      "disabled": true
     },
     "best_sellers": {
       "type": "featured-collection",
-      "name": "Best Sellers",
+      "name": "Best sellers",
       "settings": {
         "collection": "best-sellers",
         "products": [],
@@ -185,9 +155,9 @@
     },
     "nba_2526": {
       "type": "featured-collection",
-      "name": "Nba 2025/26",
+      "name": "Black Friday deals",
       "settings": {
-        "collection": "nba-2025-26",
+        "collection": "black-friday",
         "products": [],
         "full_width": true,
         "stack_products": false,
@@ -196,9 +166,9 @@
         "products_per_row_mobile": "2",
         "products_per_row_desktop": 5,
         "subheading": "",
-        "title": "NBA 2025/26",
+        "title": "BLACK FRIDAY DEALS",
         "content": "",
-        "link_url": "/collections/nba-2025-26",
+        "link_url": "/collections/black-friday",
         "link_text": "VIEW ALL",
         "background": "",
         "background_gradient": "",
@@ -211,9 +181,9 @@
     },
     "lakers": {
       "type": "featured-collection",
-      "name": "Lakers",
+      "name": "Men",
       "settings": {
-        "collection": "los-angeles-lakers-jerseys",
+        "collection": "men",
         "products": [],
         "full_width": true,
         "stack_products": false,
@@ -222,9 +192,9 @@
         "products_per_row_mobile": "2",
         "products_per_row_desktop": 5,
         "subheading": "",
-        "title": "LAKERS",
+        "title": "MEN",
         "content": "",
-        "link_url": "/collections/los-angeles-lakers-jerseys",
+        "link_url": "/collections/men",
         "link_text": "VIEW ALL",
         "background": "",
         "background_gradient": "",
@@ -237,9 +207,9 @@
     },
     "warriors": {
       "type": "featured-collection",
-      "name": "Warriors",
+      "name": "Women",
       "settings": {
-        "collection": "golden-state-warriors-jerseys",
+        "collection": "women",
         "products": [],
         "full_width": true,
         "stack_products": false,
@@ -248,9 +218,9 @@
         "products_per_row_mobile": "2",
         "products_per_row_desktop": 5,
         "subheading": "",
-        "title": "WARRIORS",
+        "title": "WOMEN",
         "content": "",
-        "link_url": "/collections/golden-state-warriors-jerseys",
+        "link_url": "/collections/women",
         "link_text": "VIEW ALL",
         "background": "",
         "background_gradient": "",
@@ -263,9 +233,9 @@
     },
     "bulls": {
       "type": "featured-collection",
-      "name": "Bulls",
+      "name": "Vests",
       "settings": {
-        "collection": "chicago-bulls-jerseys",
+        "collection": "puffer-vests",
         "products": [],
         "full_width": true,
         "stack_products": false,
@@ -274,9 +244,9 @@
         "products_per_row_mobile": "2",
         "products_per_row_desktop": 5,
         "subheading": "",
-        "title": "BULLS",
+        "title": "VESTS",
         "content": "",
-        "link_url": "/collections/chicago-bulls-jerseys",
+        "link_url": "/collections/puffer-vests",
         "link_text": "VIEW ALL",
         "background": "",
         "background_gradient": "",
@@ -293,7 +263,6 @@
         "v1": {
           "type": "video",
           "settings": {
-            "video": "shopify://files/videos/ssstik.io_1790100121631 (1).webm",
             "video_url": "",
             "rating": 5,
             "testimonial": "",
@@ -304,7 +273,6 @@
         "v2": {
           "type": "video",
           "settings": {
-            "video": "shopify://files/videos/ssstik.io_1790099795471.webm",
             "video_url": "",
             "rating": 5,
             "testimonial": "",
@@ -315,7 +283,6 @@
         "v3": {
           "type": "video",
           "settings": {
-            "video": "shopify://files/videos/ssstik.io_1790100075857.webm",
             "video_url": "",
             "rating": 5,
             "testimonial": "",
@@ -326,7 +293,6 @@
         "v4": {
           "type": "video",
           "settings": {
-            "video": "shopify://files/videos/ssstik.io_1790099690547.webm",
             "video_url": "",
             "rating": 5,
             "testimonial": "",
@@ -345,8 +311,8 @@
       "settings": {
         "full_width": true,
         "badge": "",
-        "title": "See for yourself, no filters",
-        "content": "<p>Mesh, stitching and crests filmed up close. Nothing retouched.</p>",
+        "title": "UP CLOSE",
+        "content": "<p>Baffles, seams and finishes, filmed as they are.</p>",
         "text_alignment": "center",
         "heading_style": "theme",
         "heading_uppercase": false,
@@ -367,19 +333,20 @@
         "heading_gradient": "",
         "badge_background": "",
         "badge_text_color": "",
-        "stars_color": "#00b67a",
+        "stars_color": "#111111",
         "hide_captions": true,
         "caption_text_color": "#ffffff",
         "caption_overlay_color": "#000000",
         "caption_overlay_opacity": 85,
         "card_radius": 12
-      }
+      },
+      "disabled": true
     },
     "exclusives": {
       "type": "featured-collection",
-      "name": "Authentic Editions",
+      "name": "Long puffers",
       "settings": {
-        "collection": "coupe-authentic",
+        "collection": "long-puffers",
         "products": [],
         "full_width": true,
         "stack_products": false,
@@ -388,9 +355,9 @@
         "products_per_row_mobile": "2",
         "products_per_row_desktop": 5,
         "subheading": "",
-        "title": "AUTHENTIC EDITIONS",
+        "title": "LONG PUFFERS",
         "content": "",
-        "link_url": "/collections/coupe-authentic",
+        "link_url": "/collections/long-puffers",
         "link_text": "VIEW ALL",
         "background": "",
         "background_gradient": "",
@@ -403,9 +370,9 @@
     },
     "top_teams": {
       "type": "featured-collection",
-      "name": "Celtics",
+      "name": "Lightweight",
       "settings": {
-        "collection": "boston-celtics-jerseys",
+        "collection": "lightweight-puffers",
         "products": [],
         "full_width": true,
         "stack_products": false,
@@ -414,9 +381,9 @@
         "products_per_row_mobile": "2",
         "products_per_row_desktop": 5,
         "subheading": "",
-        "title": "CELTICS",
+        "title": "LIGHTWEIGHT",
         "content": "",
-        "link_url": "/collections/boston-celtics-jerseys",
+        "link_url": "/collections/lightweight-puffers",
         "link_text": "VIEW ALL",
         "background": "",
         "background_gradient": "",
@@ -425,13 +392,14 @@
         "heading_gradient": "",
         "product_card_background": "",
         "product_card_text_color": ""
-      }
+      },
+      "disabled": true
     },
     "kids": {
       "type": "featured-collection",
-      "name": "Women",
+      "name": "Kids",
       "settings": {
-        "collection": "maillots-femme",
+        "collection": "kids",
         "products": [],
         "full_width": true,
         "stack_products": false,
@@ -440,9 +408,9 @@
         "products_per_row_mobile": "2",
         "products_per_row_desktop": 5,
         "subheading": "",
-        "title": "WOMEN",
+        "title": "KIDS",
         "content": "",
-        "link_url": "/collections/maillots-femme",
+        "link_url": "/collections/kids",
         "link_text": "VIEW ALL",
         "background": "",
         "background_gradient": "",
@@ -455,9 +423,9 @@
     },
     "throwbacks": {
       "type": "featured-collection",
-      "name": "Throwback Legends",
+      "name": "Accessories",
       "settings": {
-        "collection": "throwback-legends",
+        "collection": "accessories",
         "products": [],
         "full_width": true,
         "stack_products": false,
@@ -466,9 +434,9 @@
         "products_per_row_mobile": "2",
         "products_per_row_desktop": 5,
         "subheading": "",
-        "title": "THROWBACK LEGENDS",
+        "title": "ACCESSORIES",
         "content": "",
-        "link_url": "/collections/throwback-legends",
+        "link_url": "/collections/accessories",
         "link_text": "VIEW ALL",
         "background": "",
         "background_gradient": "",
@@ -477,7 +445,8 @@
         "heading_gradient": "",
         "product_card_background": "",
         "product_card_text_color": ""
-      }
+      },
+      "disabled": true
     },
     "fans_heading": {
       "type": "rich-text",
@@ -485,7 +454,7 @@
         "h": {
           "type": "heading",
           "settings": {
-            "text": "THE BRAND LOVED BY THOUSANDS OF FANS",
+            "text": "BUILT FOR REAL WINTERS",
             "heading_tag": "h2",
             "text_color": "",
             "gradient": ""
@@ -494,7 +463,7 @@
         "t": {
           "type": "richtext",
           "settings": {
-            "content": "<p>Real fans, real jerseys. Tag us to be featured.</p>"
+            "content": "<p>Tag us wearing yours to be featured.</p>"
           }
         }
       },
@@ -510,7 +479,8 @@
         "background": "",
         "background_gradient": "",
         "text_color": ""
-      }
+      },
+      "disabled": true
     },
     "fans_grid": {
       "type": "media-grid",
@@ -1065,7 +1035,8 @@
         "mobile_item_width": 150,
         "background": "",
         "background_gradient": ""
-      }
+      },
+      "disabled": true
     },
     "reviews": {
       "type": "reviews-carousel",
@@ -1073,49 +1044,49 @@
         "r1": {
           "type": "review",
           "settings": {
-            "author": "Daniel M.",
+            "author": "Customer name",
             "city": "",
             "date": "",
-            "title": "Better than I expected",
-            "verified": true,
+            "title": "Review title",
+            "verified": false,
             "rating": 5,
-            "content": "<p>Mesh, stitching, lettering — it feels like the jersey I paid four times as much for at the arena store. Arrived in four days.</p>"
+            "content": "<p>Paste a real customer review here.</p>"
           }
         },
         "r2": {
           "type": "review",
           "settings": {
-            "author": "Sofia R.",
+            "author": "Customer name",
             "city": "",
             "date": "",
-            "title": "Lettering is spot on",
-            "verified": true,
+            "title": "Review title",
+            "verified": false,
             "rating": 5,
-            "content": "<p>Got my son's name on the back for his birthday. The stitched-look numbers match the real thing and it survived the washing machine.</p>"
+            "content": "<p>Paste a real customer review here.</p>"
           }
         },
         "r3": {
           "type": "review",
           "settings": {
-            "author": "Marcus T.",
+            "author": "Customer name",
             "city": "",
             "date": "",
-            "title": "Third order this year",
-            "verified": true,
+            "title": "Review title",
+            "verified": false,
             "rating": 5,
-            "content": "<p>Sizes run true to the chart. I ordered a large again and it fits exactly like the last one. Easy returns the one time I got it wrong.</p>"
+            "content": "<p>Paste a real customer review here.</p>"
           }
         },
         "r4": {
           "type": "review",
           "settings": {
-            "author": "Ana P.",
+            "author": "Customer name",
             "city": "",
             "date": "",
-            "title": "Fast and well packed",
-            "verified": true,
+            "title": "Review title",
+            "verified": false,
             "rating": 5,
-            "content": "<p>Ordered on a Thursday, wore it courtside on Sunday. Folded properly in a sealed bag, no creases.</p>"
+            "content": "<p>Paste a real customer review here.</p>"
           }
         }
       },
@@ -1133,8 +1104,8 @@
         "content": "",
         "link_url": "",
         "link_text": "",
-        "rating_value": "4.8",
-        "reviews_count": "2,400",
+        "rating_value": "",
+        "reviews_count": "",
         "reviews_count_label": "verified reviews",
         "card_style": "compact",
         "compact_show_photo": false,
@@ -1153,7 +1124,8 @@
         "heading_gradient": "",
         "review_card_background": "#ffffff",
         "review_card_text_color": ""
-      }
+      },
+      "disabled": true
     },
     "faq": {
       "type": "faq",
@@ -1162,35 +1134,35 @@
           "type": "item",
           "settings": {
             "title": "When will I receive my order?",
-            "content": "<p>We dispatch within 24 hours on working days. Delivery takes 3-6 days worldwide, tracked from the moment it leaves our warehouse.</p>"
+            "content": "<p>We dispatch within 24 hours on working days. Delivery takes 3-6 days, tracked from the moment your order leaves our warehouse.</p>"
           }
         },
         "f2": {
           "type": "item",
           "settings": {
-            "title": "What is the quality of your jerseys like?",
-            "content": "<p>Lightweight recycled performance mesh with the oversized basketball cut, heat-pressed stitched-look lettering and team wordmarks. Built like the jerseys worn on court — every one is checked by hand before it ships.</p>"
+            "title": "How warm are your jackets?",
+            "content": "<p>Each jacket's fill, weight and temperature range are listed on its product page. As a rule, the higher the fill power, the warmer the jacket for its weight.</p>"
           }
         },
         "f3": {
           "type": "item",
           "settings": {
-            "title": "Can I swap the size if it doesn't fit?",
-            "content": "<p>Yes. You have 30 days to exchange any unworn jersey, and size swaps are free — even on personalised jerseys.</p>"
+            "title": "Which size should I choose?",
+            "content": "<p>Our jackets have a regular fit with room for a mid-layer. Between two sizes, take the larger one if you layer heavily. Measurements for each size are in the size guide.</p>"
           }
         },
         "f4": {
           "type": "item",
           "settings": {
-            "title": "Is name and number lettering really free?",
-            "content": "<p>Yes. Add any name and number up to 12 characters at checkout and we letter it at no extra cost, in the correct font for that team.</p>"
+            "title": "Can I return or exchange my jacket?",
+            "content": "<p>Yes. You have 30 days to return or exchange any unworn item with its tags.</p>"
           }
         },
         "f5": {
           "type": "item",
           "settings": {
-            "title": "How does the \"buy 3, get 1 free\" offer work?",
-            "content": "<p>Add four jerseys to your cart: you pay for three and the cheapest one is free. The discount is applied automatically at checkout.</p>"
+            "title": "How do Black Friday prices work?",
+            "content": "<p>Discounts are already applied to the prices shown, and the countdown shows exactly when the offer ends. When a discount code is mentioned, it is applied automatically at checkout.</p>"
           }
         },
         "f6": {
@@ -1234,11 +1206,68 @@
         "accordion_background": "",
         "accordion_text_color": ""
       }
+    },
+    "categories": {
+      "type": "collection-list",
+      "name": "Shop by category",
+      "blocks": {
+        "c_men": {
+          "type": "collection",
+          "settings": {
+            "collection": "men",
+            "title": "MEN",
+            "url": "/collections/men",
+            "text_position": "place-self-end-start text-start",
+            "text_color": "#ffffff",
+            "overlay_color": "#000000",
+            "overlay_opacity": 20
+          }
+        },
+        "c_women": {
+          "type": "collection",
+          "settings": {
+            "collection": "women",
+            "title": "WOMEN",
+            "url": "/collections/women",
+            "text_position": "place-self-end-start text-start",
+            "text_color": "#ffffff",
+            "overlay_color": "#000000",
+            "overlay_opacity": 20
+          }
+        },
+        "c_kids": {
+          "type": "collection",
+          "settings": {
+            "collection": "kids",
+            "title": "KIDS",
+            "url": "/collections/kids",
+            "text_position": "place-self-end-start text-start",
+            "text_color": "#ffffff",
+            "overlay_color": "#000000",
+            "overlay_opacity": 20
+          }
+        }
+      },
+      "block_order": [
+        "c_men",
+        "c_women",
+        "c_kids"
+      ],
+      "settings": {
+        "full_width": true,
+        "stack_collections": true,
+        "collections_per_row_mobile": "1",
+        "collections_per_row": 3,
+        "show_progress_bar": false,
+        "title": "SHOP BY CATEGORY",
+        "link_text": ""
+      }
     }
   },
   "order": [
     "hero",
     "reviews_strip",
+    "categories",
     "team_selector",
     "best_sellers",
     "nba_2526",

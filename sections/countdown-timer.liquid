@@ -1,9 +1,32 @@
 {%- liquid
   assign mode = section.settings.countdown_mode
-  assign shop_offset = 'now' | date: '%z'
+  assign shop_offset_raw = 'now' | date: '%z'
+  comment
+    Strict ISO 8601 needs "+01:00" rather than "+0100" (Safari rejects the latter).
+  endcomment
+  assign shop_offset = shop_offset_raw | slice: 0, 3 | append: ':' | append: shop_offset_raw | slice: 3, 2
   assign end_date = section.settings.end_date | default: '2026-12-31'
   assign end_time = section.settings.end_time | default: '23:59'
   assign target_iso = end_date | append: 'T' | append: end_time | append: ':00' | append: shop_offset
+
+  assign start_iso = ''
+  assign start_date = section.settings.start_date | strip
+  if mode == 'fixed' and start_date != blank
+    assign start_time = section.settings.start_time | default: '00:00' | strip
+    assign start_iso = start_date | append: 'T' | append: start_time | append: ':00' | append: shop_offset
+  endif
+
+  comment
+    First paint guess only (pages are cached): the script re-checks the phase against the visitor's clock.
+  endcomment
+  assign heading_text = section.settings.title
+  if start_iso != blank and section.settings.teaser_title != blank
+    assign now_seconds = 'now' | date: '%s' | plus: 0
+    assign start_seconds = start_iso | date: '%s' | plus: 0
+    if now_seconds < start_seconds
+      assign heading_text = section.settings.teaser_title
+    endif
+  endif
 -%}
 
 {%- render 'section-spacing-collapsing' -%}
@@ -233,6 +256,9 @@
     class="countdown"
     data-mode="{{ mode }}"
     data-target="{{ target_iso }}"
+    data-start="{{ start_iso }}"
+    data-title="{{ section.settings.title | escape }}"
+    data-teaser-title="{{ section.settings.teaser_title | escape }}"
     data-daily-hour="{{ section.settings.daily_reset_hour }}"
     data-evergreen-minutes="{{ section.settings.evergreen_minutes }}"
     data-evergreen-scope="{{ section.settings.evergreen_scope | default: 'visitor' }}"
@@ -246,12 +272,12 @@
           <p class="countdown__subheading bold text-sm uppercase">{{ section.settings.subheading | escape }}</p>
         {%- endif -%}
 
-        {%- if section.settings.title != blank -%}
+        {%- if heading_text != blank -%}
           {%- if section.settings.layout == 'bar' -%}
-            <p class="countdown__heading">{{ section.settings.title | escape }}</p>
+            <p class="countdown__heading">{{ heading_text | escape }}</p>
           {%- else -%}
             <{{ section.settings.heading_tag | default: 'h2' }} class="countdown__heading h3">
-              {{- section.settings.title | escape -}}
+              {{- heading_text | escape -}}
             </{{ section.settings.heading_tag | default: 'h2' }}>
           {%- endif -%}
         {%- endif -%}
@@ -348,6 +374,22 @@
 
       resolveDeadline() {
         const now = Date.now();
+        this.phase = 'live';
+
+        // Optional start date: before it, count down to the start with the teaser heading (or stay hidden).
+        if (this.dataset.mode === 'fixed' && this.dataset.start) {
+          const start = Date.parse(this.dataset.start);
+
+          if (!isNaN(start) && now < start) {
+            this.phase = 'teaser';
+            this.setHeading(this.dataset.teaserTitle);
+            this.toggleSection(Boolean(this.dataset.teaserTitle));
+            return start;
+          }
+
+          this.setHeading(this.dataset.title);
+          this.toggleSection(true);
+        }
 
         if (this.dataset.mode === 'daily') {
           const resetHour = parseInt(this.dataset.dailyHour, 10) || 0;
@@ -401,6 +443,17 @@
         const remaining = this.deadline - Date.now();
 
         if (remaining <= 0) {
+          // End of the teaser: switch to the live offer and keep counting.
+          if (this.phase === 'teaser') {
+            const next = this.resolveDeadline();
+
+            if (next && next > Date.now()) {
+              this.deadline = next;
+              this.tick();
+              return;
+            }
+          }
+
           clearInterval(this.interval);
           this.handleExpiry();
           return;
@@ -420,9 +473,20 @@
         this.seconds.textContent = this.pad(totalSeconds % 60);
       }
 
+      setHeading(text) {
+        const heading = this.querySelector('.countdown__heading');
+        if (heading && text) heading.textContent = text;
+      }
+
+      // Hides the whole section (not only the timer) so no empty coloured strip is left behind.
+      toggleSection(visible) {
+        const section = this.closest('.shopify-section') || this;
+        section.hidden = !visible;
+      }
+
       handleExpiry() {
         if (this.dataset.onExpiry === 'hide') {
-          this.hidden = true;
+          this.toggleSection(false);
           return;
         }
 
@@ -541,6 +605,25 @@
       "label": "End time",
       "default": "23:59",
       "info": "Format HH:MM, in your store's timezone."
+    },
+    {
+      "type": "text",
+      "id": "start_date",
+      "label": "Start date (optional)",
+      "info": "Format YYYY-MM-DD. With \"Fixed end date\": before this date the bar counts down to the start with the teaser heading, then switches to the heading below by itself."
+    },
+    {
+      "type": "text",
+      "id": "start_time",
+      "label": "Start time",
+      "default": "00:00",
+      "info": "Format HH:MM, in your store's timezone."
+    },
+    {
+      "type": "text",
+      "id": "teaser_title",
+      "label": "Heading before the start",
+      "info": "E.g. \"Black Friday starts in\". Leave empty to hide the bar until the start date."
     },
     {
       "type": "range",

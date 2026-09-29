@@ -3300,8 +3300,11 @@ renderForCombination_fn = async function(optionValues) {
   }
   if (!__privateGet(_VariantPicker, _preloadedHtml).has(hashKey)) {
     const sectionQueryParam = this.getAttribute("context") === "quick_buy" ? "" : `&section_id=${this.getAttribute("section-id")}`;
+    const pickerSectionOnPage = document.getElementById(`shopify-section-${this.getAttribute("section-id")}`) !== null;
+    const currentView = this.getAttribute("context") === "quick_buy" || !pickerSectionOnPage ? null : new URL(window.location.href).searchParams.get("view");
+    const viewQueryParam = currentView ? `&view=${encodeURIComponent(currentView)}` : "";
     const promise = new Promise(async (resolve) => {
-      resolve(await (await fetch(`${productUrl}?option_values=${optionValuesAsString}${sectionQueryParam}`)).text());
+      resolve(await (await fetch(`${productUrl}?option_values=${optionValuesAsString}${sectionQueryParam}${viewQueryParam}`)).text());
     });
     __privateGet(_VariantPicker, _preloadedHtml).set(hashKey, { htmlPromise: promise, timestamp: Date.now() });
     if (__privateGet(_VariantPicker, _preloadedHtml).size > 100) {
