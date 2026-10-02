@@ -74,8 +74,6 @@
         "allow_transparent_header": false,
         "enable_parallax": false,
         "image_size": "lg",
-        "image": "shopify://shop_images/HERO.webp",
-        "mobile_image": "shopify://shop_images/HERO_mobile_1.webp",
         "mobile_text_position": "place-self-center text-center",
         "desktop_text_position": "sm:place-self-center sm:text-center",
         "text_color": "#ffffff",
@@ -106,8 +104,79 @@
         "text_color": "#ffffff"
       }
     },
+    "categories": {
+      "type": "collection-list",
+      "blocks": {
+        "c_men": {
+          "type": "collection",
+          "settings": {
+            "collection": "men",
+            "subheading": "",
+            "title": "MEN",
+            "url": "/collections/men",
+            "heading_tag": "h2",
+            "text_position": "place-self-end-start text-start",
+            "text_color": "#ffffff",
+            "overlay_color": "#000000",
+            "overlay_opacity": 20
+          }
+        },
+        "c_women": {
+          "type": "collection",
+          "settings": {
+            "collection": "women",
+            "subheading": "",
+            "title": "WOMEN",
+            "url": "/collections/women",
+            "heading_tag": "h2",
+            "text_position": "place-self-end-start text-start",
+            "text_color": "#ffffff",
+            "overlay_color": "#000000",
+            "overlay_opacity": 20
+          }
+        },
+        "c_kids": {
+          "type": "collection",
+          "settings": {
+            "collection": "kids",
+            "subheading": "",
+            "title": "KIDS",
+            "url": "/collections/kids",
+            "heading_tag": "h2",
+            "text_position": "place-self-end-start text-start",
+            "text_color": "#ffffff",
+            "overlay_color": "#000000",
+            "overlay_opacity": 20
+          }
+        }
+      },
+      "block_order": [
+        "c_men",
+        "c_women",
+        "c_kids"
+      ],
+      "name": "Shop by category",
+      "settings": {
+        "full_width": true,
+        "stack_collections": true,
+        "collections_per_row_mobile": "1",
+        "collections_per_row": 3,
+        "show_progress_bar": false,
+        "subheading": "",
+        "title": "SHOP BY CATEGORY",
+        "content": "",
+        "link_url": "",
+        "link_text": "",
+        "background": "",
+        "background_gradient": "",
+        "text_color": "",
+        "heading_color": "",
+        "heading_gradient": ""
+      }
+    },
     "team_selector": {
       "type": "team-selector",
+      "disabled": true,
       "name": "Team selector",
       "settings": {
         "title": "",
@@ -124,8 +193,7 @@
         "text_color": "",
         "circle_background": "#f2f2f2",
         "circle_border": ""
-      },
-      "disabled": true
+      }
     },
     "best_sellers": {
       "type": "featured-collection",
@@ -263,6 +331,7 @@
         "v1": {
           "type": "video",
           "settings": {
+            "video_url": "",
             "rating": 5,
             "testimonial": "",
             "attr_1": "",
@@ -272,6 +341,7 @@
         "v2": {
           "type": "video",
           "settings": {
+            "video_url": "",
             "rating": 5,
             "testimonial": "",
             "attr_1": "",
@@ -281,6 +351,7 @@
         "v3": {
           "type": "video",
           "settings": {
+            "video_url": "",
             "rating": 5,
             "testimonial": "",
             "attr_1": "",
@@ -290,6 +361,7 @@
         "v4": {
           "type": "video",
           "settings": {
+            "video_url": "",
             "rating": 5,
             "testimonial": "",
             "attr_1": "",
@@ -365,6 +437,7 @@
     },
     "top_teams": {
       "type": "featured-collection",
+      "disabled": true,
       "name": "Lightweight",
       "settings": {
         "collection": "lightweight-puffers",
@@ -387,8 +460,7 @@
         "heading_gradient": "",
         "product_card_background": "",
         "product_card_text_color": ""
-      },
-      "disabled": true
+      }
     },
     "kids": {
       "type": "featured-collection",
@@ -418,6 +490,7 @@
     },
     "throwbacks": {
       "type": "featured-collection",
+      "disabled": true,
       "name": "Accessories",
       "settings": {
         "collection": "accessories",
@@ -440,8 +513,7 @@
         "heading_gradient": "",
         "product_card_background": "",
         "product_card_text_color": ""
-      },
-      "disabled": true
+      }
     },
     "fans_heading": {
       "type": "rich-text",
@@ -466,6 +538,7 @@
         "h",
         "t"
       ],
+      "disabled": true,
       "name": "Fans heading",
       "settings": {
         "full_width": true,
@@ -474,8 +547,7 @@
         "background": "",
         "background_gradient": "",
         "text_color": ""
-      },
-      "disabled": true
+      }
     },
     "fans_grid": {
       "type": "media-grid",
@@ -1200,60 +1272,108 @@
         "accordion_text_color": ""
       }
     },
-    "categories": {
-      "type": "collection-list",
-      "name": "Shop by category",
+    "featured_product_TMhK6X": {
+      "type": "featured-product",
       "blocks": {
-        "c_men": {
-          "type": "collection",
+        "vendor_kzpdtd": {
+          "type": "vendor",
+          "settings": {}
+        },
+        "title_pWFmGy": {
+          "type": "title",
           "settings": {
-            "collection": "men",
-            "title": "MEN",
-            "url": "/collections/men",
-            "text_position": "place-self-end-start text-start",
-            "text_color": "#ffffff",
-            "overlay_color": "#000000",
-            "overlay_opacity": 20
+            "heading_tag": "h2"
           }
         },
-        "c_women": {
-          "type": "collection",
+        "badges_wpGKMJ": {
+          "type": "badges",
+          "settings": {}
+        },
+        "price_DF86fX": {
+          "type": "price",
           "settings": {
-            "collection": "women",
-            "title": "WOMEN",
-            "url": "/collections/women",
-            "text_position": "place-self-end-start text-start",
-            "text_color": "#ffffff",
-            "overlay_color": "#000000",
-            "overlay_opacity": 20
+            "show_taxes_notice": false
           }
         },
-        "c_kids": {
-          "type": "collection",
+        "rating_9fryTM": {
+          "type": "rating",
           "settings": {
-            "collection": "kids",
-            "title": "KIDS",
-            "url": "/collections/kids",
-            "text_position": "place-self-end-start text-start",
-            "text_color": "#ffffff",
-            "overlay_color": "#000000",
-            "overlay_opacity": 20
+            "show_empty": false
           }
+        },
+        "separator_8KkhYV": {
+          "type": "separator",
+          "settings": {}
+        },
+        "description_aePYRw": {
+          "type": "description",
+          "settings": {
+            "icon": "none",
+            "icon_width": 20,
+            "collapse_content": false
+          }
+        },
+        "variant_picker_w8kddn": {
+          "type": "variant_picker",
+          "settings": {
+            "hide_sold_out_variants": false,
+            "stack_blocks": true,
+            "selector_style": "block",
+            "swatch_selector_style": "swatch",
+            "variant_image_options": "",
+            "size_chart_page": ""
+          }
+        },
+        "quantity_selector_EnWbTU": {
+          "type": "quantity_selector",
+          "settings": {}
+        },
+        "buy_buttons_VbCbYN": {
+          "type": "buy_buttons",
+          "settings": {
+            "show_payment_button": true,
+            "show_gift_card_recipient": true,
+            "atc_button_background": "",
+            "atc_button_text_color": "",
+            "payment_button_background": "",
+            "payment_button_text_color": ""
+          }
+        },
+        "pickup_availability_hWfYAK": {
+          "type": "pickup_availability",
+          "settings": {}
         }
       },
       "block_order": [
-        "c_men",
-        "c_women",
-        "c_kids"
+        "vendor_kzpdtd",
+        "title_pWFmGy",
+        "badges_wpGKMJ",
+        "price_DF86fX",
+        "rating_9fryTM",
+        "separator_8KkhYV",
+        "description_aePYRw",
+        "variant_picker_w8kddn",
+        "quantity_selector_EnWbTU",
+        "buy_buttons_VbCbYN",
+        "pickup_availability_hWfYAK"
       ],
+      "name": "Featured product",
       "settings": {
         "full_width": true,
-        "stack_collections": true,
-        "collections_per_row_mobile": "1",
-        "collections_per_row": 3,
-        "show_progress_bar": false,
-        "title": "SHOP BY CATEGORY",
-        "link_text": ""
+        "product": "doudoune-space-1996",
+        "desktop_media_width": 55,
+        "desktop_media_layout": "carousel_thumbnails_left",
+        "mobile_media_size": "expanded",
+        "mobile_carousel_control": "floating_dots",
+        "enable_video_autoplay": true,
+        "enable_video_looping": false,
+        "enable_image_zoom": true,
+        "max_image_zoom_level": 3,
+        "background": "",
+        "background_gradient": "",
+        "text_color": "",
+        "input_background": "rgba(0,0,0,0)",
+        "input_text_color": ""
       }
     }
   },
@@ -1275,6 +1395,7 @@
     "fans_heading",
     "fans_grid",
     "reviews",
-    "faq"
+    "faq",
+    "featured_product_TMhK6X"
   ]
 }
