@@ -57,7 +57,7 @@
           "type": "pdp_size_selector",
           "settings": {
             "label_text": "Select your size",
-            "size_option_name": "Size",
+            "size_option_name": "Size, Taille",
             "show_size_guide": true,
             "size_guide_text": "Size guide",
             "other_options": "show",

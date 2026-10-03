@@ -33,7 +33,7 @@ Supported variables
   assign pss_class = 'pdp-size-selector-' | append: block.id
   assign pss_label = block.settings.label_text | default: 'Choose your size'
   assign pss_guide_text = block.settings.size_guide_text | default: 'Size guide'
-  assign pss_size_name = block.settings.size_option_name | default: 'Size' | downcase | strip
+  assign pss_size_names = block.settings.size_option_name | default: 'Size, Taille' | downcase | split: ','
   assign pss_other_options = block.settings.other_options | default: 'show'
   assign pss_color_names = 'color,colour,couleur,couleurs,coloris,colors,colours,farbe,colore,kleur' | split: ','
   assign pss_hide_sold_out = block.settings.hide_sold_out_variants | default: false
@@ -68,11 +68,31 @@ Supported variables
   assign pss_size_position = 0
   for option in product.options_with_values
     assign option_downcase = option.name | downcase | strip
-    if option_downcase == pss_size_name
-      assign pss_size_position = option.position
+    for pss_size_name in pss_size_names
+      assign pss_size_name_clean = pss_size_name | strip
+      if option_downcase == pss_size_name_clean
+        assign pss_size_position = option.position
+        break
+      endif
+    endfor
+    if pss_size_position != 0
       break
     endif
   endfor
+
+  comment
+    Common size option names in other languages, so a "Taille" or "Talla" option is never mistaken for the color one.
+  endcomment
+  if pss_size_position == 0
+    assign pss_common_size_names = 'size,sizes,taille,tailles,talla,tallas,größe,grösse,taglia,maat,tamanho,rozmiar' | split: ','
+    for option in product.options_with_values
+      assign option_downcase = option.name | downcase | strip
+      if pss_common_size_names contains option_downcase
+        assign pss_size_position = option.position
+        break
+      endif
+    endfor
+  endif
 
   if pss_size_position == 0
     for option in product.options_with_values
@@ -86,7 +106,13 @@ Supported variables
 
   # Without a recognisable size option, the first option takes the header row and the size guide link.
   if pss_size_position == 0 and product.has_only_default_variant == false
-    assign pss_size_position = product.options_with_values.first.position
+    for option in product.options_with_values
+      assign option_downcase = option.name | downcase | strip
+      unless pss_color_names contains option_downcase
+        assign pss_size_position = option.position
+        break
+      endunless
+    endfor
   endif
 
   capture drawer_id
