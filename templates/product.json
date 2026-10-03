@@ -19,14 +19,16 @@
             "text": "Earn [amount] in store credit",
             "icon_color": "#111111",
             "background": "#f4f3f0",
-            "text_color": "#111111"
+            "text_color": "#111111",
+            "ab_visibility": "all"
           },
           "disabled": true
         },
         "title": {
           "type": "title",
           "settings": {
-            "heading_tag": "h1"
+            "heading_tag": "h1",
+            "ab_visibility": "all"
           }
         },
         "price_row": {
@@ -34,7 +36,8 @@
           "settings": {
             "show_badge": true,
             "badge_background": "#c8102e",
-            "badge_text_color": "#ffffff"
+            "badge_text_color": "#ffffff",
+            "ab_visibility": "all"
           }
         },
         "stock_alert": {
@@ -45,7 +48,8 @@
             "dynamic_count": false,
             "count_min": 14,
             "count_max": 47,
-            "count_interval": 16
+            "count_interval": 16,
+            "ab_visibility": "all"
           },
           "disabled": true
         },
@@ -57,7 +61,8 @@
             "show_size_guide": true,
             "size_guide_text": "Size guide",
             "other_options": "show",
-            "hide_sold_out_variants": false
+            "hide_sold_out_variants": false,
+            "ab_visibility": "all"
           }
         },
         "personalise": {
@@ -75,7 +80,8 @@
             "name_max_length": 12,
             "number_label": "Number",
             "number_placeholder": "00",
-            "helper_text": "Embroidered exactly as entered."
+            "helper_text": "Embroidered exactly as entered.",
+            "ab_visibility": "all"
           },
           "disabled": true
         },
@@ -88,7 +94,8 @@
             "option_2": "Gift box + card",
             "required": false,
             "property_name": "Gift wrapping",
-            "required_message": "Please choose an option before adding to cart."
+            "required_message": "Please choose an option before adding to cart.",
+            "ab_visibility": "all"
           },
           "disabled": true
         },
@@ -100,7 +107,8 @@
             "atc_button_background": "#111111",
             "atc_button_text_color": "#ffffff",
             "payment_button_background": "",
-            "payment_button_text_color": ""
+            "payment_button_text_color": "",
+            "ab_visibility": "all"
           }
         },
         "payment": {
@@ -108,7 +116,8 @@
           "settings": {
             "icons_source": "custom",
             "icons_list": "visa, master, american_express, paypal, apple_pay, google_pay, shopify_pay, klarna",
-            "alignment": "center"
+            "alignment": "center",
+            "ab_visibility": "all"
           }
         },
         "tiers": {
@@ -131,7 +140,8 @@
             "tier4_percent": 0,
             "tier5_quantity": 0,
             "tier5_pay": 0,
-            "tier5_percent": 0
+            "tier5_percent": 0,
+            "ab_visibility": "all"
           },
           "disabled": true
         },
@@ -143,7 +153,8 @@
             "show_verified": false,
             "video_url_1": "",
             "video_url_2": "",
-            "video_url_3": ""
+            "video_url_3": "",
+            "ab_visibility": "all"
           }
         },
         "bundle": {
@@ -185,7 +196,8 @@
             "empty_collection_text": "No jackets are available right now.",
             "button_background": "#111111",
             "button_text_color": "#ffffff",
-            "badge_color": "#c8102e"
+            "badge_color": "#c8102e",
+            "ab_visibility": "all"
           }
         },
         "trust": {
@@ -201,7 +213,8 @@
             "text_2": "30-day returns",
             "icon_3": "picto-lock",
             "icon_color_3": "#111111",
-            "text_3": "Secure checkout"
+            "text_3": "Secure checkout",
+            "ab_visibility": "all"
           }
         },
         "ct_details": {
@@ -211,7 +224,8 @@
             "icon_width": 20,
             "title": "Fit & sizing",
             "content": "<p>Regular fit with room for a mid-layer underneath. If you are between two sizes, take the larger one for layering or the smaller one for a closer fit. Measurements for each size are in the size guide.</p>",
-            "page": ""
+            "page": "",
+            "ab_visibility": "all"
           }
         },
         "ct_care": {
@@ -221,7 +235,8 @@
             "icon_width": 20,
             "title": "Care",
             "content": "<p>Close all zips and wash cold on a gentle cycle with a down-specific detergent. Tumble dry on low with two clean tennis balls to restore the loft. Do not dry-clean or iron. Store uncompressed and dry.</p>",
-            "page": ""
+            "page": "",
+            "ab_visibility": "all"
           }
         },
         "delivery": {
@@ -230,7 +245,8 @@
             "icon": "picto-box",
             "min_days": 3,
             "max_days": 6,
-            "text": "Order now — delivered between [date_min] and [date_max]"
+            "text": "Order now — delivered between [date_min] and [date_max]",
+            "ab_visibility": "all"
           }
         },
         "reviews_left": {
@@ -334,7 +350,8 @@
             "review_10_size": "",
             "review_10_fit": "",
             "review_10_body": "",
-            "review_10_helpful": 0
+            "review_10_helpful": 0,
+            "ab_visibility": "all"
           }
         },
         "sticky": {
@@ -344,13 +361,15 @@
             "show_delivery": true,
             "min_days": 3,
             "max_days": 6,
-            "mobile_only": false
+            "mobile_only": false,
+            "ab_visibility": "all"
           }
         },
         "rating": {
           "type": "rating",
           "settings": {
-            "show_empty": false
+            "show_empty": false,
+            "ab_visibility": "all"
           }
         },
         "countdown_bf": {
@@ -372,10 +391,11 @@
             "label_minutes": "Min",
             "label_seconds": "Sec",
             "discount_code": "",
-            "code_price_label": "Your price: ",
+            "code_price_label": "Your price:",
             "background": "#111111",
             "text_color": "#ffffff",
-            "accent_color": "#c8102e"
+            "accent_color": "#c8102e",
+            "ab_visibility": "b"
           }
         },
         "countdown_midnight": {
@@ -399,16 +419,18 @@
             "label_seconds": "Sec",
             "discount_code": "MIDNIGHT15",
             "code_percent": 15,
-            "code_price_label": "Your price tonight: ",
+            "code_price_label": "Your price tonight:",
             "background": "#0b0b0b",
             "text_color": "#ffffff",
-            "accent_color": "#c8102e"
+            "accent_color": "#c8102e",
+            "ab_visibility": "all"
           }
         },
         "inventory": {
           "type": "inventory",
           "settings": {
-            "low_inventory_threshold": 10
+            "low_inventory_threshold": 10,
+            "ab_visibility": "all"
           }
         },
         "description": {
@@ -416,7 +438,8 @@
           "settings": {
             "icon": "none",
             "icon_width": 20,
-            "collapse_content": true
+            "collapse_content": true,
+            "ab_visibility": "all"
           }
         },
         "ct_shipping": {
@@ -426,7 +449,8 @@
             "icon_width": 20,
             "title": "Shipping & returns",
             "content": "<p>Dispatched within 24 hours on working days, delivered in 3-6 days with tracking. Free shipping on every jacket. 30 days to return or exchange any unworn item.</p>",
-            "page": ""
+            "page": "",
+            "ab_visibility": "all"
           }
         },
         "guarantee": {
@@ -439,7 +463,8 @@
             "title": "Our 30-day promise",
             "content": "<p>Try it at home. If it's not right, exchange it or return it within 30 days for a full refund.</p>",
             "background": "#f4f3f0",
-            "text_color": "#111111"
+            "text_color": "#111111",
+            "ab_visibility": "all"
           }
         },
         "help": {
@@ -452,7 +477,8 @@
             "title": "Need help choosing?",
             "content": "<p>Questions about sizing or warmth? <a href=\"/pages/contact\">Write to our team</a>, we'll help you pick the right jacket.</p>",
             "background": "#f4f3f0",
-            "text_color": "#111111"
+            "text_color": "#111111",
+            "ab_visibility": "all"
           }
         },
         "ct_payment": {
@@ -462,11 +488,39 @@
             "icon_width": 20,
             "title": "Secure payment",
             "content": "<p>Payments go through Shopify's encrypted checkout (SSL). We never see or store your card details. Pay by card or with the express payment options shown at checkout.</p>",
-            "page": ""
+            "page": "",
+            "ab_visibility": "all"
+          }
+        },
+        "countdown_bf_a": {
+          "type": "pdp_countdown",
+          "settings": {
+            "mode": "fixed",
+            "timezone": "",
+            "start_date": "2026-11-20",
+            "end_date": "2026-11-30",
+            "end_time": "23:59",
+            "window_start": "23:30",
+            "window_end": "01:00",
+            "badge": "Black Friday",
+            "title": "Black Friday — up to 50% off, ends in",
+            "text": "Discount already applied to the price shown.",
+            "show_days": true,
+            "label_days": "Days",
+            "label_hours": "Hrs",
+            "label_minutes": "Min",
+            "label_seconds": "Sec",
+            "discount_code": "",
+            "code_price_label": "Your price:",
+            "background": "#111111",
+            "text_color": "#ffffff",
+            "accent_color": "#c8102e",
+            "ab_visibility": "a"
           }
         }
       },
       "block_order": [
+        "countdown_bf_a",
         "title",
         "rating",
         "price_row",
