@@ -953,26 +953,13 @@
     "settings": [
       {
         "type": "paragraph",
-        "content": "Les produits qui utilisent le template B affichent le template A pendant la plage horaire, et le template B le reste du temps. Tous les visiteurs voient la même version au même moment."
+        "content": "Versions A et B dans la même page produit : chaque bloc a un réglage « A/B test version ». La version A s'affiche pendant la plage horaire, la version B le reste du temps, pour tous les visiteurs. Aperçu : ajoutez ?ab_preview=a ou ?ab_preview=b à l'adresse d'un produit."
       },
       {
         "type": "checkbox",
         "id": "ab_enabled",
         "label": "Activer l'A/B test horaire",
         "default": false
-      },
-      {
-        "type": "text",
-        "id": "ab_template_a",
-        "label": "Template A (suffixe)",
-        "default": "version-a",
-        "info": "product.version-a.json → version-a"
-      },
-      {
-        "type": "text",
-        "id": "ab_template_b",
-        "label": "Template B (suffixe)",
-        "info": "Vide = template produit par défaut (product.json). Seuls les produits assignés à ce template participent au test."
       },
       {
         "type": "text",

@@ -1,64 +1,46 @@
 {%- comment -%}
 ----------------------------------------------------------------------------------------------------------------------
-A/B PRODUCT PAGE SWITCH (time based)
+A/B PRODUCT PAGE (time based, single page)
 ----------------------------------------------------------------------------------------------------------------------
 
-Rendered first thing in <head>. For products assigned to template B, shows template A (through Shopify's ?view=
-parameter) during the daily time window set in Theme settings > "A/B test pages produit", and template B the rest of
-the time. Everyone sees the same version at the same time.
+Rendered first thing in <head>. Versions A and B live in the same product page: each product block has an
+"A/B test version" setting (both versions / version A only / version B only). During the daily time window set in
+Theme settings > "A/B test pages produit", version A is shown; the rest of the time, version B. Everyone sees the same
+version at the same time, and the page never redirects.
 
+* The version is set on <html data-ab-version="A|B"> before the page paints, so blocks never flash.
 * Time is read in the store's timezone (UTC offset rendered by Liquid) or in the IANA timezone set in the settings
   (e.g. the ad account's timezone), which also follows daylight saving time.
-* It never switches in the theme editor, so both templates can be edited.
-* ?ab_preview=a or ?ab_preview=b forces a version, to check both pages at any time.
-* The version seen is saved on the cart as the attribute "A/B page produit" (visible on the order), exposed as
-  html[data-ab-version] and published as the "ab_product_page_view" customer event for custom pixels.
+* ?ab_preview=a or ?ab_preview=b forces a version, to check both at any time.
+* In the theme editor both versions are shown, each A/B block tagged "Version A" / "Version B", so all can be edited.
+* When the page has A/B blocks, the version seen is saved on the cart as the attribute "A/B page produit" (visible on
+  the order) and published as the "ab_product_page_view" customer event for custom pixels.
 {%- endcomment -%}
 
-{%- comment -%}
-  Safety net: if the redirect to template A lands on a 404 (template A missing or not yet synced on the store), go
-  straight back to the product without ?view= and switch the test off for the rest of the visit.
-{%- endcomment -%}
-{%- if settings.ab_enabled and request.page_type == '404' -%}
-  <script>
-    (function () {
-      var templateA = {{ settings.ab_template_a | default: 'version-a' | strip | json }};
-      var url = new URL(window.location.href);
+{%- if settings.ab_enabled and request.design_mode -%}
+  <style>
+    [data-ab-only] { position: relative; outline: 1px dashed rgba(17, 17, 17, .35); outline-offset: 4px; }
+    [data-ab-only]::before {
+      content: "Version " attr(data-ab-only);
+      position: absolute; inset-block-start: -10px; inset-inline-end: 0; z-index: 2;
+      padding: 1px 6px; border-radius: 2px; background: #111111; color: #ffffff;
+      font: 700 10px/1.4 var(--text-font-family); letter-spacing: .08em; text-transform: uppercase;
+    }
+  </style>
+{%- elsif settings.ab_enabled -%}
+  <style>
+    html:not([data-ab-version="A"]) [data-ab-only="a"],
+    html[data-ab-version="A"] [data-ab-only="b"] { display: none !important; }
+  </style>
 
-      if (url.searchParams.get('view') === templateA && url.pathname.indexOf('/products/') !== -1) {
-        try { sessionStorage.setItem('ab-template-a-missing', '1'); } catch (error) {}
-        url.searchParams.delete('view');
-        url.searchParams.delete('ab_preview');
-        window.location.replace(url.toString());
-      }
-    })();
-  </script>
-{%- endif -%}
-
-{%- if settings.ab_enabled and request.page_type == 'product' and product != blank -%}
-  {%- liquid
-    assign ab_a = settings.ab_template_a | default: 'version-a' | strip
-    assign ab_b = settings.ab_template_b | strip
-    assign ab_assigned = product.template_suffix | default: ''
-    assign ab_current = template.suffix | default: ''
-
-    assign ab_in_test = false
-    if ab_a != blank and ab_a != ab_b and ab_assigned == ab_b
-      assign ab_in_test = true
-    endif
-  -%}
-
-  {%- if ab_in_test -%}
+  {%- if request.page_type == 'product' -%}
     <script>
       (function () {
         var config = {
-          a: {{ ab_a | json }},
-          current: {{ ab_current | json }},
           start: {{ settings.ab_start | default: '23:30' | strip | json }},
           end: {{ settings.ab_end | default: '01:00' | strip | json }},
           timezone: {{ settings.ab_timezone | strip | json }},
           shopOffset: {{ 'now' | date: '%z' | json }},
-          designMode: {{ request.design_mode | json }},
           tagOrders: {{ settings.ab_tag_orders | json }}
         };
 
@@ -96,36 +78,19 @@ the time. Everyone sees the same version at the same time.
         var now = minutesNow();
         var inWindow = start === end ? false : (start < end ? now >= start && now < end : now >= start || now < end);
 
-        var url = new URL(window.location.href);
-        var preview = (url.searchParams.get('ab_preview') || '').toLowerCase();
-        var wantA = preview === 'a' ? true : (preview === 'b' ? false : inWindow);
-
-        // Template A answered with a 404 earlier in this visit (see the 404 guard below): stay on B.
-        try {
-          if (preview !== 'a' && sessionStorage.getItem('ab-template-a-missing')) wantA = false;
-        } catch (error) {}
-        var isA = config.current === config.a;
-
-        if (!config.designMode) {
-          if (wantA && !isA && url.searchParams.get('view') !== config.a) {
-            // A ?view= already pointing at A while B is rendered means template A does not exist: stay on B.
-            url.searchParams.set('view', config.a);
-            window.location.replace(url.toString());
-            return;
-          }
-
-          if (!wantA && isA) {
-            url.searchParams.delete('view');
-            window.location.replace(url.toString());
-            return;
-          }
-        }
-
-        var version = isA ? 'A' : 'B';
+        var preview = (new URL(window.location.href).searchParams.get('ab_preview') || '').toLowerCase();
+        var version = preview === 'a' ? 'A' : (preview === 'b' ? 'B' : (inWindow ? 'A' : 'B'));
         document.documentElement.setAttribute('data-ab-version', version);
 
-        if (config.tagOrders && !config.designMode) {
+        // Only pages that actually contain A/B blocks take part in the test.
+        function inTest() {
+          return document.querySelector('[data-ab-only]') !== null;
+        }
+
+        if (config.tagOrders) {
           document.addEventListener('DOMContentLoaded', function () {
+            if (!inTest()) return;
+
             try {
               if (sessionStorage.getItem('ab-product-page') === version) return;
             } catch (error) {}
@@ -143,13 +108,32 @@ the time. Everyone sees the same version at the same time.
         }
 
         window.addEventListener('load', function () {
+          if (!inTest()) return;
           try {
             if (window.Shopify && window.Shopify.analytics && typeof window.Shopify.analytics.publish === 'function') {
-              window.Shopify.analytics.publish('ab_product_page_view', { version: version, template: config.current || 'default' });
+              window.Shopify.analytics.publish('ab_product_page_view', { version: version });
             }
           } catch (error) {}
         });
       })();
     </script>
   {%- endif -%}
+{%- else -%}
+  {%- comment -%}A/B test off: blocks for version A hide, everything else shows.{%- endcomment -%}
+  <style>[data-ab-only="a"] { display: none !important; }</style>
+{%- endif -%}
+
+{%- comment -%}
+  Old links to the former separate version A page (?view=version-a): drop the parameter and show the product.
+{%- endcomment -%}
+{%- if request.page_type == '404' -%}
+  <script>
+    (function () {
+      var url = new URL(window.location.href);
+      if (url.searchParams.get('view') === 'version-a' && url.pathname.indexOf('/products/') !== -1) {
+        url.searchParams.delete('view');
+        window.location.replace(url.toString());
+      }
+    })();
+  </script>
 {%- endif -%}

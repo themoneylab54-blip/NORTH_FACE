@@ -62,7 +62,9 @@
 
         {%- for block in section.blocks -%}
           {%- if block.type == 'pdp_gallery_reviews' -%}
-            {%- render 'pdp-gallery-reviews', block: block, product: product, product_form_id: product_form_id, section: section -%}
+            <div {% if block.settings.ab_visibility == 'a' or block.settings.ab_visibility == 'b' %}data-ab-only="{{ block.settings.ab_visibility }}"{% endif %}>
+              {%- render 'pdp-gallery-reviews', block: block, product: product, product_form_id: product_form_id, section: section -%}
+            </div>
           {%- endif -%}
         {%- endfor -%}
       </div>
@@ -139,7 +141,34 @@ quick buy information in a template, that will be extracted in JS, but ensure it
     {
       "type": "vendor",
       "name": "Vendor",
-      "limit": 1
+      "limit": 1,
+      "settings": [
+        {
+          "type": "header",
+          "content": "A/B test"
+        },
+        {
+          "type": "select",
+          "id": "ab_visibility",
+          "label": "A/B test version",
+          "options": [
+            {
+              "value": "all",
+              "label": "Both versions"
+            },
+            {
+              "value": "a",
+              "label": "Version A only"
+            },
+            {
+              "value": "b",
+              "label": "Version B only"
+            }
+          ],
+          "default": "all",
+          "info": "Version A shows during the A/B time window set in Theme settings, version B the rest of the time."
+        }
+      ]
     },
     {
       "type": "title",
@@ -177,13 +206,65 @@ quick buy information in a template, that will be extracted in JS, but ensure it
             }
           ],
           "default": "h2"
+        },
+        {
+          "type": "header",
+          "content": "A/B test"
+        },
+        {
+          "type": "select",
+          "id": "ab_visibility",
+          "label": "A/B test version",
+          "options": [
+            {
+              "value": "all",
+              "label": "Both versions"
+            },
+            {
+              "value": "a",
+              "label": "Version A only"
+            },
+            {
+              "value": "b",
+              "label": "Version B only"
+            }
+          ],
+          "default": "all",
+          "info": "Version A shows during the A/B time window set in Theme settings, version B the rest of the time."
         }
       ]
     },
     {
       "type": "sku",
       "name": "SKU",
-      "limit": 1
+      "limit": 1,
+      "settings": [
+        {
+          "type": "header",
+          "content": "A/B test"
+        },
+        {
+          "type": "select",
+          "id": "ab_visibility",
+          "label": "A/B test version",
+          "options": [
+            {
+              "value": "all",
+              "label": "Both versions"
+            },
+            {
+              "value": "a",
+              "label": "Version A only"
+            },
+            {
+              "value": "b",
+              "label": "Version B only"
+            }
+          ],
+          "default": "all",
+          "info": "Version A shows during the A/B time window set in Theme settings, version B the rest of the time."
+        }
+      ]
     },
     {
       "type": "badges",
@@ -193,6 +274,31 @@ quick buy information in a template, that will be extracted in JS, but ensure it
         {
           "type": "paragraph",
           "content": "Use metafields to add custom badges. [Learn more](https://support.maestrooo.com/article/75-collection-displaying-custom-label)"
+        },
+        {
+          "type": "header",
+          "content": "A/B test"
+        },
+        {
+          "type": "select",
+          "id": "ab_visibility",
+          "label": "A/B test version",
+          "options": [
+            {
+              "value": "all",
+              "label": "Both versions"
+            },
+            {
+              "value": "a",
+              "label": "Version A only"
+            },
+            {
+              "value": "b",
+              "label": "Version B only"
+            }
+          ],
+          "default": "all",
+          "info": "Version A shows during the A/B time window set in Theme settings, version B the rest of the time."
         }
       ]
     },
@@ -206,6 +312,31 @@ quick buy information in a template, that will be extracted in JS, but ensure it
           "id": "show_taxes_notice",
           "label": "Show taxes notice",
           "default": false
+        },
+        {
+          "type": "header",
+          "content": "A/B test"
+        },
+        {
+          "type": "select",
+          "id": "ab_visibility",
+          "label": "A/B test version",
+          "options": [
+            {
+              "value": "all",
+              "label": "Both versions"
+            },
+            {
+              "value": "a",
+              "label": "Version A only"
+            },
+            {
+              "value": "b",
+              "label": "Version B only"
+            }
+          ],
+          "default": "all",
+          "info": "Version A shows during the A/B time window set in Theme settings, version B the rest of the time."
         }
       ]
     },
@@ -217,6 +348,31 @@ quick buy information in a template, that will be extracted in JS, but ensure it
         {
           "type": "paragraph",
           "content": "To display payment installments, your store needs to support Shop Pay Installments. [Learn more](https://help.shopify.com/en/manual/payments/shop-pay-installments)"
+        },
+        {
+          "type": "header",
+          "content": "A/B test"
+        },
+        {
+          "type": "select",
+          "id": "ab_visibility",
+          "label": "A/B test version",
+          "options": [
+            {
+              "value": "all",
+              "label": "Both versions"
+            },
+            {
+              "value": "a",
+              "label": "Version A only"
+            },
+            {
+              "value": "b",
+              "label": "Version B only"
+            }
+          ],
+          "default": "all",
+          "info": "Version A shows during the A/B time window set in Theme settings, version B the rest of the time."
         }
       ]
     },
@@ -234,12 +390,64 @@ quick buy information in a template, that will be extracted in JS, but ensure it
           "id": "show_empty",
           "label": "Show if no reviews",
           "default": false
+        },
+        {
+          "type": "header",
+          "content": "A/B test"
+        },
+        {
+          "type": "select",
+          "id": "ab_visibility",
+          "label": "A/B test version",
+          "options": [
+            {
+              "value": "all",
+              "label": "Both versions"
+            },
+            {
+              "value": "a",
+              "label": "Version A only"
+            },
+            {
+              "value": "b",
+              "label": "Version B only"
+            }
+          ],
+          "default": "all",
+          "info": "Version A shows during the A/B time window set in Theme settings, version B the rest of the time."
         }
       ]
     },
     {
       "type": "separator",
-      "name": "Separator"
+      "name": "Separator",
+      "settings": [
+        {
+          "type": "header",
+          "content": "A/B test"
+        },
+        {
+          "type": "select",
+          "id": "ab_visibility",
+          "label": "A/B test version",
+          "options": [
+            {
+              "value": "all",
+              "label": "Both versions"
+            },
+            {
+              "value": "a",
+              "label": "Version A only"
+            },
+            {
+              "value": "b",
+              "label": "Version B only"
+            }
+          ],
+          "default": "all",
+          "info": "Version A shows during the A/B time window set in Theme settings, version B the rest of the time."
+        }
+      ]
     },
     {
       "type": "description",
@@ -534,6 +742,31 @@ quick buy information in a template, that will be extracted in JS, but ensure it
           "id": "collapse_content",
           "label": "Collapse content",
           "default": false
+        },
+        {
+          "type": "header",
+          "content": "A/B test"
+        },
+        {
+          "type": "select",
+          "id": "ab_visibility",
+          "label": "A/B test version",
+          "options": [
+            {
+              "value": "all",
+              "label": "Both versions"
+            },
+            {
+              "value": "a",
+              "label": "Version A only"
+            },
+            {
+              "value": "b",
+              "label": "Version B only"
+            }
+          ],
+          "default": "all",
+          "info": "Version A shows during the A/B time window set in Theme settings, version B the rest of the time."
         }
       ]
     },
@@ -602,6 +835,31 @@ quick buy information in a template, that will be extracted in JS, but ensure it
           "id": "size_chart_page",
           "label": "Size chart page",
           "info": "Feature a page for size option"
+        },
+        {
+          "type": "header",
+          "content": "A/B test"
+        },
+        {
+          "type": "select",
+          "id": "ab_visibility",
+          "label": "A/B test version",
+          "options": [
+            {
+              "value": "all",
+              "label": "Both versions"
+            },
+            {
+              "value": "a",
+              "label": "Version A only"
+            },
+            {
+              "value": "b",
+              "label": "Version B only"
+            }
+          ],
+          "default": "all",
+          "info": "Version A shows during the A/B time window set in Theme settings, version B the rest of the time."
         }
       ]
     },
@@ -656,6 +914,31 @@ quick buy information in a template, that will be extracted in JS, but ensure it
             }
           ],
           "default": "swatch"
+        },
+        {
+          "type": "header",
+          "content": "A/B test"
+        },
+        {
+          "type": "select",
+          "id": "ab_visibility",
+          "label": "A/B test version",
+          "options": [
+            {
+              "value": "all",
+              "label": "Both versions"
+            },
+            {
+              "value": "a",
+              "label": "Version A only"
+            },
+            {
+              "value": "b",
+              "label": "Version B only"
+            }
+          ],
+          "default": "all",
+          "info": "Version A shows during the A/B time window set in Theme settings, version B the rest of the time."
         }
       ]
     },
@@ -711,6 +994,31 @@ quick buy information in a template, that will be extracted in JS, but ensure it
           "type": "number",
           "id": "max_length",
           "label": "Maximum number of characters"
+        },
+        {
+          "type": "header",
+          "content": "A/B test"
+        },
+        {
+          "type": "select",
+          "id": "ab_visibility",
+          "label": "A/B test version",
+          "options": [
+            {
+              "value": "all",
+              "label": "Both versions"
+            },
+            {
+              "value": "a",
+              "label": "Version A only"
+            },
+            {
+              "value": "b",
+              "label": "Version B only"
+            }
+          ],
+          "default": "all",
+          "info": "Version A shows during the A/B time window set in Theme settings, version B the rest of the time."
         }
       ]
     },
@@ -722,6 +1030,31 @@ quick buy information in a template, that will be extracted in JS, but ensure it
         {
           "type": "paragraph",
           "content": "The selector is automatically hidden if all variants are sold out. When at least one variant is available, the selector is always visible to prevent the page from moving when switching variants. To show a volume pricing table, add the dedicatd Volume pricing block."
+        },
+        {
+          "type": "header",
+          "content": "A/B test"
+        },
+        {
+          "type": "select",
+          "id": "ab_visibility",
+          "label": "A/B test version",
+          "options": [
+            {
+              "value": "all",
+              "label": "Both versions"
+            },
+            {
+              "value": "a",
+              "label": "Version A only"
+            },
+            {
+              "value": "b",
+              "label": "Version B only"
+            }
+          ],
+          "default": "all",
+          "info": "Version A shows during the A/B time window set in Theme settings, version B the rest of the time."
         }
       ]
     },
@@ -733,6 +1066,31 @@ quick buy information in a template, that will be extracted in JS, but ensure it
         {
           "type": "paragraph",
           "content": "Volume pricing is only available to Shopify Plus merchants. [Learn more](https://help.shopify.com/en/manual/b2b/catalogs/quantity-pricing#volume-pricing)"
+        },
+        {
+          "type": "header",
+          "content": "A/B test"
+        },
+        {
+          "type": "select",
+          "id": "ab_visibility",
+          "label": "A/B test version",
+          "options": [
+            {
+              "value": "all",
+              "label": "Both versions"
+            },
+            {
+              "value": "a",
+              "label": "Version A only"
+            },
+            {
+              "value": "b",
+              "label": "Version B only"
+            }
+          ],
+          "default": "all",
+          "info": "Version A shows during the A/B time window set in Theme settings, version B the rest of the time."
         }
       ]
     },
@@ -750,6 +1108,31 @@ quick buy information in a template, that will be extracted in JS, but ensure it
           "max": 100,
           "step": 1,
           "default": 0
+        },
+        {
+          "type": "header",
+          "content": "A/B test"
+        },
+        {
+          "type": "select",
+          "id": "ab_visibility",
+          "label": "A/B test version",
+          "options": [
+            {
+              "value": "all",
+              "label": "Both versions"
+            },
+            {
+              "value": "a",
+              "label": "Version A only"
+            },
+            {
+              "value": "b",
+              "label": "Version B only"
+            }
+          ],
+          "default": "all",
+          "info": "Version A shows during the A/B time window set in Theme settings, version B the rest of the time."
         }
       ]
     },
@@ -873,6 +1256,31 @@ quick buy information in a template, that will be extracted in JS, but ensure it
           "type": "color",
           "id": "text_color",
           "label": "Texte du bouton"
+        },
+        {
+          "type": "header",
+          "content": "A/B test"
+        },
+        {
+          "type": "select",
+          "id": "ab_visibility",
+          "label": "A/B test version",
+          "options": [
+            {
+              "value": "all",
+              "label": "Both versions"
+            },
+            {
+              "value": "a",
+              "label": "Version A only"
+            },
+            {
+              "value": "b",
+              "label": "Version B only"
+            }
+          ],
+          "default": "all",
+          "info": "Version A shows during the A/B time window set in Theme settings, version B the rest of the time."
         }
       ]
     },
@@ -1038,6 +1446,31 @@ quick buy information in a template, that will be extracted in JS, but ensure it
           "type": "color",
           "id": "icon_color",
           "label": "Couleur de l'icône"
+        },
+        {
+          "type": "header",
+          "content": "A/B test"
+        },
+        {
+          "type": "select",
+          "id": "ab_visibility",
+          "label": "A/B test version",
+          "options": [
+            {
+              "value": "all",
+              "label": "Both versions"
+            },
+            {
+              "value": "a",
+              "label": "Version A only"
+            },
+            {
+              "value": "b",
+              "label": "Version B only"
+            }
+          ],
+          "default": "all",
+          "info": "Version A shows during the A/B time window set in Theme settings, version B the rest of the time."
         }
       ]
     },
@@ -1095,6 +1528,31 @@ quick buy information in a template, that will be extracted in JS, but ensure it
           "step": 1,
           "unit": "s",
           "default": 18
+        },
+        {
+          "type": "header",
+          "content": "A/B test"
+        },
+        {
+          "type": "select",
+          "id": "ab_visibility",
+          "label": "A/B test version",
+          "options": [
+            {
+              "value": "all",
+              "label": "Both versions"
+            },
+            {
+              "value": "a",
+              "label": "Version A only"
+            },
+            {
+              "value": "b",
+              "label": "Version B only"
+            }
+          ],
+          "default": "all",
+          "info": "Version A shows during the A/B time window set in Theme settings, version B the rest of the time."
         }
       ]
     },
@@ -1229,6 +1687,31 @@ quick buy information in a template, that will be extracted in JS, but ensure it
           "type": "color",
           "id": "accent_text_color",
           "label": "Texte du badge"
+        },
+        {
+          "type": "header",
+          "content": "A/B test"
+        },
+        {
+          "type": "select",
+          "id": "ab_visibility",
+          "label": "A/B test version",
+          "options": [
+            {
+              "value": "all",
+              "label": "Both versions"
+            },
+            {
+              "value": "a",
+              "label": "Version A only"
+            },
+            {
+              "value": "b",
+              "label": "Version B only"
+            }
+          ],
+          "default": "all",
+          "info": "Version A shows during the A/B time window set in Theme settings, version B the rest of the time."
         }
       ]
     },
@@ -1278,6 +1761,31 @@ quick buy information in a template, that will be extracted in JS, but ensure it
           "type": "color",
           "id": "button_text_color",
           "label": "Texte du bouton"
+        },
+        {
+          "type": "header",
+          "content": "A/B test"
+        },
+        {
+          "type": "select",
+          "id": "ab_visibility",
+          "label": "A/B test version",
+          "options": [
+            {
+              "value": "all",
+              "label": "Both versions"
+            },
+            {
+              "value": "a",
+              "label": "Version A only"
+            },
+            {
+              "value": "b",
+              "label": "Version B only"
+            }
+          ],
+          "default": "all",
+          "info": "Version A shows during the A/B time window set in Theme settings, version B the rest of the time."
         }
       ]
     },
@@ -1328,6 +1836,31 @@ quick buy information in a template, that will be extracted in JS, but ensure it
           "label": "Texte",
           "info": "[date_min] et [date_max] sont remplacés par les dates calculées.",
           "default": "Commandé aujourd'hui, livré entre le [date_min] et le [date_max]"
+        },
+        {
+          "type": "header",
+          "content": "A/B test"
+        },
+        {
+          "type": "select",
+          "id": "ab_visibility",
+          "label": "A/B test version",
+          "options": [
+            {
+              "value": "all",
+              "label": "Both versions"
+            },
+            {
+              "value": "a",
+              "label": "Version A only"
+            },
+            {
+              "value": "b",
+              "label": "Version B only"
+            }
+          ],
+          "default": "all",
+          "info": "Version A shows during the A/B time window set in Theme settings, version B the rest of the time."
         }
       ]
     },
@@ -1361,6 +1894,31 @@ quick buy information in a template, that will be extracted in JS, but ensure it
           "id": "link",
           "label": "Lien (optionnel)",
           "info": "Ex. l'ancre d'une section d'avis plus bas dans la page."
+        },
+        {
+          "type": "header",
+          "content": "A/B test"
+        },
+        {
+          "type": "select",
+          "id": "ab_visibility",
+          "label": "A/B test version",
+          "options": [
+            {
+              "value": "all",
+              "label": "Both versions"
+            },
+            {
+              "value": "a",
+              "label": "Version A only"
+            },
+            {
+              "value": "b",
+              "label": "Version B only"
+            }
+          ],
+          "default": "all",
+          "info": "Version A shows during the A/B time window set in Theme settings, version B the rest of the time."
         }
       ]
     },
@@ -1402,6 +1960,31 @@ quick buy information in a template, that will be extracted in JS, but ensure it
           "type": "color",
           "id": "payment_button_text_color",
           "label": "Buy now button color"
+        },
+        {
+          "type": "header",
+          "content": "A/B test"
+        },
+        {
+          "type": "select",
+          "id": "ab_visibility",
+          "label": "A/B test version",
+          "options": [
+            {
+              "value": "all",
+              "label": "Both versions"
+            },
+            {
+              "value": "a",
+              "label": "Version A only"
+            },
+            {
+              "value": "b",
+              "label": "Version B only"
+            }
+          ],
+          "default": "all",
+          "info": "Version A shows during the A/B time window set in Theme settings, version B the rest of the time."
         }
       ]
     },
@@ -1413,6 +1996,31 @@ quick buy information in a template, that will be extracted in JS, but ensure it
         {
           "type": "paragraph",
           "content": "Allow your customers to see availability in retail stores by [setting up local pickup](https://help.shopify.com/en/manual/sell-in-person/shopify-pos/order-management/local-pickup-for-online-orders)."
+        },
+        {
+          "type": "header",
+          "content": "A/B test"
+        },
+        {
+          "type": "select",
+          "id": "ab_visibility",
+          "label": "A/B test version",
+          "options": [
+            {
+              "value": "all",
+              "label": "Both versions"
+            },
+            {
+              "value": "a",
+              "label": "Version A only"
+            },
+            {
+              "value": "b",
+              "label": "Version B only"
+            }
+          ],
+          "default": "all",
+          "info": "Version A shows during the A/B time window set in Theme settings, version B the rest of the time."
         }
       ]
     },
@@ -1425,6 +2033,31 @@ quick buy information in a template, that will be extracted in JS, but ensure it
           "id": "text",
           "label": "Text",
           "default": "<p>Share some content to your customers about your products.</p>"
+        },
+        {
+          "type": "header",
+          "content": "A/B test"
+        },
+        {
+          "type": "select",
+          "id": "ab_visibility",
+          "label": "A/B test version",
+          "options": [
+            {
+              "value": "all",
+              "label": "Both versions"
+            },
+            {
+              "value": "a",
+              "label": "Version A only"
+            },
+            {
+              "value": "b",
+              "label": "Version B only"
+            }
+          ],
+          "default": "all",
+          "info": "Version A shows during the A/B time window set in Theme settings, version B the rest of the time."
         }
       ]
     },
@@ -1732,6 +2365,31 @@ quick buy information in a template, that will be extracted in JS, but ensure it
           "id": "page",
           "label": "Page",
           "info": "Replaces inline content if specified."
+        },
+        {
+          "type": "header",
+          "content": "A/B test"
+        },
+        {
+          "type": "select",
+          "id": "ab_visibility",
+          "label": "A/B test version",
+          "options": [
+            {
+              "value": "all",
+              "label": "Both versions"
+            },
+            {
+              "value": "a",
+              "label": "Version A only"
+            },
+            {
+              "value": "b",
+              "label": "Version B only"
+            }
+          ],
+          "default": "all",
+          "info": "Version A shows during the A/B time window set in Theme settings, version B the rest of the time."
         }
       ]
     },
@@ -1773,6 +2431,31 @@ quick buy information in a template, that will be extracted in JS, but ensure it
           "unit": "px",
           "label": "Width",
           "default": 150
+        },
+        {
+          "type": "header",
+          "content": "A/B test"
+        },
+        {
+          "type": "select",
+          "id": "ab_visibility",
+          "label": "A/B test version",
+          "options": [
+            {
+              "value": "all",
+              "label": "Both versions"
+            },
+            {
+              "value": "a",
+              "label": "Version A only"
+            },
+            {
+              "value": "b",
+              "label": "Version B only"
+            }
+          ],
+          "default": "all",
+          "info": "Version A shows during the A/B time window set in Theme settings, version B the rest of the time."
         }
       ]
     },
@@ -1850,6 +2533,31 @@ quick buy information in a template, that will be extracted in JS, but ensure it
           "type": "color",
           "id": "text_color",
           "label": "Text"
+        },
+        {
+          "type": "header",
+          "content": "A/B test"
+        },
+        {
+          "type": "select",
+          "id": "ab_visibility",
+          "label": "A/B test version",
+          "options": [
+            {
+              "value": "all",
+              "label": "Both versions"
+            },
+            {
+              "value": "a",
+              "label": "Version A only"
+            },
+            {
+              "value": "b",
+              "label": "Version B only"
+            }
+          ],
+          "default": "all",
+          "info": "Version A shows during the A/B time window set in Theme settings, version B the rest of the time."
         }
       ]
     },
@@ -1862,6 +2570,31 @@ quick buy information in a template, that will be extracted in JS, but ensure it
           "id": "liquid",
           "label": "Liquid",
           "info": "Add app snippets or other Liquid code to create advanced customizations."
+        },
+        {
+          "type": "header",
+          "content": "A/B test"
+        },
+        {
+          "type": "select",
+          "id": "ab_visibility",
+          "label": "A/B test version",
+          "options": [
+            {
+              "value": "all",
+              "label": "Both versions"
+            },
+            {
+              "value": "a",
+              "label": "Version A only"
+            },
+            {
+              "value": "b",
+              "label": "Version B only"
+            }
+          ],
+          "default": "all",
+          "info": "Version A shows during the A/B time window set in Theme settings, version B the rest of the time."
         }
       ]
     },
@@ -1908,6 +2641,31 @@ quick buy information in a template, that will be extracted in JS, but ensure it
           "type": "color",
           "id": "text_color",
           "label": "Text"
+        },
+        {
+          "type": "header",
+          "content": "A/B test"
+        },
+        {
+          "type": "select",
+          "id": "ab_visibility",
+          "label": "A/B test version",
+          "options": [
+            {
+              "value": "all",
+              "label": "Both versions"
+            },
+            {
+              "value": "a",
+              "label": "Version A only"
+            },
+            {
+              "value": "b",
+              "label": "Version B only"
+            }
+          ],
+          "default": "all",
+          "info": "Version A shows during the A/B time window set in Theme settings, version B the rest of the time."
         }
       ]
     },
@@ -2253,6 +3011,31 @@ quick buy information in a template, that will be extracted in JS, but ensure it
           "id": "text_color",
           "label": "Text",
           "default": "#00a341"
+        },
+        {
+          "type": "header",
+          "content": "A/B test"
+        },
+        {
+          "type": "select",
+          "id": "ab_visibility",
+          "label": "A/B test version",
+          "options": [
+            {
+              "value": "all",
+              "label": "Both versions"
+            },
+            {
+              "value": "a",
+              "label": "Version A only"
+            },
+            {
+              "value": "b",
+              "label": "Version B only"
+            }
+          ],
+          "default": "all",
+          "info": "Version A shows during the A/B time window set in Theme settings, version B the rest of the time."
         }
       ]
     },
@@ -2283,6 +3066,31 @@ quick buy information in a template, that will be extracted in JS, but ensure it
             }
           ],
           "default": "start"
+        },
+        {
+          "type": "header",
+          "content": "A/B test"
+        },
+        {
+          "type": "select",
+          "id": "ab_visibility",
+          "label": "A/B test version",
+          "options": [
+            {
+              "value": "all",
+              "label": "Both versions"
+            },
+            {
+              "value": "a",
+              "label": "Version A only"
+            },
+            {
+              "value": "b",
+              "label": "Version B only"
+            }
+          ],
+          "default": "all",
+          "info": "Version A shows during the A/B time window set in Theme settings, version B the rest of the time."
         }
       ]
     },
@@ -2338,6 +3146,31 @@ quick buy information in a template, that will be extracted in JS, but ensure it
           "id": "required_message",
           "label": "Error message when required and empty",
           "default": "Please choose a patch before adding to cart."
+        },
+        {
+          "type": "header",
+          "content": "A/B test"
+        },
+        {
+          "type": "select",
+          "id": "ab_visibility",
+          "label": "A/B test version",
+          "options": [
+            {
+              "value": "all",
+              "label": "Both versions"
+            },
+            {
+              "value": "a",
+              "label": "Version A only"
+            },
+            {
+              "value": "b",
+              "label": "Version B only"
+            }
+          ],
+          "default": "all",
+          "info": "Version A shows during the A/B time window set in Theme settings, version B the rest of the time."
         }
       ]
     },
@@ -2645,6 +3478,31 @@ quick buy information in a template, that will be extracted in JS, but ensure it
           "id": "badge_color",
           "label": "Discount badge / sale price colour",
           "default": "#F04242"
+        },
+        {
+          "type": "header",
+          "content": "A/B test"
+        },
+        {
+          "type": "select",
+          "id": "ab_visibility",
+          "label": "A/B test version",
+          "options": [
+            {
+              "value": "all",
+              "label": "Both versions"
+            },
+            {
+              "value": "a",
+              "label": "Version A only"
+            },
+            {
+              "value": "b",
+              "label": "Version B only"
+            }
+          ],
+          "default": "all",
+          "info": "Version A shows during the A/B time window set in Theme settings, version B the rest of the time."
         }
       ]
     },
@@ -2691,6 +3549,31 @@ quick buy information in a template, that will be extracted in JS, but ensure it
           "id": "text_color",
           "label": "Text colour",
           "default": "#121212"
+        },
+        {
+          "type": "header",
+          "content": "A/B test"
+        },
+        {
+          "type": "select",
+          "id": "ab_visibility",
+          "label": "A/B test version",
+          "options": [
+            {
+              "value": "all",
+              "label": "Both versions"
+            },
+            {
+              "value": "a",
+              "label": "Version A only"
+            },
+            {
+              "value": "b",
+              "label": "Version B only"
+            }
+          ],
+          "default": "all",
+          "info": "Version A shows during the A/B time window set in Theme settings, version B the rest of the time."
         }
       ]
     },
@@ -3297,6 +4180,31 @@ quick buy information in a template, that will be extracted in JS, but ensure it
           "type": "number",
           "id": "review_10_helpful",
           "label": "Helpful votes"
+        },
+        {
+          "type": "header",
+          "content": "A/B test"
+        },
+        {
+          "type": "select",
+          "id": "ab_visibility",
+          "label": "A/B test version",
+          "options": [
+            {
+              "value": "all",
+              "label": "Both versions"
+            },
+            {
+              "value": "a",
+              "label": "Version A only"
+            },
+            {
+              "value": "b",
+              "label": "Version B only"
+            }
+          ],
+          "default": "all",
+          "info": "Version A shows during the A/B time window set in Theme settings, version B the rest of the time."
         }
       ]
     },
@@ -3347,6 +4255,31 @@ quick buy information in a template, that will be extracted in JS, but ensure it
             }
           ],
           "default": "center"
+        },
+        {
+          "type": "header",
+          "content": "A/B test"
+        },
+        {
+          "type": "select",
+          "id": "ab_visibility",
+          "label": "A/B test version",
+          "options": [
+            {
+              "value": "all",
+              "label": "Both versions"
+            },
+            {
+              "value": "a",
+              "label": "Version A only"
+            },
+            {
+              "value": "b",
+              "label": "Version B only"
+            }
+          ],
+          "default": "all",
+          "info": "Version A shows during the A/B time window set in Theme settings, version B the rest of the time."
         }
       ]
     },
@@ -3462,6 +4395,31 @@ quick buy information in a template, that will be extracted in JS, but ensure it
           "id": "helper_text",
           "label": "Helper text",
           "default": "Printed on the back exactly as entered. Numbers: 2 digits max."
+        },
+        {
+          "type": "header",
+          "content": "A/B test"
+        },
+        {
+          "type": "select",
+          "id": "ab_visibility",
+          "label": "A/B test version",
+          "options": [
+            {
+              "value": "all",
+              "label": "Both versions"
+            },
+            {
+              "value": "a",
+              "label": "Version A only"
+            },
+            {
+              "value": "b",
+              "label": "Version B only"
+            }
+          ],
+          "default": "all",
+          "info": "Version A shows during the A/B time window set in Theme settings, version B the rest of the time."
         }
       ]
     },
@@ -3491,6 +4449,31 @@ quick buy information in a template, that will be extracted in JS, but ensure it
           "id": "badge_text_color",
           "label": "Badge text color",
           "default": "#FFFFFF"
+        },
+        {
+          "type": "header",
+          "content": "A/B test"
+        },
+        {
+          "type": "select",
+          "id": "ab_visibility",
+          "label": "A/B test version",
+          "options": [
+            {
+              "value": "all",
+              "label": "Both versions"
+            },
+            {
+              "value": "a",
+              "label": "Version A only"
+            },
+            {
+              "value": "b",
+              "label": "Version B only"
+            }
+          ],
+          "default": "all",
+          "info": "Version A shows during the A/B time window set in Theme settings, version B the rest of the time."
         }
       ]
     },
@@ -3551,6 +4534,31 @@ quick buy information in a template, that will be extracted in JS, but ensure it
           "id": "hide_sold_out_variants",
           "label": "Hide sold out sizes",
           "default": false
+        },
+        {
+          "type": "header",
+          "content": "A/B test"
+        },
+        {
+          "type": "select",
+          "id": "ab_visibility",
+          "label": "A/B test version",
+          "options": [
+            {
+              "value": "all",
+              "label": "Both versions"
+            },
+            {
+              "value": "a",
+              "label": "Version A only"
+            },
+            {
+              "value": "b",
+              "label": "Version B only"
+            }
+          ],
+          "default": "all",
+          "info": "Version A shows during the A/B time window set in Theme settings, version B the rest of the time."
         }
       ]
     },
@@ -3655,6 +4663,31 @@ quick buy information in a template, that will be extracted in JS, but ensure it
           "id": "poster_3",
           "label": "Poster image",
           "info": "Vertical 9:16 recommended. Shown before play, or on its own when no video is set."
+        },
+        {
+          "type": "header",
+          "content": "A/B test"
+        },
+        {
+          "type": "select",
+          "id": "ab_visibility",
+          "label": "A/B test version",
+          "options": [
+            {
+              "value": "all",
+              "label": "Both versions"
+            },
+            {
+              "value": "a",
+              "label": "Version A only"
+            },
+            {
+              "value": "b",
+              "label": "Version B only"
+            }
+          ],
+          "default": "all",
+          "info": "Version A shows during the A/B time window set in Theme settings, version B the rest of the time."
         }
       ]
     },
@@ -3712,6 +4745,31 @@ quick buy information in a template, that will be extracted in JS, but ensure it
           "label": "Show on mobile only",
           "info": "When checked the bar is hidden on screens 700px and wider.",
           "default": false
+        },
+        {
+          "type": "header",
+          "content": "A/B test"
+        },
+        {
+          "type": "select",
+          "id": "ab_visibility",
+          "label": "A/B test version",
+          "options": [
+            {
+              "value": "all",
+              "label": "Both versions"
+            },
+            {
+              "value": "a",
+              "label": "Version A only"
+            },
+            {
+              "value": "b",
+              "label": "Version B only"
+            }
+          ],
+          "default": "all",
+          "info": "Version A shows during the A/B time window set in Theme settings, version B the rest of the time."
         }
       ]
     },
@@ -3851,6 +4909,31 @@ quick buy information in a template, that will be extracted in JS, but ensure it
           "id": "tier5_percent",
           "label": "Discount (%)",
           "default": 60
+        },
+        {
+          "type": "header",
+          "content": "A/B test"
+        },
+        {
+          "type": "select",
+          "id": "ab_visibility",
+          "label": "A/B test version",
+          "options": [
+            {
+              "value": "all",
+              "label": "Both versions"
+            },
+            {
+              "value": "a",
+              "label": "Version A only"
+            },
+            {
+              "value": "b",
+              "label": "Version B only"
+            }
+          ],
+          "default": "all",
+          "info": "Version A shows during the A/B time window set in Theme settings, version B the rest of the time."
         }
       ]
     },
@@ -3873,7 +4956,7 @@ quick buy information in a template, that will be extracted in JS, but ensure it
             },
             {
               "value": "window",
-              "label": "Every day during a time window (e.g. midnight sale)"
+              "label": "Daily time window (e.g. midnight sale)"
             }
           ],
           "default": "fixed"
@@ -4002,7 +5085,7 @@ quick buy information in a template, that will be extracted in JS, but ensure it
           "type": "text",
           "id": "code_price_label",
           "label": "Price with code label",
-          "default": "Your price tonight: "
+          "default": "Your price tonight:"
         },
         {
           "type": "header",
@@ -4025,6 +5108,31 @@ quick buy information in a template, that will be extracted in JS, but ensure it
           "id": "accent_color",
           "label": "Accent",
           "default": "#c8102e"
+        },
+        {
+          "type": "header",
+          "content": "A/B test"
+        },
+        {
+          "type": "select",
+          "id": "ab_visibility",
+          "label": "A/B test version",
+          "options": [
+            {
+              "value": "all",
+              "label": "Both versions"
+            },
+            {
+              "value": "a",
+              "label": "Version A only"
+            },
+            {
+              "value": "b",
+              "label": "Version B only"
+            }
+          ],
+          "default": "all",
+          "info": "Version A shows during the A/B time window set in Theme settings, version B the rest of the time."
         }
       ]
     },
@@ -4402,6 +5510,31 @@ quick buy information in a template, that will be extracted in JS, but ensure it
           "id": "text_3",
           "label": "Label",
           "default": "Secure checkout"
+        },
+        {
+          "type": "header",
+          "content": "A/B test"
+        },
+        {
+          "type": "select",
+          "id": "ab_visibility",
+          "label": "A/B test version",
+          "options": [
+            {
+              "value": "all",
+              "label": "Both versions"
+            },
+            {
+              "value": "a",
+              "label": "Version A only"
+            },
+            {
+              "value": "b",
+              "label": "Version B only"
+            }
+          ],
+          "default": "all",
+          "info": "Version A shows during the A/B time window set in Theme settings, version B the rest of the time."
         }
       ]
     }

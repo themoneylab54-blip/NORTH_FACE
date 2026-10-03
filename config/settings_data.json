@@ -58,8 +58,6 @@
     "show_discount": true,
     "discount_mode": "percentage",
     "ab_enabled": true,
-    "ab_template_a": "version-a",
-    "ab_template_b": "",
     "ab_start": "23:30",
     "ab_end": "01:00",
     "ab_timezone": "",
