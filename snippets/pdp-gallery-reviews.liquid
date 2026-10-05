@@ -61,12 +61,6 @@ Supported variables
     color: {{ gr_text }};
     -webkit-font-smoothing: antialiased;
   }
-  @media screen and (min-width: 1000px) {
-    /* Third child of the .product grid: sits under the gallery in column 1 while the sticky buy box keeps
-       spanning both rows, so it stays sticky along the full height of gallery + reviews. */
-    #shopify-section-{{ section.id }} .product > .{{ gr_uid }} { grid-column: 1; }
-    #shopify-section-{{ section.id }} .product > .product-info { grid-row: 1 / span 2; }
-  }
 
   .{{ gr_uid }}__header {
     display: flex;
