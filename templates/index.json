@@ -78,12 +78,6 @@
             "accent_color": "#c8102e"
           }
         },
-        "inventory": {
-          "type": "inventory",
-          "settings": {
-            "low_inventory_threshold": 10
-          }
-        },
         "stock_alert": {
           "type": "stock_alert",
           "disabled": true,
@@ -149,6 +143,17 @@
             "required": false,
             "property_name": "Gift wrapping",
             "required_message": "Please choose an option before adding to cart."
+          }
+        },
+        "stock_alert_DPf3P7": {
+          "type": "stock_alert",
+          "settings": {
+            "text": "Low Stock",
+            "color": "#c62828",
+            "dynamic_count": false,
+            "count_min": 12,
+            "count_max": 41,
+            "count_interval": 18
           }
         },
         "buy_buttons": {
@@ -469,12 +474,12 @@
         "price_row",
         "countdown_bf",
         "countdown_midnight",
-        "inventory",
         "stock_alert",
         "credit",
         "size",
         "personalise",
         "patch",
+        "stock_alert_DPf3P7",
         "buy_buttons",
         "payment",
         "delivery",
