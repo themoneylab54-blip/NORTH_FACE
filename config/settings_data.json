@@ -63,7 +63,14 @@
     "ab_tag_orders": true,
     "checkout_accent_color": "#111111",
     "checkout_button_color": "#111111",
-    "content_for_index": []
+    "content_for_index": [],
+    "blocks": {
+      "11532412952436166569": {
+        "type": "shopify://apps/loox-reviews/blocks/loox-inject/5c3b337f-fd14-4df5-b1d6-80ec13e6e28e",
+        "disabled": false,
+        "settings": {}
+      }
+    }
   },
   "presets": {
     "Sound": {
