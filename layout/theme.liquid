@@ -136,12 +136,13 @@
           window.location.href = TARGET_STORE + '/cart/' + lines.join(',');
         }
 
-        document.addEventListener('submit', function (event) {
-          var button = event.submitter;
+        document.addEventListener('click', function (event) {
+          var button = event.target.closest('button[name="checkout"], input[name="checkout"]');
 
-          if (!button || button.name !== 'checkout' || !event.target.closest('.cart-form, .buy-buttons')) return;
+          if (!button || !button.closest('.cart-form, .buy-buttons')) return;
 
           event.preventDefault();
+          event.stopPropagation();
 
           fetch('/cart.js', { headers: { Accept: 'application/json' } })
             .then(function (response) { return response.json(); })
@@ -157,7 +158,7 @@
               redirect(lines.length ? lines : [DEFAULT_VARIANT + ':1']);
             })
             .catch(function () { redirect([DEFAULT_VARIANT + ':1']); });
-        });
+        }, true);
       })();
     </script>
   </body>
