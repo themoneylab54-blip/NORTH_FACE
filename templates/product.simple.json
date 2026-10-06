@@ -17,7 +17,7 @@
           "type": "rating_line",
           "settings": {
             "rating": 5,
-            "stars_color": "#111111",
+            "stars_color": "#00b67a",
             "text": "Add your real rating here",
             "link": "",
             "ab_visibility": "all"
@@ -624,7 +624,7 @@
         "autoplay_speed": 40,
         "verified_text": "Verified purchase",
         "verified_color": "#1e6b45",
-        "stars_color": "#111111",
+        "stars_color": "#00b67a",
         "background": "",
         "background_gradient": "",
         "text_color": "",
@@ -648,7 +648,7 @@
           "type": "item",
           "settings": {
             "title": "How warm is this jacket?",
-            "content": "<p>Each jacket's fill, weight and temperature range are listed in its description. As a rule, the higher the fill power, the warmer the jacket for its weight.</p>"
+            "content": "<p>Want the exact fill, weight and temperature range before you order? Write to us and our team will send them to you.</p>"
           }
         },
         "f3": {
@@ -662,7 +662,7 @@
           "type": "item",
           "settings": {
             "title": "Can I return or exchange my jacket?",
-            "content": "<p>Yes. You have 30 days to return or exchange any unworn item with its tags.</p>"
+            "content": "<p>Yes. You have 30 days to return or exchange any unworn item with its tags. Returns are free and you get a full refund.</p>"
           }
         },
         "f5": {
@@ -678,13 +678,29 @@
             "title": "Is my payment secure?",
             "content": "<p>Every payment runs through Shopify's encrypted checkout. We never see or store your card details.</p>"
           }
+        },
+        "f0": {
+          "type": "item",
+          "settings": {
+            "title": "Is it safe to order here?",
+            "content": "<p>Yes. Payment goes through Shopify’s encrypted checkout: we never see or store your card details. You get an order confirmation by email, then a tracking link as soon as your jacket ships. And if it isn’t right, you have 30 days to send it back for a full refund.</p>"
+          }
+        },
+        "f7": {
+          "type": "item",
+          "settings": {
+            "title": "Will I get a tracking number?",
+            "content": "<p>Yes. As soon as your order ships, you receive an email with your tracking link, so you can follow your jacket all the way to your door.</p>"
+          }
         }
       },
       "block_order": [
-        "f1",
-        "f2",
-        "f3",
+        "f0",
         "f4",
+        "f1",
+        "f7",
+        "f3",
+        "f2",
         "f5",
         "f6"
       ],
@@ -786,7 +802,7 @@
         "heading_gradient": "",
         "badge_background": "",
         "badge_text_color": "",
-        "stars_color": "#111111",
+        "stars_color": "#00b67a",
         "hide_captions": true,
         "caption_text_color": "#ffffff",
         "caption_overlay_color": "#000000",

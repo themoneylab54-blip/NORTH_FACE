@@ -59,36 +59,36 @@
         "m1": {
           "type": "message",
           "settings": {
-            "text": "FREE SHIPPING ON EVERY JACKET",
-            "url": "/collections/all"
+            "text": "FREE TRACKED SHIPPING ON EVERY JACKET",
+            "url": ""
           }
         },
         "m2": {
           "type": "message",
           "settings": {
-            "text": "30-DAY FREE RETURNS & EXCHANGES",
-            "url": "/collections/all"
+            "text": "30-DAY FREE RETURNS — FULL REFUND",
+            "url": ""
           }
         },
         "m3": {
           "type": "message",
           "settings": {
             "text": "BLACK FRIDAY: 20–30 NOVEMBER",
-            "url": "/collections/all"
+            "url": ""
           }
         },
         "m4": {
           "type": "message",
           "settings": {
-            "text": "SECURE CHECKOUT",
-            "url": "/collections/all"
+            "text": "SECURE CHECKOUT BY SHOPIFY",
+            "url": ""
           }
         },
         "m5": {
           "type": "message",
           "settings": {
-            "text": "NEW WINTER COLLECTION",
-            "url": "/collections/all"
+            "text": "QUESTIONS? A REAL PERSON ANSWERS",
+            "url": "/pages/contact"
           }
         }
       },
@@ -99,7 +99,6 @@
         "m4",
         "m5"
       ],
-      "disabled": true,
       "settings": {
         "enable_sticky": true,
         "autoplay": false,

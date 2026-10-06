@@ -291,6 +291,32 @@ Supported variables:
     outline-color: transparent;
   }
 
+  /* Two-tone color chips (diagonal main color / second color, set in the theme's color swatch configuration):
+     40 x 30, no frame, a thin dark ring 3px around the selected one. Sold out: faded, without the strike line
+     that would read as a third color across the diagonal. */
+  {{ pdp_scope }} .pdp-size-selector__values--color {
+    gap: 8px;
+  }
+
+  {{ pdp_scope }} .pdp-size-selector__values--color .color-swatch {
+    width: 40px;
+    height: 30px;
+    border-radius: 3px;
+    outline: none;
+    box-shadow: inset 0 0 0 1px rgb(0 0 0 / .08);
+  }
+
+  {{ pdp_scope }} .pdp-size-selector__values--color .color-swatch::before {
+    inset: -4px;
+    border-radius: 5px;
+    box-shadow: 0 0 0 1.5px #111111;
+  }
+
+  {{ pdp_scope }} .pdp-size-selector__values--color .color-swatch.is-disabled {
+    background: var(--swatch-background) center / cover;
+    opacity: .35;
+  }
+
   /* ------------------------------------------------------------------
      Mobile gallery arrows: two small squares over the bottom-left corner
      ------------------------------------------------------------------ */

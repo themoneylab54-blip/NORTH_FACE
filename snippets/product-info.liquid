@@ -138,6 +138,56 @@ Supported variables
           {%- if previous_block.type != 'price' -%}
             <div class="product-info__rating">
               {%- render 'product-rating', product: product, show_empty: block.settings.show_empty, block: block -%}
+
+              {%- comment -%}
+                Without a reviews app (no rating metafield), show the score of the "Customer reviews" section of the
+                same page: green squares, score and count, linking down to the reviews. Hidden when there is none.
+              {%- endcomment -%}
+              {%- if product.metafields.reviews.rating.value == blank -%}
+                <pdp-review-summary hidden>
+                  <a href="#customer-reviews" class="pdp-review-summary">
+                    <span class="pdp-review-summary__stars" aria-hidden="true">
+                      {%- for i in (1..5) -%}
+                        <span class="pdp-review-summary__star">{%- render 'icon' with 'rating-star', width: 10, height: 10 -%}</span>
+                      {%- endfor -%}
+                    </span>
+                    <span class="pdp-review-summary__text"></span>
+                  </a>
+                </pdp-review-summary>
+
+                <style>
+                  .pdp-review-summary { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; line-height: 1; color: inherit; text-decoration: none; }
+                  .pdp-review-summary__stars { display: inline-flex; gap: 2px; }
+                  .pdp-review-summary__star { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; border-radius: 2px; background: #00B67A; color: #FFFFFF; }
+                  .pdp-review-summary__star.is-empty { background: #DCDCE6; }
+                  .pdp-review-summary__star svg { width: 62.5%; height: 62.5%; }
+                  .pdp-review-summary__text { text-decoration: underline; text-underline-offset: 3px; }
+                </style>
+
+                <script>
+                  if (!window.customElements.get('pdp-review-summary')) {
+                    window.customElements.define('pdp-review-summary', class extends HTMLElement {
+                      connectedCallback() {
+                        // The reviews section comes after the product section: wait for it to be parsed.
+                        if (document.readyState === 'loading') {
+                          document.addEventListener('DOMContentLoaded', () => this.connectedCallback(), { once: true });
+                          return;
+                        }
+
+                        const source = document.querySelector('[data-reviews-summary]');
+                        const count = parseInt(source?.dataset.count || '0', 10);
+                        const average = parseFloat(source?.dataset.average || '0');
+                        if (!count || !average) return;
+
+                        this.querySelectorAll('.pdp-review-summary__star').forEach((star, index) => star.classList.toggle('is-empty', index >= Math.round(average)));
+                        this.querySelector('.pdp-review-summary__text').textContent = `${average.toFixed(1)} · ${count} ${source.dataset.label}`;
+                        this.querySelector('a').setAttribute('aria-label', `${average.toFixed(1)} / 5 · ${count} ${source.dataset.label}`);
+                        this.hidden = false;
+                      }
+                    });
+                  }
+                </script>
+              {%- endif -%}
             </div>
           {%- endif -%}
 

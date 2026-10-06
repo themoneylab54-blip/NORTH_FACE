@@ -4550,6 +4550,23 @@ quick buy information in a template, that will be extracted in JS, but ensure it
           "default": "show"
         },
         {
+          "type": "select",
+          "id": "color_chips",
+          "label": "Color chips",
+          "info": "Two-tone colors are set in Theme settings > Color swatch > Configuration, one line per color: Name: linear-gradient(135deg, #main 50%, #second 50%). A color without a line there shows the variant photo.",
+          "options": [
+            {
+              "value": "colors",
+              "label": "Two-tone colors"
+            },
+            {
+              "value": "photo",
+              "label": "Variant photo"
+            }
+          ],
+          "default": "colors"
+        },
+        {
           "type": "checkbox",
           "id": "hide_sold_out_variants",
           "label": "Hide sold out sizes",

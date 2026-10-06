@@ -36,6 +36,17 @@ Supported variables
   assign pss_guide_text = block.settings.size_guide_text | default: 'Size guide'
   assign pss_size_names = block.settings.size_option_name | default: 'Size, Taille' | downcase | split: ','
   assign pss_other_options = block.settings.other_options | default: 'show'
+  assign pss_color_chips = block.settings.color_chips | default: 'colors'
+
+  # Color names that have a two-tone (or plain) color in Theme settings > Color swatch > Configuration: "|name|name|"
+  assign pss_configured_colors = '|'
+  assign pss_swatch_lines = settings.color_swatch_config | newline_to_br | split: '<br />'
+  for pss_swatch_line in pss_swatch_lines
+    assign pss_swatch_name = pss_swatch_line | split: ':' | first | downcase | strip
+    if pss_swatch_name != blank
+      assign pss_configured_colors = pss_configured_colors | append: pss_swatch_name | append: '|'
+    endif
+  endfor
   assign pss_color_names = 'color,colour,couleur,couleurs,coloris,colors,colours,farbe,colore,kleur' | split: ','
   assign pss_hide_sold_out = block.settings.hide_sold_out_variants | default: false
   assign pss_show_guide = block.settings.show_size_guide
@@ -283,8 +294,10 @@ Supported variables
             assign param_name = product_form_id | append: '-option' | append: option.position
 
             comment
-              Color options are shown as small rectangular chips (outdoor brand style): the native Shopify swatch when
-              every value has one, otherwise the photo of that color's variant, otherwise a plain color chip.
+              Color options are shown as small rectangular chips (outdoor brand style). With "Two-tone colors", each
+              value gets a color chip as long as every value has a native Shopify swatch or a line in the theme's color
+              swatch configuration (which can be a diagonal two-tone gradient). Otherwise, or with "Variant photo", the
+              chip is the photo of that color's variant (a plain color chip if no variant has a photo).
             endcomment
             assign option_downcase = option.name | downcase | strip
             assign is_color_option = false
@@ -294,8 +307,15 @@ Supported variables
 
             assign color_chip_type = 'swatch'
             if is_color_option
-              assign native_swatch_count = option.values | map: 'swatch' | compact | size
-              if native_swatch_count < option.values.size
+              assign colored_value_count = 0
+              for option_value in option.values
+                assign value_key = option_value.name | downcase | strip | prepend: '|' | append: '|'
+                if option_value.swatch != blank or pss_configured_colors contains value_key
+                  assign colored_value_count = colored_value_count | plus: 1
+                endif
+              endfor
+
+              if pss_color_chips == 'photo' or colored_value_count < option.values.size
                 for variant in product.variants
                   if variant.featured_media != blank
                     assign color_chip_type = 'thumbnail'

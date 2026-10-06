@@ -396,6 +396,12 @@ Deux rendus cohabitent, pilotés par les réglages de section :
     <span class="reviews-star reviews-star--empty">{%- render 'icon' with 'rating-star', width: 10, height: 10 -%}</span>
   {%- endcapture -%}
 
+  {%- comment -%}
+    Anchor for the "rating" block of the product page: it links here and shows the same score and count, read from
+    these attributes (the reviews filled in below, nothing else).
+  {%- endcomment -%}
+  <span id="customer-reviews" data-reviews-summary data-average="{{ average_rating }}" data-count="{{ rc_count }}" data-label="{{ section.settings.reviews_count_label | default: 'reviews' | escape }}"></span>
+
   <div {% render 'section-properties' %}>
     <div class="section-stack">
       <div class="v-stack gap-4 sm:gap-5 {% if header_alignment == 'center' %}justify-items-center text-center{% endif %}">
@@ -430,20 +436,14 @@ Deux rendus cohabitent, pilotés par les réglages de section :
           <div class="h-stack gap-3 sm:gap-4">
             <span class="h1">{{ average_rating }}</span>
 
-            <div class="rating">
-              <div class="rating__stars" role="img" aria-label="{{ 'general.rating.info' | t: rating_value: average_rating, rating_max: 5 }}">
-                {%- for i in (1..5) -%}
-                  {%- if i <= average_rating_stars -%}
-                    {%- render 'icon' with 'rating-star', class: 'rating__star rating__star--full' -%}
-                  {%- else -%}
-                    {%- render 'icon' with 'rating-star', class: 'rating__star rating__star--empty' -%}
-                  {%- endif -%}
-                {%- endfor -%}
-              </div>
+            <div class="reviews-stars" style="--reviews-star-size: 24px;" role="img" aria-label="{{ 'general.rating.info' | t: rating_value: average_rating, rating_max: 5 }}">
+              {%- for i in (1..5) -%}
+                {%- if i <= average_rating_stars -%}{{ star_square }}{%- else -%}{{ star_square_empty }}{%- endif -%}
+              {%- endfor -%}
             </div>
           </div>
 
-          <p class="text-subdued text-sm">{{ 'general.rating.info' | t: rating_value: average_rating, rating_max: 5 }} &middot; {{ rc_count }} avis</p>
+          <p class="text-subdued text-sm">{{ 'general.rating.info' | t: rating_value: average_rating, rating_max: 5 }} &middot; {{ rc_count }} {{ section.settings.reviews_count_label | default: 'reviews' | escape }}</p>
         {%- endif -%}
       </div>
 
@@ -997,7 +997,7 @@ Deux rendus cohabitent, pilotés par les réglages de section :
       "type": "color",
       "id": "stars_color",
       "label": "Couleur des étoiles",
-      "default": "#0DA558"
+      "default": "#00B67A"
     },
     {
       "type": "header",

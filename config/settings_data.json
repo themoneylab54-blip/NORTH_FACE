@@ -62,7 +62,10 @@
     "ab_end": "01:00",
     "ab_timezone": "",
     "ab_tag_orders": true,
-    "color_swatch_style": "rectangle"
+    "cart_timer_enabled": true,
+    "cart_timer_minutes": 5,
+    "color_swatch_style": "rectangle",
+    "color_swatch_config": "Violet - Lapis Blue: linear-gradient(135deg, #5a46b5 49.5%, #111111 50.5%)\nBleu - TNF Blue: linear-gradient(135deg, #1f4fa8 49.5%, #111111 50.5%)\nNoir - TNF Black: linear-gradient(135deg, #1c1c1c 49.5%, #111111 50.5%)\nBordeaux - Boysenberry: linear-gradient(135deg, #6b2a3d 49.5%, #111111 50.5%)\nGris - Smoked Pearl: linear-gradient(135deg, #80868b 49.5%, #111111 50.5%)"
   },
   "presets": {
     "Sound": {
