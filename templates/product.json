@@ -12,22 +12,43 @@
     "main": {
       "type": "main-product",
       "blocks": {
-        "credit": {
-          "type": "pdp_credit_line",
+        "countdown_bf_a": {
+          "type": "pdp_countdown",
           "settings": {
-            "credit_percent": 5,
-            "text": "Earn [amount] in store credit",
-            "icon_color": "#111111",
-            "background": "#f4f3f0",
-            "text_color": "#111111",
-            "ab_visibility": "all"
-          },
-          "disabled": true
+            "mode": "fixed",
+            "timezone": "",
+            "start_date": "2026-11-20",
+            "end_date": "2026-11-30",
+            "end_time": "23:59",
+            "window_start": "23:30",
+            "window_end": "01:00",
+            "badge": "Black Friday",
+            "title": "Black Friday — up to 50% off, ends in",
+            "text": "Discount already applied to the price shown.",
+            "show_days": true,
+            "label_days": "Days",
+            "label_hours": "Hrs",
+            "label_minutes": "Min",
+            "label_seconds": "Sec",
+            "discount_code": "",
+            "code_price_label": "Your price:",
+            "background": "#111111",
+            "text_color": "#ffffff",
+            "accent_color": "#c8102e",
+            "ab_visibility": "a"
+          }
         },
         "title": {
           "type": "title",
           "settings": {
             "heading_tag": "h1",
+            "ab_visibility": "all"
+          }
+        },
+        "rating": {
+          "type": "rating",
+          "settings": {
+            "show_empty": false,
             "ab_visibility": "all"
           }
         },
@@ -40,8 +61,70 @@
             "ab_visibility": "all"
           }
         },
+        "countdown_bf": {
+          "type": "pdp_countdown",
+          "settings": {
+            "mode": "fixed",
+            "timezone": "",
+            "start_date": "2026-11-20",
+            "end_date": "2026-11-30",
+            "end_time": "23:59",
+            "window_start": "23:30",
+            "window_end": "01:00",
+            "badge": "Black Friday",
+            "title": "Up to 50% off — ends in",
+            "text": "Discount already applied to the price shown.",
+            "show_days": true,
+            "label_days": "Days",
+            "label_hours": "Hrs",
+            "label_minutes": "Min",
+            "label_seconds": "Sec",
+            "discount_code": "",
+            "code_price_label": "Your price:",
+            "background": "#111111",
+            "text_color": "#ffffff",
+            "accent_color": "#c8102e",
+            "ab_visibility": "b"
+          }
+        },
+        "countdown_midnight": {
+          "type": "pdp_countdown",
+          "disabled": true,
+          "settings": {
+            "mode": "window",
+            "timezone": "",
+            "start_date": "",
+            "end_date": "2026-11-30",
+            "end_time": "23:59",
+            "window_start": "23:30",
+            "window_end": "01:00",
+            "badge": "Midnight sale",
+            "title": "Extra 15% off tonight only — ends in",
+            "text": "Code [code] applied automatically at checkout.",
+            "show_days": false,
+            "label_days": "Days",
+            "label_hours": "Hrs",
+            "label_minutes": "Min",
+            "label_seconds": "Sec",
+            "discount_code": "MIDNIGHT15",
+            "code_percent": 15,
+            "code_price_label": "Your price tonight:",
+            "background": "#0b0b0b",
+            "text_color": "#ffffff",
+            "accent_color": "#c8102e",
+            "ab_visibility": "all"
+          }
+        },
+        "inventory": {
+          "type": "inventory",
+          "settings": {
+            "low_inventory_threshold": 10,
+            "ab_visibility": "all"
+          }
+        },
         "stock_alert": {
           "type": "stock_alert",
+          "disabled": true,
           "settings": {
             "text": "Black Friday prices — only while stock lasts",
             "color": "#c8102e",
@@ -50,8 +133,19 @@
             "count_max": 47,
             "count_interval": 16,
             "ab_visibility": "all"
-          },
-          "disabled": true
+          }
+        },
+        "credit": {
+          "type": "pdp_credit_line",
+          "disabled": true,
+          "settings": {
+            "credit_percent": 5,
+            "text": "Earn [amount] in store credit",
+            "icon_color": "#111111",
+            "background": "#f4f3f0",
+            "text_color": "#111111",
+            "ab_visibility": "all"
+          }
         },
         "size": {
           "type": "pdp_size_selector",
@@ -61,12 +155,14 @@
             "show_size_guide": true,
             "size_guide_text": "Size guide",
             "other_options": "show",
+            "color_chips": "colors",
             "hide_sold_out_variants": false,
             "ab_visibility": "all"
           }
         },
         "personalise": {
           "type": "pdp_personalisation",
+          "disabled": true,
           "settings": {
             "label": "Add your initials",
             "tab_player_label": "Choose a player",
@@ -82,11 +178,11 @@
             "number_placeholder": "00",
             "helper_text": "Embroidered exactly as entered.",
             "ab_visibility": "all"
-          },
-          "disabled": true
+          }
         },
         "patch": {
           "type": "pdp_badge_addon",
+          "disabled": true,
           "settings": {
             "label": "Gift wrapping",
             "patch_price": 9.9,
@@ -96,8 +192,7 @@
             "property_name": "Gift wrapping",
             "required_message": "Please choose an option before adding to cart.",
             "ab_visibility": "all"
-          },
-          "disabled": true
+          }
         },
         "buy_buttons": {
           "type": "buy_buttons",
@@ -120,8 +215,64 @@
             "ab_visibility": "all"
           }
         },
+        "delivery": {
+          "type": "delivery_estimate",
+          "settings": {
+            "icon": "picto-box",
+            "min_days": 3,
+            "max_days": 6,
+            "text": "Order now — delivered between [date_min] and [date_max]",
+            "ab_visibility": "all"
+          }
+        },
+        "trust": {
+          "type": "pdp_trust_icons",
+          "settings": {
+            "text_color": "#111111",
+            "border_color": "#e4e2dd",
+            "icon_1": "picto-truck",
+            "icon_color_1": "#111111",
+            "text_1": "Free shipping",
+            "icon_2": "picto-return",
+            "icon_color_2": "#111111",
+            "text_2": "30-day returns",
+            "icon_3": "picto-lock",
+            "icon_color_3": "#111111",
+            "text_3": "Secure checkout",
+            "ab_visibility": "all"
+          }
+        },
+        "guarantee": {
+          "type": "offer",
+          "settings": {
+            "text_alignment": "start",
+            "icon_position": "aligned",
+            "icon": "picto-shield",
+            "icon_width": 24,
+            "title": "Our 30-day promise",
+            "content": "<p>Try it at home. If it's not right, exchange it or return it within 30 days for a full refund.</p>",
+            "background": "#f4f3f0",
+            "text_color": "#111111",
+            "ab_visibility": "all"
+          }
+        },
+        "help": {
+          "type": "offer",
+          "settings": {
+            "text_alignment": "start",
+            "icon_position": "aligned",
+            "icon": "picto-customer-support",
+            "icon_width": 24,
+            "title": "Need help choosing?",
+            "content": "<p>Questions about sizing or warmth? <a href=\"/pages/contact\">Write to our team</a>, we'll help you pick the right jacket.</p>",
+            "background": "#f4f3f0",
+            "text_color": "#111111",
+            "ab_visibility": "all"
+          }
+        },
         "tiers": {
           "type": "pdp_tiers",
+          "disabled": true,
           "settings": {
             "title": "Buy more, save more",
             "take_label": "Buy",
@@ -142,8 +293,7 @@
             "tier5_pay": 0,
             "tier5_percent": 0,
             "ab_visibility": "all"
-          },
-          "disabled": true
+          }
         },
         "social": {
           "type": "pdp_social_videos",
@@ -200,20 +350,12 @@
             "ab_visibility": "all"
           }
         },
-        "trust": {
-          "type": "pdp_trust_icons",
+        "description": {
+          "type": "description",
           "settings": {
-            "text_color": "#111111",
-            "border_color": "#e4e2dd",
-            "icon_1": "picto-truck",
-            "icon_color_1": "#111111",
-            "text_1": "Free shipping",
-            "icon_2": "picto-return",
-            "icon_color_2": "#111111",
-            "text_2": "30-day returns",
-            "icon_3": "picto-lock",
-            "icon_color_3": "#111111",
-            "text_3": "Secure checkout",
+            "icon": "none",
+            "icon_width": 20,
+            "collapse_content": true,
             "ab_visibility": "all"
           }
         },
@@ -239,13 +381,25 @@
             "ab_visibility": "all"
           }
         },
-        "delivery": {
-          "type": "delivery_estimate",
+        "ct_shipping": {
+          "type": "collapsible_text",
           "settings": {
-            "icon": "picto-box",
-            "min_days": 3,
-            "max_days": 6,
-            "text": "Order now — delivered between [date_min] and [date_max]",
+            "icon": "picto-plane",
+            "icon_width": 20,
+            "title": "Shipping & returns",
+            "content": "<p>Dispatched within 24 hours on working days, delivered in 3-6 days with tracking. Free shipping on every jacket. 30 days to return or exchange any unworn item.</p>",
+            "page": "",
+            "ab_visibility": "all"
+          }
+        },
+        "ct_payment": {
+          "type": "collapsible_text",
+          "settings": {
+            "icon": "picto-lock",
+            "icon_width": 20,
+            "title": "Secure payment",
+            "content": "<p>Payments go through Shopify's encrypted checkout (SSL). We never see or store your card details. Pay by card or with the express payment options shown at checkout.</p>",
+            "page": "",
             "ab_visibility": "all"
           }
         },
@@ -364,159 +518,6 @@
             "mobile_only": false,
             "ab_visibility": "all"
           }
-        },
-        "rating": {
-          "type": "rating",
-          "settings": {
-            "show_empty": false,
-            "ab_visibility": "all"
-          }
-        },
-        "countdown_bf": {
-          "type": "pdp_countdown",
-          "settings": {
-            "mode": "fixed",
-            "timezone": "",
-            "start_date": "2026-11-20",
-            "end_date": "2026-11-30",
-            "end_time": "23:59",
-            "window_start": "23:30",
-            "window_end": "01:00",
-            "badge": "Black Friday",
-            "title": "Up to 50% off — ends in",
-            "text": "Discount already applied to the price shown.",
-            "show_days": true,
-            "label_days": "Days",
-            "label_hours": "Hrs",
-            "label_minutes": "Min",
-            "label_seconds": "Sec",
-            "discount_code": "",
-            "code_price_label": "Your price:",
-            "background": "#111111",
-            "text_color": "#ffffff",
-            "accent_color": "#c8102e",
-            "ab_visibility": "b"
-          }
-        },
-        "countdown_midnight": {
-          "type": "pdp_countdown",
-          "disabled": true,
-          "settings": {
-            "mode": "window",
-            "timezone": "",
-            "start_date": "",
-            "end_date": "2026-11-30",
-            "end_time": "23:59",
-            "window_start": "23:30",
-            "window_end": "01:00",
-            "badge": "Midnight sale",
-            "title": "Extra 15% off tonight only — ends in",
-            "text": "Code [code] applied automatically at checkout.",
-            "show_days": false,
-            "label_days": "Days",
-            "label_hours": "Hrs",
-            "label_minutes": "Min",
-            "label_seconds": "Sec",
-            "discount_code": "MIDNIGHT15",
-            "code_percent": 15,
-            "code_price_label": "Your price tonight:",
-            "background": "#0b0b0b",
-            "text_color": "#ffffff",
-            "accent_color": "#c8102e",
-            "ab_visibility": "all"
-          }
-        },
-        "inventory": {
-          "type": "inventory",
-          "settings": {
-            "low_inventory_threshold": 10,
-            "ab_visibility": "all"
-          }
-        },
-        "description": {
-          "type": "description",
-          "settings": {
-            "icon": "none",
-            "icon_width": 20,
-            "collapse_content": true,
-            "ab_visibility": "all"
-          }
-        },
-        "ct_shipping": {
-          "type": "collapsible_text",
-          "settings": {
-            "icon": "picto-plane",
-            "icon_width": 20,
-            "title": "Shipping & returns",
-            "content": "<p>Dispatched within 24 hours on working days, delivered in 3-6 days with tracking. Free shipping on every jacket. 30 days to return or exchange any unworn item.</p>",
-            "page": "",
-            "ab_visibility": "all"
-          }
-        },
-        "guarantee": {
-          "type": "offer",
-          "settings": {
-            "text_alignment": "start",
-            "icon_position": "aligned",
-            "icon": "picto-shield",
-            "icon_width": 24,
-            "title": "Our 30-day promise",
-            "content": "<p>Try it at home. If it's not right, exchange it or return it within 30 days for a full refund.</p>",
-            "background": "#f4f3f0",
-            "text_color": "#111111",
-            "ab_visibility": "all"
-          }
-        },
-        "help": {
-          "type": "offer",
-          "settings": {
-            "text_alignment": "start",
-            "icon_position": "aligned",
-            "icon": "picto-customer-support",
-            "icon_width": 24,
-            "title": "Need help choosing?",
-            "content": "<p>Questions about sizing or warmth? <a href=\"/pages/contact\">Write to our team</a>, we'll help you pick the right jacket.</p>",
-            "background": "#f4f3f0",
-            "text_color": "#111111",
-            "ab_visibility": "all"
-          }
-        },
-        "ct_payment": {
-          "type": "collapsible_text",
-          "settings": {
-            "icon": "picto-lock",
-            "icon_width": 20,
-            "title": "Secure payment",
-            "content": "<p>Payments go through Shopify's encrypted checkout (SSL). We never see or store your card details. Pay by card or with the express payment options shown at checkout.</p>",
-            "page": "",
-            "ab_visibility": "all"
-          }
-        },
-        "countdown_bf_a": {
-          "type": "pdp_countdown",
-          "settings": {
-            "mode": "fixed",
-            "timezone": "",
-            "start_date": "2026-11-20",
-            "end_date": "2026-11-30",
-            "end_time": "23:59",
-            "window_start": "23:30",
-            "window_end": "01:00",
-            "badge": "Black Friday",
-            "title": "Black Friday — up to 50% off, ends in",
-            "text": "Discount already applied to the price shown.",
-            "show_days": true,
-            "label_days": "Days",
-            "label_hours": "Hrs",
-            "label_minutes": "Min",
-            "label_seconds": "Sec",
-            "discount_code": "",
-            "code_price_label": "Your price:",
-            "background": "#111111",
-            "text_color": "#ffffff",
-            "accent_color": "#c8102e",
-            "ab_visibility": "a"
-          }
         }
       },
       "block_order": [
@@ -551,12 +552,15 @@
       ],
       "name": "Product",
       "settings": {
+        "product": "",
         "full_width": true,
         "show_fixed_add_to_cart": false,
         "desktop_media_width": 60,
         "desktop_media_layout": "grid",
         "mobile_media_size": "expanded",
         "mobile_carousel_control": "dots",
+        "mobile_gallery_arrows": true,
+        "color_image_sets": true,
         "enable_video_autoplay": false,
         "enable_video_looping": false,
         "enable_image_zoom": true,
@@ -565,112 +569,7 @@
         "background_gradient": "",
         "text_color": "",
         "input_background": "",
-        "input_text_color": "",
-        "mobile_gallery_arrows": true,
-        "color_image_sets": true
-      }
-    },
-    "complete_look": {
-      "type": "related-products",
-      "name": "Complete the look",
-      "settings": {
-        "recommendations_count": 8,
-        "products": [],
-        "full_width": true,
-        "stack_products": false,
-        "show_progress_bar": true,
-        "products_per_row_mobile": "2",
-        "products_per_row_desktop": 4,
-        "subheading": "Complete your winter look",
-        "title": "YOU MAY ALSO LIKE",
-        "content": "",
-        "background": "",
-        "background_gradient": "",
-        "text_color": "",
-        "heading_color": "",
-        "heading_gradient": "",
-        "product_card_background": "",
-        "product_card_text_color": ""
-      }
-    },
-    "closeups": {
-      "type": "video-testimonials",
-      "blocks": {
-        "v1": {
-          "type": "video",
-          "settings": {
-            "rating": 5,
-            "testimonial": "",
-            "attr_1": "",
-            "attr_2": ""
-          }
-        },
-        "v2": {
-          "type": "video",
-          "settings": {
-            "rating": 5,
-            "testimonial": "",
-            "attr_1": "",
-            "attr_2": ""
-          }
-        },
-        "v3": {
-          "type": "video",
-          "settings": {
-            "rating": 5,
-            "testimonial": "",
-            "attr_1": "",
-            "attr_2": ""
-          }
-        },
-        "v4": {
-          "type": "video",
-          "settings": {
-            "rating": 5,
-            "testimonial": "",
-            "attr_1": "",
-            "attr_2": ""
-          }
-        }
-      },
-      "block_order": [
-        "v1",
-        "v2",
-        "v3",
-        "v4"
-      ],
-      "name": "Close-up videos",
-      "settings": {
-        "full_width": true,
-        "badge": "",
-        "title": "SEE IT UP CLOSE",
-        "content": "<p>Filmed as it is: seams, baffles and finishes, nothing retouched.</p>",
-        "text_alignment": "center",
-        "heading_style": "theme",
-        "heading_uppercase": true,
-        "subtitle_color": "",
-        "card_ratio": "9 / 16",
-        "desktop_layout": "carousel",
-        "cards_per_row_desktop": 6,
-        "card_gap": "8",
-        "card_width_mobile": "62",
-        "center_cards_mobile": true,
-        "autoplay_muted": true,
-        "tap_toggles_sound": true,
-        "play_glyph": false,
-        "background": "",
-        "background_gradient": "",
-        "text_color": "",
-        "heading_color": "",
-        "heading_gradient": "",
-        "badge_background": "",
-        "badge_text_color": "",
-        "stars_color": "#00b67a",
-        "hide_captions": true,
-        "caption_text_color": "#ffffff",
-        "caption_overlay_color": "#000000",
-        "caption_overlay_opacity": 85,
-        "card_radius": 2
+        "input_text_color": ""
       }
     },
     "reviews": {
@@ -761,6 +660,188 @@
         "review_card_text_color": "#111111"
       }
     },
+    "trust_bar": {
+      "type": "text-with-icons",
+      "blocks": {
+        "t1": {
+          "type": "item",
+          "settings": {
+            "icon": "picto-truck",
+            "mobile_icon_width": 24,
+            "icon_width": 32,
+            "icon_background_type": "none",
+            "icon_background": "",
+            "icon_color": "#111111",
+            "title": "Free shipping",
+            "content": "<p>On every jacket, tracked from our warehouse to your door.</p>"
+          }
+        },
+        "t2": {
+          "type": "item",
+          "settings": {
+            "icon": "picto-return",
+            "mobile_icon_width": 24,
+            "icon_width": 32,
+            "icon_background_type": "none",
+            "icon_background": "",
+            "icon_color": "#111111",
+            "title": "30-day returns",
+            "content": "<p>Not the right fit? Exchange or return it within 30 days.</p>"
+          }
+        },
+        "t3": {
+          "type": "item",
+          "settings": {
+            "icon": "picto-lock",
+            "mobile_icon_width": 24,
+            "icon_width": 32,
+            "icon_background_type": "none",
+            "icon_background": "",
+            "icon_color": "#111111",
+            "title": "Secure payment",
+            "content": "<p>Encrypted checkout powered by Shopify.</p>"
+          }
+        },
+        "t4": {
+          "type": "item",
+          "settings": {
+            "icon": "picto-customer-support",
+            "mobile_icon_width": 24,
+            "icon_width": 32,
+            "icon_background_type": "none",
+            "icon_background": "",
+            "icon_color": "#111111",
+            "title": "Real support",
+            "content": "<p>Questions about sizing or an order? Our team replies personally.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "t1",
+        "t2",
+        "t3",
+        "t4"
+      ],
+      "name": "Trust bar",
+      "settings": {
+        "full_width": true,
+        "stack_on_mobile": false,
+        "title": "",
+        "heading_tag": "h5",
+        "text_alignment": "center",
+        "icon_spacing": "medium",
+        "background": "#f4f3f0",
+        "background_gradient": "",
+        "text_color": "#111111"
+      }
+    },
+    "closeups": {
+      "type": "video-testimonials",
+      "blocks": {
+        "v1": {
+          "type": "video",
+          "settings": {
+            "video_url": "",
+            "rating": 5,
+            "testimonial": "",
+            "attr_1": "",
+            "attr_2": ""
+          }
+        },
+        "v2": {
+          "type": "video",
+          "settings": {
+            "video_url": "",
+            "rating": 5,
+            "testimonial": "",
+            "attr_1": "",
+            "attr_2": ""
+          }
+        },
+        "v3": {
+          "type": "video",
+          "settings": {
+            "video_url": "",
+            "rating": 5,
+            "testimonial": "",
+            "attr_1": "",
+            "attr_2": ""
+          }
+        },
+        "v4": {
+          "type": "video",
+          "settings": {
+            "video_url": "",
+            "rating": 5,
+            "testimonial": "",
+            "attr_1": "",
+            "attr_2": ""
+          }
+        }
+      },
+      "block_order": [
+        "v1",
+        "v2",
+        "v3",
+        "v4"
+      ],
+      "name": "Close-up videos",
+      "settings": {
+        "full_width": true,
+        "badge": "",
+        "title": "SEE IT UP CLOSE",
+        "content": "<p>Filmed as it is: seams, baffles and finishes, nothing retouched.</p>",
+        "text_alignment": "center",
+        "heading_style": "theme",
+        "heading_uppercase": true,
+        "subtitle_color": "",
+        "card_ratio": "9 / 16",
+        "desktop_layout": "carousel",
+        "cards_per_row_desktop": 6,
+        "card_gap": "8",
+        "card_width_mobile": "62",
+        "center_cards_mobile": true,
+        "autoplay_muted": true,
+        "tap_toggles_sound": true,
+        "play_glyph": false,
+        "background": "",
+        "background_gradient": "",
+        "text_color": "",
+        "heading_color": "",
+        "heading_gradient": "",
+        "badge_background": "",
+        "badge_text_color": "",
+        "stars_color": "#00b67a",
+        "hide_captions": true,
+        "caption_text_color": "#ffffff",
+        "caption_overlay_color": "#000000",
+        "caption_overlay_opacity": 85,
+        "card_radius": 2
+      }
+    },
+    "complete_look": {
+      "type": "related-products",
+      "name": "Complete the look",
+      "settings": {
+        "recommendations_count": 8,
+        "products": [],
+        "full_width": true,
+        "stack_products": false,
+        "show_progress_bar": true,
+        "products_per_row_mobile": "2",
+        "products_per_row_desktop": 4,
+        "subheading": "Complete your winter look",
+        "title": "YOU MAY ALSO LIKE",
+        "content": "",
+        "background": "",
+        "background_gradient": "",
+        "text_color": "",
+        "heading_color": "",
+        "heading_gradient": "",
+        "product_card_background": "",
+        "product_card_text_color": ""
+      }
+    },
     "fans_heading": {
       "type": "rich-text",
       "blocks": {
@@ -784,6 +865,7 @@
         "h",
         "t"
       ],
+      "disabled": true,
       "name": "Fans heading",
       "settings": {
         "full_width": true,
@@ -792,8 +874,7 @@
         "background": "",
         "background_gradient": "",
         "text_color": ""
-      },
-      "disabled": true
+      }
     },
     "fans_grid": {
       "type": "media-grid",
@@ -1177,6 +1258,20 @@
     "faq": {
       "type": "faq",
       "blocks": {
+        "f0": {
+          "type": "item",
+          "settings": {
+            "title": "Is it safe to order here?",
+            "content": "<p>Yes. Payment goes through Shopify’s encrypted checkout: we never see or store your card details. You get an order confirmation by email, then a tracking link as soon as your jacket ships. And if it isn’t right, you have 30 days to send it back for a full refund.</p>"
+          }
+        },
+        "f4": {
+          "type": "item",
+          "settings": {
+            "title": "Can I return or exchange my jacket?",
+            "content": "<p>Yes. You have 30 days to return or exchange any unworn item with its tags. Returns are free and you get a full refund.</p>"
+          }
+        },
         "f1": {
           "type": "item",
           "settings": {
@@ -1184,11 +1279,11 @@
             "content": "<p>We dispatch within 24 hours on working days. Delivery takes 3-6 days, tracked from the moment your order leaves our warehouse.</p>"
           }
         },
-        "f2": {
+        "f7": {
           "type": "item",
           "settings": {
-            "title": "How warm is this jacket?",
-            "content": "<p>Want the exact fill, weight and temperature range before you order? Write to us and our team will send them to you.</p>"
+            "title": "Will I get a tracking number?",
+            "content": "<p>Yes. As soon as your order ships, you receive an email with your tracking link, so you can follow your jacket all the way to your door.</p>"
           }
         },
         "f3": {
@@ -1198,11 +1293,11 @@
             "content": "<p>Our jackets have a regular fit with room for a mid-layer. Between two sizes, take the larger one if you layer heavily. Measurements for each size are in the size guide.</p>"
           }
         },
-        "f4": {
+        "f2": {
           "type": "item",
           "settings": {
-            "title": "Can I return or exchange my jacket?",
-            "content": "<p>Yes. You have 30 days to return or exchange any unworn item with its tags. Returns are free and you get a full refund.</p>"
+            "title": "How warm is this jacket?",
+            "content": "<p>Want the exact fill, weight and temperature range before you order? Write to us and our team will send them to you.</p>"
           }
         },
         "f5": {
@@ -1217,20 +1312,6 @@
           "settings": {
             "title": "Is my payment secure?",
             "content": "<p>Every payment runs through Shopify's encrypted checkout. We never see or store your card details.</p>"
-          }
-        },
-        "f0": {
-          "type": "item",
-          "settings": {
-            "title": "Is it safe to order here?",
-            "content": "<p>Yes. Payment goes through Shopify’s encrypted checkout: we never see or store your card details. You get an order confirmation by email, then a tracking link as soon as your jacket ships. And if it isn’t right, you have 30 days to send it back for a full refund.</p>"
-          }
-        },
-        "f7": {
-          "type": "item",
-          "settings": {
-            "title": "Will I get a tracking number?",
-            "content": "<p>Yes. As soon as your order ships, you receive an email with your tracking link, so you can follow your jacket all the way to your door.</p>"
           }
         }
       },
@@ -1270,74 +1351,33 @@
         "accordion_text_color": ""
       }
     },
-    "trust_bar": {
-      "type": "text-with-icons",
-      "name": "Trust bar",
+    "1791293454902aba85": {
+      "type": "apps",
       "blocks": {
-        "t1": {
-          "type": "item",
+        "loox_reviews_loox_dynamic_section_wga9gE": {
+          "type": "shopify://apps/loox-reviews/blocks/loox-dynamic-section/5c3b337f-fd14-4df5-b1d6-80ec13e6e28e",
           "settings": {
-            "icon": "picto-truck",
-            "mobile_icon_width": 24,
-            "icon_width": 32,
-            "icon_background_type": "none",
-            "icon_color": "#111111",
-            "title": "Free shipping",
-            "content": "<p>On every jacket, tracked from our warehouse to your door.</p>"
-          }
-        },
-        "t2": {
-          "type": "item",
-          "settings": {
-            "icon": "picto-return",
-            "mobile_icon_width": 24,
-            "icon_width": 32,
-            "icon_background_type": "none",
-            "icon_color": "#111111",
-            "title": "30-day returns",
-            "content": "<p>Not the right fit? Exchange or return it within 30 days.</p>"
-          }
-        },
-        "t3": {
-          "type": "item",
-          "settings": {
-            "icon": "picto-lock",
-            "mobile_icon_width": 24,
-            "icon_width": 32,
-            "icon_background_type": "none",
-            "icon_color": "#111111",
-            "title": "Secure payment",
-            "content": "<p>Encrypted checkout powered by Shopify.</p>"
-          }
-        },
-        "t4": {
-          "type": "item",
-          "settings": {
-            "icon": "picto-customer-support",
-            "mobile_icon_width": 24,
-            "icon_width": 32,
-            "icon_background_type": "none",
-            "icon_color": "#111111",
-            "title": "Real support",
-            "content": "<p>Questions about sizing or an order? Our team replies personally.</p>"
+            "reviews_to_display": "",
+            "default_tab": "automatic",
+            "only_photos": false,
+            "aggregated": false,
+            "limit": 20,
+            "hide_thumbnails": false,
+            "maxwidth": 1080,
+            "is_sample": true
           }
         }
       },
       "block_order": [
-        "t1",
-        "t2",
-        "t3",
-        "t4"
+        "loox_reviews_loox_dynamic_section_wga9gE"
       ],
       "settings": {
         "full_width": true,
-        "stack_on_mobile": false,
-        "title": "",
-        "heading_tag": "h5",
-        "text_alignment": "center",
-        "icon_spacing": "medium",
-        "background": "#f4f3f0",
-        "text_color": "#111111"
+        "remove_vertical_spacing": false,
+        "remove_horizontal_spacing": false,
+        "background": "",
+        "background_gradient": "",
+        "text_color": ""
       }
     }
   },
@@ -1349,6 +1389,7 @@
     "complete_look",
     "fans_heading",
     "fans_grid",
+    "1791293454902aba85",
     "faq"
   ]
 }
