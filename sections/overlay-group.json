@@ -40,7 +40,7 @@
           "settings": {
             "minutes": 5,
             "text": "Your cart expires in [time]",
-            "background": "#000000",
+            "background": "#E14848",
             "text_color": "#ffffff",
             "icon": "picto-timer",
             "emoji": "",
@@ -51,6 +51,7 @@
         },
         "offer_gauge": {
           "type": "offer_gauge",
+          "disabled": true,
           "settings": {
             "collection": "",
             "buy_quantity": 2,
@@ -64,8 +65,7 @@
             "show_shipping": true,
             "shipping_text": "Free shipping unlocked",
             "shipping_icon": "picto-truck"
-          },
-          "disabled": true
+          }
         },
         "progress_goals": {
           "type": "progress_goals",
@@ -88,6 +88,7 @@
         },
         "social_proof": {
           "type": "social_proof",
+          "disabled": true,
           "settings": {
             "position": "header",
             "style": "stars",
@@ -100,8 +101,7 @@
             "text_color": "",
             "border_color": "",
             "radius": 12
-          },
-          "disabled": true
+          }
         },
         "guarantee": {
           "type": "guarantee",
