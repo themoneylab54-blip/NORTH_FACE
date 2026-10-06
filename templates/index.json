@@ -532,7 +532,7 @@
         "mobile_media_size": "expanded",
         "mobile_carousel_control": "free_scroll",
         "mobile_gallery_arrows": true,
-        "color_image_sets": true,
+        "color_image_sets": false,
         "enable_video_autoplay": false,
         "enable_video_looping": false,
         "enable_image_zoom": true,
