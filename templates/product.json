@@ -491,6 +491,19 @@
             "max_days": 6,
             "mobile_only": false
           }
+        },
+        "clearance": {
+          "type": "offer",
+          "settings": {
+            "text_alignment": "start",
+            "icon_position": "aligned",
+            "icon": "picto-percent",
+            "icon_width": 28,
+            "title": "HUGE CLEARANCE — BIG SALE",
+            "content": "<p>Prices slashed on every color while stock lasts. Once it’s gone, it’s gone.</p>",
+            "background": "#d7141a",
+            "text_color": "#ffffff"
+          }
         }
       },
       "block_order": [
@@ -498,6 +511,7 @@
         "title",
         "rating",
         "price_row",
+        "clearance",
         "countdown_bf",
         "countdown_midnight",
         "inventory",
