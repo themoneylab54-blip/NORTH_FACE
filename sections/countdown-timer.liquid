@@ -4,7 +4,9 @@
   comment
     Strict ISO 8601 needs "+01:00" rather than "+0100" (Safari rejects the latter).
   endcomment
-  assign shop_offset = shop_offset_raw | slice: 0, 3 | append: ':' | append: shop_offset_raw | slice: 3, 2
+  assign shop_offset_hours = shop_offset_raw | slice: 0, 3
+  assign shop_offset_minutes = shop_offset_raw | slice: 3, 2
+  assign shop_offset = shop_offset_hours | append: ':' | append: shop_offset_minutes
   assign end_date = section.settings.end_date | default: '2026-12-31'
   assign end_time = section.settings.end_time | default: '23:59'
   assign target_iso = end_date | append: 'T' | append: end_time | append: ':00' | append: shop_offset
