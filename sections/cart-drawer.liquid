@@ -206,7 +206,7 @@
                   endif
                 -%}
 
-                <cart-reserve-timer minutes="{{ block.settings.minutes }}" timer-id="{{ block.id }}" class="h-stack gap-2 justify-center text-sm{% if timer_full %} cart-reserve-timer--full{% endif %}" style="align-items: center; background: {{ timer_background }}; border: 1px solid {{ timer_border }}; {% if block.settings.text_color.alpha != 0 and block.settings.text_color != blank %}color: {{ block.settings.text_color }};{% endif %} padding: var(--spacing-3) var(--spacing-4); border-radius: {{ timer_radius }};" {{ block.shopify_attributes }}>
+                <cart-reserve-timer minutes="{{ block.settings.minutes }}" cart-token="{{ cart.token | escape }}" {% if request.page_type == 'cart' %}reload-on-expire{% endif %} class="h-stack gap-2 justify-center text-sm{% if timer_full %} cart-reserve-timer--full{% endif %}" style="align-items: center; background: {{ timer_background }}; border: 1px solid {{ timer_border }}; {% if block.settings.text_color.alpha != 0 and block.settings.text_color != blank %}color: {{ block.settings.text_color }};{% endif %} padding: var(--spacing-3) var(--spacing-4); border-radius: {{ timer_radius }};" {{ block.shopify_attributes }}>
                   {%- if block.settings.icon != blank and block.settings.icon != 'none' -%}
                     <span class="cart-drawer__timer-icon" aria-hidden="true">{%- render 'icon' with block.settings.icon, width: 18, height: 18 -%}</span>
                   {%- elsif block.settings.emoji != blank -%}
@@ -510,40 +510,93 @@
 </style>
 
 <script>
+  // Cart timer: one end time per cart (kept in localStorage with the cart token, so it carries on across pages and a
+  // new cart starts fresh), started when the cart gets its first item. At zero the cart is really emptied: the text
+  // says what happens, and it happens. The drawer then shows the empty cart.
   if (!window.customElements.get('cart-reserve-timer')) {
     window.customElements.define('cart-reserve-timer', class extends HTMLElement {
       connectedCallback() {
-        const minutes = parseInt(this.getAttribute('minutes')) || 10;
-        const storageKey = 'cart-reserve-timer-' + this.getAttribute('timer-id');
-        let expiry = parseInt(localStorage.getItem(storageKey));
+        this.storageKey = 'cart-timer';
+        this.token = this.getAttribute('cart-token') || '';
+        this.minutes = Math.max(1, parseInt(this.getAttribute('minutes'), 10) || 5);
+        this.textElement = this.querySelector('[data-timer-text]');
+        this.template = this.textElement.getAttribute('data-template');
 
-        if (!expiry || expiry < Date.now()) {
-          expiry = Date.now() + minutes * 60000;
-          localStorage.setItem(storageKey, expiry);
+        if (!this.read()) {
+          this.write(Date.now() + this.minutes * 60000);
         }
 
-        const textElement = this.querySelector('[data-timer-text]');
-        const template = textElement.getAttribute('data-template');
-
-        const tick = () => {
-          const remaining = Math.max(0, expiry - Date.now());
-          const mins = Math.floor(remaining / 60000);
-          const secs = Math.floor((remaining % 60000) / 1000);
-          const formatted = mins + ':' + String(secs).padStart(2, '0');
-          textElement.textContent = template.replace('[temps]', formatted).replace('[time]', formatted);
-
-          if (remaining <= 0) {
-            clearInterval(this._interval);
-            this.style.display = 'none';
-          }
+        // Cart emptied by the shopper: the next first item starts a new countdown.
+        this.onCartChange = (event) => {
+          if (event.detail?.cart?.item_count === 0) this.write(0);
         };
+        document.addEventListener('cart:change', this.onCartChange);
 
-        tick();
-        this._interval = setInterval(tick, 1000);
+        this.tick();
+        this.interval = setInterval(() => this.tick(), 1000);
       }
 
       disconnectedCallback() {
-        clearInterval(this._interval);
+        clearInterval(this.interval);
+        document.removeEventListener('cart:change', this.onCartChange);
+      }
+
+      read() {
+        try {
+          const saved = JSON.parse(window.localStorage.getItem(this.storageKey) || 'null');
+          return saved && saved.token === this.token ? saved.expiresAt : 0;
+        } catch (error) {
+          return this.memory || 0;
+        }
+      }
+
+      write(expiresAt) {
+        this.memory = expiresAt;
+        try {
+          if (expiresAt) {
+            window.localStorage.setItem(this.storageKey, JSON.stringify({ token: this.token, expiresAt }));
+          } else {
+            window.localStorage.removeItem(this.storageKey);
+          }
+        } catch (error) {}
+      }
+
+      tick() {
+        const expiresAt = this.read();
+
+        // Emptied in another tab: nothing left to count.
+        if (!expiresAt) {
+          clearInterval(this.interval);
+          this.style.display = 'none';
+          return;
+        }
+
+        const secondsLeft = Math.ceil((expiresAt - Date.now()) / 1000);
+
+        if (secondsLeft <= 0) {
+          this.expire();
+          return;
+        }
+
+        const formatted = String(Math.floor(secondsLeft / 60)).padStart(2, '0') + ':' + String(secondsLeft % 60).padStart(2, '0');
+        this.textElement.textContent = this.template.replace('[temps]', formatted).replace('[time]', formatted);
+      }
+
+      async expire() {
+        clearInterval(this.interval);
+        this.write(0);
+
+        try {
+          await fetch(`${window.Shopify?.routes?.root || '/'}cart/clear.js`, { method: 'POST', headers: { 'Accept': 'application/json' } });
+        } catch (error) {}
+
+        if (this.hasAttribute('reload-on-expire')) {
+          window.location.reload();
+          return;
+        }
+
+        // Cart count, drawer content and every cart-aware element reload from the server.
+        document.dispatchEvent(new CustomEvent('cart:refresh'));
       }
     });
   }
@@ -1041,8 +1094,8 @@
           "type": "text",
           "id": "text",
           "label": "Texte",
-          "info": "[temps] est remplacé par le compte à rebours.",
-          "default": "Votre panier est réservé pendant [temps]"
+          "info": "[temps] est remplacé par le compte à rebours. Il part au premier article ajouté et continue d'une page à l'autre ; à zéro, le panier est vidé.",
+          "default": "Votre panier expire dans [temps]"
         },
         {
           "type": "color",

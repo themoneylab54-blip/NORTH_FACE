@@ -38,8 +38,8 @@
         "timer_urgency": {
           "type": "timer",
           "settings": {
-            "minutes": 10,
-            "text": "Your cart is reserved for [time]",
+            "minutes": 5,
+            "text": "Your cart expires in [time]",
             "background": "#000000",
             "text_color": "#ffffff",
             "icon": "picto-timer",
@@ -47,8 +47,7 @@
             "border_color": "",
             "radius": 12,
             "full_width": true
-          },
-          "disabled": true
+          }
         },
         "offer_gauge": {
           "type": "offer_gauge",

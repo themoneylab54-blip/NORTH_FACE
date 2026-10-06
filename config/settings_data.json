@@ -61,8 +61,6 @@
     "ab_end": "01:00",
     "ab_timezone": "",
     "ab_tag_orders": true,
-    "cart_timer_enabled": true,
-    "cart_timer_minutes": 5,
     "checkout_accent_color": "#111111",
     "checkout_button_color": "#111111",
     "content_for_index": []

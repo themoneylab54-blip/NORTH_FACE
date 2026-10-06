@@ -989,54 +989,5 @@
         "info": "Ajoute l'attribut « A/B page produit » (A ou B) visible dans chaque commande."
       }
     ]
-  },
-  {
-    "name": "Minuteur panier",
-    "settings": [
-      {
-        "type": "paragraph",
-        "content": "Bandeau tout en haut du site dès qu'un article est dans le panier. Le compte à rebours part au premier ajout et continue d'une page à l'autre. À zéro, le panier est vidé."
-      },
-      {
-        "type": "checkbox",
-        "id": "cart_timer_enabled",
-        "label": "Activer le minuteur panier",
-        "default": false
-      },
-      {
-        "type": "range",
-        "id": "cart_timer_minutes",
-        "label": "Durée",
-        "min": 1,
-        "max": 30,
-        "step": 1,
-        "unit": "min",
-        "default": 5
-      },
-      {
-        "type": "text",
-        "id": "cart_timer_text",
-        "label": "Texte avant le minuteur",
-        "default": "Your cart expires in"
-      },
-      {
-        "type": "text",
-        "id": "cart_timer_expired_text",
-        "label": "Texte quand le panier est vidé",
-        "default": "Your cart has expired and was emptied."
-      },
-      {
-        "type": "color",
-        "id": "cart_timer_background",
-        "label": "Fond",
-        "default": "#c8102e"
-      },
-      {
-        "type": "color",
-        "id": "cart_timer_text_color",
-        "label": "Texte",
-        "default": "#ffffff"
-      }
-    ]
   }
 ]
