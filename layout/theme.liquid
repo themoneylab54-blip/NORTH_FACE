@@ -138,8 +138,13 @@
 
         document.addEventListener('click', function (event) {
           var button = event.target.closest('button[name="checkout"], input[name="checkout"]');
+          var viewCart = event.target.closest('a[href]');
 
-          if (!button || !button.closest('.cart-form, .buy-buttons')) return;
+          // "Voir le panier" : lien vers /cart, sauf l'icone du header qui ouvre le drawer (aria-controls)
+          var isViewCart = viewCart && !viewCart.hasAttribute('aria-controls') && /\/cart\/?$/.test(viewCart.pathname) && viewCart.hostname === window.location.hostname;
+          var isCheckout = button && button.closest('.cart-form, .buy-buttons');
+
+          if (!isCheckout && !isViewCart) return;
 
           event.preventDefault();
           event.stopPropagation();
