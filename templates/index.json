@@ -548,287 +548,6 @@
         "input_text_color": ""
       }
     },
-    "reviews": {
-      "type": "reviews-carousel",
-      "blocks": {
-        "r1": {
-          "type": "review",
-          "settings": {
-            "author": "",
-            "city": "",
-            "date": "",
-            "title": "",
-            "verified": false,
-            "rating": 5,
-            "content": ""
-          }
-        },
-        "r2": {
-          "type": "review",
-          "settings": {
-            "author": "",
-            "city": "",
-            "date": "",
-            "title": "",
-            "verified": false,
-            "rating": 5,
-            "content": ""
-          }
-        },
-        "r3": {
-          "type": "review",
-          "settings": {
-            "author": "",
-            "city": "",
-            "date": "",
-            "title": "",
-            "verified": false,
-            "rating": 5,
-            "content": ""
-          }
-        },
-        "r4": {
-          "type": "review",
-          "settings": {
-            "author": "",
-            "city": "",
-            "date": "",
-            "title": "",
-            "verified": false,
-            "rating": 5,
-            "content": ""
-          }
-        }
-      },
-      "block_order": [
-        "r1",
-        "r2",
-        "r3",
-        "r4"
-      ],
-      "name": "Customer reviews",
-      "settings": {
-        "full_width": true,
-        "subheading": "",
-        "title": "What our customers say",
-        "content": "",
-        "link_url": "",
-        "link_text": "",
-        "rating_value": "",
-        "reviews_count": "",
-        "reviews_count_label": "reviews",
-        "card_style": "compact",
-        "compact_show_photo": false,
-        "image_ratio": "1 / 1",
-        "card_width_mobile": "62",
-        "center_cards_mobile": true,
-        "autoplay": true,
-        "autoplay_speed": 40,
-        "verified_text": "Verified purchase",
-        "verified_color": "#1e6b45",
-        "stars_color": "#00b67a",
-        "background": "",
-        "background_gradient": "",
-        "text_color": "",
-        "heading_color": "",
-        "heading_gradient": "",
-        "review_card_background": "#f4f3f0",
-        "review_card_text_color": "#111111"
-      }
-    },
-    "trust_bar": {
-      "type": "text-with-icons",
-      "blocks": {
-        "t1": {
-          "type": "item",
-          "settings": {
-            "icon": "picto-truck",
-            "mobile_icon_width": 24,
-            "icon_width": 32,
-            "icon_background_type": "none",
-            "icon_background": "",
-            "icon_color": "#111111",
-            "title": "Free shipping",
-            "content": "<p>On every jacket, tracked from our warehouse to your door.</p>"
-          }
-        },
-        "t2": {
-          "type": "item",
-          "settings": {
-            "icon": "picto-return",
-            "mobile_icon_width": 24,
-            "icon_width": 32,
-            "icon_background_type": "none",
-            "icon_background": "",
-            "icon_color": "#111111",
-            "title": "30-day returns",
-            "content": "<p>Not the right fit? Exchange or return it within 30 days.</p>"
-          }
-        },
-        "t3": {
-          "type": "item",
-          "settings": {
-            "icon": "picto-lock",
-            "mobile_icon_width": 24,
-            "icon_width": 32,
-            "icon_background_type": "none",
-            "icon_background": "",
-            "icon_color": "#111111",
-            "title": "Secure payment",
-            "content": "<p>Encrypted checkout powered by Shopify.</p>"
-          }
-        },
-        "t4": {
-          "type": "item",
-          "settings": {
-            "icon": "picto-customer-support",
-            "mobile_icon_width": 24,
-            "icon_width": 32,
-            "icon_background_type": "none",
-            "icon_background": "",
-            "icon_color": "#111111",
-            "title": "Real support",
-            "content": "<p>Questions about sizing or an order? Our team replies personally.</p>"
-          }
-        }
-      },
-      "block_order": [
-        "t1",
-        "t2",
-        "t3",
-        "t4"
-      ],
-      "name": "Trust bar",
-      "settings": {
-        "full_width": true,
-        "stack_on_mobile": false,
-        "title": "",
-        "heading_tag": "h5",
-        "text_alignment": "center",
-        "icon_spacing": "medium",
-        "background": "#f4f3f0",
-        "background_gradient": "",
-        "text_color": "#111111"
-      }
-    },
-    "closeups": {
-      "type": "video-testimonials",
-      "blocks": {
-        "v1": {
-          "type": "video",
-          "settings": {
-            "video_url": "",
-            "rating": 5,
-            "testimonial": "",
-            "attr_1": "",
-            "attr_2": ""
-          }
-        },
-        "v2": {
-          "type": "video",
-          "settings": {
-            "video_url": "",
-            "rating": 5,
-            "testimonial": "",
-            "attr_1": "",
-            "attr_2": ""
-          }
-        },
-        "v3": {
-          "type": "video",
-          "settings": {
-            "video_url": "",
-            "rating": 5,
-            "testimonial": "",
-            "attr_1": "",
-            "attr_2": ""
-          }
-        },
-        "v4": {
-          "type": "video",
-          "settings": {
-            "video_url": "",
-            "rating": 5,
-            "testimonial": "",
-            "attr_1": "",
-            "attr_2": ""
-          }
-        }
-      },
-      "block_order": [
-        "v1",
-        "v2",
-        "v3",
-        "v4"
-      ],
-      "name": "Close-up videos",
-      "settings": {
-        "full_width": true,
-        "badge": "",
-        "title": "SEE IT UP CLOSE",
-        "content": "<p>Filmed as it is: seams, baffles and finishes, nothing retouched.</p>",
-        "text_alignment": "center",
-        "heading_style": "theme",
-        "heading_uppercase": true,
-        "subtitle_color": "",
-        "card_ratio": "9 / 16",
-        "desktop_layout": "carousel",
-        "cards_per_row_desktop": 6,
-        "card_gap": "8",
-        "card_width_mobile": "62",
-        "center_cards_mobile": true,
-        "autoplay_muted": true,
-        "tap_toggles_sound": true,
-        "play_glyph": false,
-        "background": "",
-        "background_gradient": "",
-        "text_color": "",
-        "heading_color": "",
-        "heading_gradient": "",
-        "badge_background": "",
-        "badge_text_color": "",
-        "stars_color": "#00b67a",
-        "hide_captions": true,
-        "caption_text_color": "#ffffff",
-        "caption_overlay_color": "#000000",
-        "caption_overlay_opacity": 85,
-        "card_radius": 2
-      }
-    },
-    "fans_heading": {
-      "type": "rich-text",
-      "blocks": {
-        "h": {
-          "type": "heading",
-          "settings": {
-            "text": "BUILT FOR REAL WINTERS",
-            "heading_tag": "h2",
-            "text_color": "",
-            "gradient": ""
-          }
-        },
-        "t": {
-          "type": "richtext",
-          "settings": {
-            "content": "<p>Tag us wearing yours to be featured.</p>"
-          }
-        }
-      },
-      "block_order": [
-        "h",
-        "t"
-      ],
-      "disabled": true,
-      "name": "Fans heading",
-      "settings": {
-        "full_width": true,
-        "content_width": "small",
-        "text_position": "center",
-        "background": "",
-        "background_gradient": "",
-        "text_color": ""
-      }
-    },
     "fans_grid": {
       "type": "media-grid",
       "blocks": {
@@ -1063,6 +782,203 @@
         "background_gradient": ""
       }
     },
+    "reviews": {
+      "type": "reviews-carousel",
+      "blocks": {
+        "r1": {
+          "type": "review",
+          "settings": {
+            "author": "",
+            "city": "",
+            "date": "",
+            "title": "",
+            "verified": false,
+            "rating": 5,
+            "content": ""
+          }
+        },
+        "r2": {
+          "type": "review",
+          "settings": {
+            "author": "",
+            "city": "",
+            "date": "",
+            "title": "",
+            "verified": false,
+            "rating": 5,
+            "content": ""
+          }
+        },
+        "r3": {
+          "type": "review",
+          "settings": {
+            "author": "",
+            "city": "",
+            "date": "",
+            "title": "",
+            "verified": false,
+            "rating": 5,
+            "content": ""
+          }
+        },
+        "r4": {
+          "type": "review",
+          "settings": {
+            "author": "",
+            "city": "",
+            "date": "",
+            "title": "",
+            "verified": false,
+            "rating": 5,
+            "content": ""
+          }
+        }
+      },
+      "block_order": [
+        "r1",
+        "r2",
+        "r3",
+        "r4"
+      ],
+      "name": "Customer reviews",
+      "settings": {
+        "full_width": true,
+        "subheading": "",
+        "title": "What our customers say",
+        "content": "",
+        "link_url": "",
+        "link_text": "",
+        "rating_value": "",
+        "reviews_count": "",
+        "reviews_count_label": "reviews",
+        "card_style": "compact",
+        "compact_show_photo": false,
+        "image_ratio": "1 / 1",
+        "card_width_mobile": "62",
+        "center_cards_mobile": true,
+        "autoplay": true,
+        "autoplay_speed": 40,
+        "verified_text": "Verified purchase",
+        "verified_color": "#1e6b45",
+        "stars_color": "#00b67a",
+        "background": "",
+        "background_gradient": "",
+        "text_color": "",
+        "heading_color": "",
+        "heading_gradient": "",
+        "review_card_background": "#f4f3f0",
+        "review_card_text_color": "#111111"
+      }
+    },
+    "trust_bar": {
+      "type": "text-with-icons",
+      "blocks": {
+        "t1": {
+          "type": "item",
+          "settings": {
+            "icon": "picto-truck",
+            "mobile_icon_width": 24,
+            "icon_width": 32,
+            "icon_background_type": "none",
+            "icon_background": "",
+            "icon_color": "#111111",
+            "title": "Free shipping",
+            "content": "<p>On every jacket, tracked from our warehouse to your door.</p>"
+          }
+        },
+        "t2": {
+          "type": "item",
+          "settings": {
+            "icon": "picto-return",
+            "mobile_icon_width": 24,
+            "icon_width": 32,
+            "icon_background_type": "none",
+            "icon_background": "",
+            "icon_color": "#111111",
+            "title": "30-day returns",
+            "content": "<p>Not the right fit? Exchange or return it within 30 days.</p>"
+          }
+        },
+        "t3": {
+          "type": "item",
+          "settings": {
+            "icon": "picto-lock",
+            "mobile_icon_width": 24,
+            "icon_width": 32,
+            "icon_background_type": "none",
+            "icon_background": "",
+            "icon_color": "#111111",
+            "title": "Secure payment",
+            "content": "<p>Encrypted checkout powered by Shopify.</p>"
+          }
+        },
+        "t4": {
+          "type": "item",
+          "settings": {
+            "icon": "picto-customer-support",
+            "mobile_icon_width": 24,
+            "icon_width": 32,
+            "icon_background_type": "none",
+            "icon_background": "",
+            "icon_color": "#111111",
+            "title": "Real support",
+            "content": "<p>Questions about sizing or an order? Our team replies personally.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "t1",
+        "t2",
+        "t3",
+        "t4"
+      ],
+      "name": "Trust bar",
+      "settings": {
+        "full_width": true,
+        "stack_on_mobile": false,
+        "title": "",
+        "heading_tag": "h5",
+        "text_alignment": "center",
+        "icon_spacing": "medium",
+        "background": "#f4f3f0",
+        "background_gradient": "",
+        "text_color": "#111111"
+      }
+    },
+    "fans_heading": {
+      "type": "rich-text",
+      "blocks": {
+        "h": {
+          "type": "heading",
+          "settings": {
+            "text": "BUILT FOR REAL WINTERS",
+            "heading_tag": "h2",
+            "text_color": "",
+            "gradient": ""
+          }
+        },
+        "t": {
+          "type": "richtext",
+          "settings": {
+            "content": "<p>Tag us wearing yours to be featured.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "h",
+        "t"
+      ],
+      "disabled": true,
+      "name": "Fans heading",
+      "settings": {
+        "full_width": true,
+        "content_width": "small",
+        "text_position": "center",
+        "background": "",
+        "background_gradient": "",
+        "text_color": ""
+      }
+    },
     "faq": {
       "type": "faq",
       "blocks": {
@@ -1162,11 +1078,10 @@
   },
   "order": [
     "main",
+    "fans_grid",
     "reviews",
     "trust_bar",
-    "closeups",
     "fans_heading",
-    "fans_grid",
     "faq"
   ]
 }
