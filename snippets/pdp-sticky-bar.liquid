@@ -55,12 +55,15 @@ Supported variables
   endif
   assign psb_date_max = psb_max_seconds | date: '%-d/%-m'
 
-  # Which option is the size: "Size" first, then the theme's translated size labels, then the first option.
+  # Which option is the size: common size names ("Size", "Taille"...) first, then the theme's translated size labels,
+  # then the first option that is not a color (a "Couleur" option must never show up as sizes in this bar).
   assign psb_size_position = 0
   assign psb_size_label_list = 'general.label.size' | t | replace: ', ', ',' | downcase | split: ','
+  assign psb_size_names = 'size,sizes,taille,tailles,talla,tallas,größe,grösse,taglia,maat,tamanho,rozmiar' | split: ','
+  assign psb_color_names = 'color,colour,couleur,couleurs,coloris,colors,colours,farbe,colore,kleur' | split: ','
   for option in product.options_with_values
     assign psb_option_downcase = option.name | downcase | strip
-    if psb_option_downcase == 'size'
+    if psb_size_names contains psb_option_downcase
       assign psb_size_position = option.position
       break
     endif
@@ -77,7 +80,13 @@ Supported variables
   endif
 
   if psb_size_position == 0 and product.has_only_default_variant == false
-    assign psb_size_position = product.options_with_values.first.position
+    for option in product.options_with_values
+      assign psb_option_downcase = option.name | downcase | strip
+      unless psb_color_names contains psb_option_downcase
+        assign psb_size_position = option.position
+        break
+      endunless
+    endfor
   endif
 
   assign psb_image = psb_variant.featured_media | default: product.featured_media
@@ -178,7 +187,9 @@ Supported variables
   }
 
   .{{ psb_class }} .pdp-sticky-bar__select {
-    flex-shrink: 0;
+    flex-shrink: 1;
+    max-width: 40%;
+    text-overflow: ellipsis;
     box-sizing: border-box;
     height: 40px;
     min-width: 96px;

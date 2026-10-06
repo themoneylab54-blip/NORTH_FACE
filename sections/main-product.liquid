@@ -53,8 +53,13 @@
     }
   }
 
+  {%- comment -%}
+    One column exactly as wide as the gallery side: without minmax(0, 1fr) the column grows to the widest content
+    under the gallery (the side-scrolling review cards, laid end to end) and the whole page scrolls sideways on phones.
+  {%- endcomment -%}
   #shopify-section-{{ section.id }} .product__gallery-column {
     display: grid;
+    grid-template-columns: minmax(0, 1fr);
     align-content: start;
     gap: var(--spacing-6);
     min-width: 0;
