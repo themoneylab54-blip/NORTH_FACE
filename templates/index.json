@@ -183,7 +183,7 @@
           "type": "pdp_payment_icons",
           "settings": {
             "icons_source": "custom",
-            "icons_list": "visa, master, american_express, paypal, apple_pay, google_pay, shopify_pay, klarna",
+            "icons_list": "visa, master, american_express, paypal, apple_pay, google_pay, shopify_pay,",
             "alignment": "center",
             "ab_visibility": "all"
           }
