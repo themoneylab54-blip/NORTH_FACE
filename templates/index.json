@@ -129,6 +129,7 @@
             "show_size_guide": true,
             "size_guide_text": "Size guide",
             "other_options": "show",
+            "color_chips": "colors",
             "hide_sold_out_variants": false,
             "ab_visibility": "all"
           }
@@ -828,195 +829,6 @@
     "fans_grid": {
       "type": "media-grid",
       "blocks": {
-        "p1": {
-          "type": "image",
-          "settings": {
-            "title": "",
-            "heading_tag": "h3",
-            "link_url": "",
-            "link_text": "",
-            "mobile_text_position": "place-self-center text-center",
-            "desktop_column_span": 1,
-            "desktop_row_span": 1,
-            "desktop_text_position": "sm:place-self-center sm:text-center",
-            "background": "",
-            "background_gradient": "",
-            "text_color": "",
-            "text_gradient": "",
-            "button_background": "",
-            "button_text_color": "",
-            "overlay_color": "#000000",
-            "overlay_opacity": 0
-          }
-        },
-        "p2": {
-          "type": "image",
-          "settings": {
-            "title": "",
-            "heading_tag": "h3",
-            "link_url": "",
-            "link_text": "",
-            "mobile_text_position": "place-self-center text-center",
-            "desktop_column_span": 1,
-            "desktop_row_span": 1,
-            "desktop_text_position": "sm:place-self-center sm:text-center",
-            "background": "",
-            "background_gradient": "",
-            "text_color": "",
-            "text_gradient": "",
-            "button_background": "",
-            "button_text_color": "",
-            "overlay_color": "#000000",
-            "overlay_opacity": 0
-          }
-        },
-        "p3": {
-          "type": "image",
-          "settings": {
-            "title": "",
-            "heading_tag": "h3",
-            "link_url": "",
-            "link_text": "",
-            "mobile_text_position": "place-self-center text-center",
-            "desktop_column_span": 1,
-            "desktop_row_span": 1,
-            "desktop_text_position": "sm:place-self-center sm:text-center",
-            "background": "",
-            "background_gradient": "",
-            "text_color": "",
-            "text_gradient": "",
-            "button_background": "",
-            "button_text_color": "",
-            "overlay_color": "#000000",
-            "overlay_opacity": 0
-          }
-        },
-        "p4": {
-          "type": "image",
-          "settings": {
-            "title": "",
-            "heading_tag": "h3",
-            "link_url": "",
-            "link_text": "",
-            "mobile_text_position": "place-self-center text-center",
-            "desktop_column_span": 1,
-            "desktop_row_span": 1,
-            "desktop_text_position": "sm:place-self-center sm:text-center",
-            "background": "",
-            "background_gradient": "",
-            "text_color": "",
-            "text_gradient": "",
-            "button_background": "",
-            "button_text_color": "",
-            "overlay_color": "#000000",
-            "overlay_opacity": 0
-          }
-        },
-        "p5": {
-          "type": "image",
-          "settings": {
-            "title": "",
-            "heading_tag": "h3",
-            "link_url": "",
-            "link_text": "",
-            "mobile_text_position": "place-self-center text-center",
-            "desktop_column_span": 1,
-            "desktop_row_span": 1,
-            "desktop_text_position": "sm:place-self-center sm:text-center",
-            "background": "",
-            "background_gradient": "",
-            "text_color": "",
-            "text_gradient": "",
-            "button_background": "",
-            "button_text_color": "",
-            "overlay_color": "#000000",
-            "overlay_opacity": 0
-          }
-        },
-        "p6": {
-          "type": "image",
-          "settings": {
-            "title": "",
-            "heading_tag": "h3",
-            "link_url": "",
-            "link_text": "",
-            "mobile_text_position": "place-self-center text-center",
-            "desktop_column_span": 1,
-            "desktop_row_span": 1,
-            "desktop_text_position": "sm:place-self-center sm:text-center",
-            "background": "",
-            "background_gradient": "",
-            "text_color": "",
-            "text_gradient": "",
-            "button_background": "",
-            "button_text_color": "",
-            "overlay_color": "#000000",
-            "overlay_opacity": 0
-          }
-        },
-        "p7": {
-          "type": "image",
-          "settings": {
-            "title": "",
-            "heading_tag": "h3",
-            "link_url": "",
-            "link_text": "",
-            "mobile_text_position": "place-self-center text-center",
-            "desktop_column_span": 1,
-            "desktop_row_span": 1,
-            "desktop_text_position": "sm:place-self-center sm:text-center",
-            "background": "",
-            "background_gradient": "",
-            "text_color": "",
-            "text_gradient": "",
-            "button_background": "",
-            "button_text_color": "",
-            "overlay_color": "#000000",
-            "overlay_opacity": 0
-          }
-        },
-        "p8": {
-          "type": "image",
-          "settings": {
-            "title": "",
-            "heading_tag": "h3",
-            "link_url": "",
-            "link_text": "",
-            "mobile_text_position": "place-self-center text-center",
-            "desktop_column_span": 1,
-            "desktop_row_span": 1,
-            "desktop_text_position": "sm:place-self-center sm:text-center",
-            "background": "",
-            "background_gradient": "",
-            "text_color": "",
-            "text_gradient": "",
-            "button_background": "",
-            "button_text_color": "",
-            "overlay_color": "#000000",
-            "overlay_opacity": 0
-          }
-        },
-        "p9": {
-          "type": "image",
-          "settings": {
-            "title": "",
-            "heading_tag": "h3",
-            "link_url": "",
-            "link_text": "",
-            "mobile_text_position": "place-self-center text-center",
-            "desktop_column_span": 1,
-            "desktop_row_span": 1,
-            "desktop_text_position": "sm:place-self-center sm:text-center",
-            "background": "",
-            "background_gradient": "",
-            "text_color": "",
-            "text_gradient": "",
-            "button_background": "",
-            "button_text_color": "",
-            "overlay_color": "#000000",
-            "overlay_opacity": 0
-          }
-        },
         "p10": {
           "type": "image",
           "settings": {
@@ -1166,15 +978,6 @@
         }
       },
       "block_order": [
-        "p1",
-        "p2",
-        "p3",
-        "p4",
-        "p5",
-        "p6",
-        "p7",
-        "p8",
-        "p9",
         "p10",
         "p11",
         "p12",
@@ -1207,6 +1010,20 @@
     "faq": {
       "type": "faq",
       "blocks": {
+        "f0": {
+          "type": "item",
+          "settings": {
+            "title": "Is it safe to order here?",
+            "content": "<p>Yes. Payment goes through Shopify’s encrypted checkout: we never see or store your card details. You get an order confirmation by email, then a tracking link as soon as your jacket ships. And if it isn’t right, you have 30 days to send it back for a full refund.</p>"
+          }
+        },
+        "f4": {
+          "type": "item",
+          "settings": {
+            "title": "Can I return or exchange my jacket?",
+            "content": "<p>Yes. You have 30 days to return or exchange any unworn item with its tags. Returns are free and you get a full refund.</p>"
+          }
+        },
         "f1": {
           "type": "item",
           "settings": {
@@ -1214,11 +1031,11 @@
             "content": "<p>We dispatch within 24 hours on working days. Delivery takes 3-6 days, tracked from the moment your order leaves our warehouse.</p>"
           }
         },
-        "f2": {
+        "f7": {
           "type": "item",
           "settings": {
-            "title": "How warm is this jacket?",
-            "content": "<p>Want the exact fill, weight and temperature range before you order? Write to us and our team will send them to you.</p>"
+            "title": "Will I get a tracking number?",
+            "content": "<p>Yes. As soon as your order ships, you receive an email with your tracking link, so you can follow your jacket all the way to your door.</p>"
           }
         },
         "f3": {
@@ -1228,11 +1045,11 @@
             "content": "<p>Our jackets have a regular fit with room for a mid-layer. Between two sizes, take the larger one if you layer heavily. Measurements for each size are in the size guide.</p>"
           }
         },
-        "f4": {
+        "f2": {
           "type": "item",
           "settings": {
-            "title": "Can I return or exchange my jacket?",
-            "content": "<p>Yes. You have 30 days to return or exchange any unworn item with its tags. Returns are free and you get a full refund.</p>"
+            "title": "How warm is this jacket?",
+            "content": "<p>Want the exact fill, weight and temperature range before you order? Write to us and our team will send them to you.</p>"
           }
         },
         "f5": {
@@ -1247,20 +1064,6 @@
           "settings": {
             "title": "Is my payment secure?",
             "content": "<p>Every payment runs through Shopify's encrypted checkout. We never see or store your card details.</p>"
-          }
-        },
-        "f0": {
-          "type": "item",
-          "settings": {
-            "title": "Is it safe to order here?",
-            "content": "<p>Yes. Payment goes through Shopify’s encrypted checkout: we never see or store your card details. You get an order confirmation by email, then a tracking link as soon as your jacket ships. And if it isn’t right, you have 30 days to send it back for a full refund.</p>"
-          }
-        },
-        "f7": {
-          "type": "item",
-          "settings": {
-            "title": "Will I get a tracking number?",
-            "content": "<p>Yes. As soon as your order ships, you receive an email with your tracking link, so you can follow your jacket all the way to your door.</p>"
           }
         }
       },
