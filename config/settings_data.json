@@ -47,7 +47,7 @@
     "text_font_size_desktop": 16,
     "heading_apparition": "fade",
     "color_swatch_style": "rectangle",
-    "color_swatch_config": "Violet - Lapis Blue: linear-gradient(135deg, #5a46b5 49.5%, #111111 50.5%)\nBleu - TNF Blue: linear-gradient(135deg, #1f4fa8 49.5%, #111111 50.5%)\nNoir - TNF Black: linear-gradient(135deg, #1c1c1c 49.5%, #111111 50.5%)\nBordeaux - Boysenberry: linear-gradient(135deg, #6b2a3d 49.5%, #111111 50.5%)\nGris - Smoked Pearl: linear-gradient(135deg, #80868b 49.5%, #111111 50.5%)",
+    "color_swatch_config": "Purple - Lapis Blue: linear-gradient(135deg, #5a46b5 49.5%, #111111 50.5%)\nBlue - TNF Blue: linear-gradient(135deg, #1f4fa8 49.5%, #111111 50.5%)\nBlack - TNF Black: linear-gradient(135deg, #1c1c1c 49.5%, #111111 50.5%)\nBordeaux - Boysenberry: linear-gradient(135deg, #6b2a3d 49.5%, #111111 50.5%)\nGray - Smoky Pearl: linear-gradient(135deg, #80868b 49.5%, #111111 50.5%)",
     "show_discount": true,
     "discount_mode": "percentage",
     "product_color_display": "swatch",
