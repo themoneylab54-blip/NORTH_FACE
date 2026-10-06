@@ -21,6 +21,9 @@
         "countdown_mode": "fixed",
         "end_date": "2026-11-30",
         "end_time": "23:59",
+        "start_date": "2026-11-20",
+        "start_time": "00:00",
+        "teaser_title": "BLACK FRIDAY STARTS IN",
         "daily_reset_hour": 0,
         "evergreen_minutes": 420,
         "evergreen_scope": "session",
@@ -47,10 +50,7 @@
         "button_background": "",
         "button_text_color": "",
         "spacing_block_start": 8,
-        "spacing_block_end": 8,
-        "start_date": "2026-11-20",
-        "start_time": "00:00",
-        "teaser_title": "BLACK FRIDAY STARTS IN"
+        "spacing_block_end": 8
       }
     },
     "announcement-bar": {
@@ -148,9 +148,9 @@
         "inline_search_placeholder": "Search a jacket, colour or style",
         "search_placeholder_prefix": "Search",
         "search_placeholder_terms": "Puffer jackets\nLong puffers\nVests\nHooded jackets\nKids",
-        "logo": "shopify://shop_images/LOGO.webp",
-        "logo_max_width": 195,
-        "logo_mobile_max_width": 125,
+        "logo": "shopify://shop_images/Image_ChatGPT_6_oct._2026_12_57_49.webp",
+        "logo_max_width": 300,
+        "logo_mobile_max_width": 155,
         "two_row_logo_height": 24,
         "menu": "main-menu",
         "sidebar_menu": "",
@@ -172,7 +172,7 @@
         "drawer_offer_title": "Free shipping on every jacket",
         "drawer_offer_text": "30-day free returns and exchanges",
         "drawer_offer_url": "/collections/all",
-        "drawer_help_menu": "help-menu",
+        "drawer_help_menu": "",
         "layout": "logo_left_navigation_center",
         "show_social_media": false,
         "show_locale_selector": false,
