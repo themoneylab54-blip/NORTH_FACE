@@ -832,6 +832,7 @@
         "p10": {
           "type": "image",
           "settings": {
+            "image": "shopify://shop_images/ugc_01.webp",
             "title": "",
             "heading_tag": "h3",
             "link_url": "",
@@ -853,6 +854,7 @@
         "p11": {
           "type": "image",
           "settings": {
+            "image": "shopify://shop_images/ugc_02.webp",
             "title": "",
             "heading_tag": "h3",
             "link_url": "",
@@ -874,6 +876,7 @@
         "p12": {
           "type": "image",
           "settings": {
+            "image": "shopify://shop_images/ugc_08.webp",
             "title": "",
             "heading_tag": "h3",
             "link_url": "",
@@ -895,6 +898,7 @@
         "p13": {
           "type": "image",
           "settings": {
+            "image": "shopify://shop_images/ugc_06.webp",
             "title": "",
             "heading_tag": "h3",
             "link_url": "",
@@ -916,6 +920,7 @@
         "p14": {
           "type": "image",
           "settings": {
+            "image": "shopify://shop_images/ugc_09.webp",
             "title": "",
             "heading_tag": "h3",
             "link_url": "",
@@ -937,6 +942,7 @@
         "p15": {
           "type": "image",
           "settings": {
+            "image": "shopify://shop_images/ugc_07.webp",
             "title": "",
             "heading_tag": "h3",
             "link_url": "",
@@ -958,6 +964,51 @@
         "p16": {
           "type": "image",
           "settings": {
+            "image": "shopify://shop_images/ugc_10.webp",
+            "title": "",
+            "heading_tag": "h3",
+            "link_url": "",
+            "link_text": "",
+            "mobile_text_position": "place-self-center text-center",
+            "desktop_column_span": 1,
+            "desktop_row_span": 1,
+            "desktop_text_position": "sm:place-self-center sm:text-center",
+            "background": "",
+            "background_gradient": "",
+            "text_color": "",
+            "text_gradient": "",
+            "button_background": "",
+            "button_text_color": "",
+            "overlay_color": "#000000",
+            "overlay_opacity": 0
+          }
+        },
+        "image_fFtPKC": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/ugc_03.webp",
+            "title": "",
+            "heading_tag": "h3",
+            "link_url": "",
+            "link_text": "",
+            "mobile_text_position": "place-self-center text-center",
+            "desktop_column_span": 1,
+            "desktop_row_span": 1,
+            "desktop_text_position": "sm:place-self-center sm:text-center",
+            "background": "",
+            "background_gradient": "",
+            "text_color": "",
+            "text_gradient": "",
+            "button_background": "",
+            "button_text_color": "",
+            "overlay_color": "#000000",
+            "overlay_opacity": 0
+          }
+        },
+        "image_hgepp9": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/ugc_04.webp",
             "title": "",
             "heading_tag": "h3",
             "link_url": "",
@@ -984,7 +1035,9 @@
         "p13",
         "p14",
         "p15",
-        "p16"
+        "p16",
+        "image_fFtPKC",
+        "image_hgepp9"
       ],
       "name": "Fan photos",
       "settings": {
