@@ -1,0 +1,46 @@
+{%- comment -%}
+Meta (Facebook) pixel, browser side: PageView on every page, ViewContent on product pages, AddToCart on every add
+to cart (the theme's product form and the bundle builder both dispatch "variant:add" with the added items).
+Checkout events (InitiateCheckout, Purchase) cannot run from the theme: they live in a custom pixel under
+Shopify admin > Settings > Customer events. The Conversions API token never goes here: theme code is public.
+Skipped in the theme editor so editing the theme does not pollute the pixel data.
+{%- endcomment -%}
+{%- unless request.design_mode -%}
+  {%- assign meta_pixel_id = '1636632014598583' -%}
+  <script>
+    !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+    n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+    document,'script','https://connect.facebook.net/en_US/fbevents.js');
+
+    fbq('init', '{{ meta_pixel_id }}');
+    fbq('track', 'PageView');
+
+    {%- if template.name == 'product' and product %}
+      fbq('track', 'ViewContent', {
+        content_ids: ['{{ product.selected_or_first_available_variant.id }}'],
+        content_name: {{ product.title | json }},
+        content_type: 'product',
+        value: {{ product.selected_or_first_available_variant.price | divided_by: 100.0 }},
+        currency: {{ cart.currency.iso_code | json }}
+      });
+    {%- endif %}
+
+    document.addEventListener('variant:add', function(event) {
+      var items = (event.detail && event.detail.items) || [];
+      if (!items.length) return;
+
+      var value = 0;
+      items.forEach(function(item) { value += (item.final_line_price || 0) / 100; });
+
+      fbq('track', 'AddToCart', {
+        content_ids: items.map(function(item) { return String(item.variant_id); }),
+        contents: items.map(function(item) { return { id: String(item.variant_id), quantity: item.quantity }; }),
+        content_type: 'product',
+        value: Math.round(value * 100) / 100,
+        currency: {{ cart.currency.iso_code | json }}
+      });
+    });
+  </script>
+{%- endunless -%}

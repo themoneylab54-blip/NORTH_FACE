@@ -80,6 +80,8 @@
 
     {{ content_for_header }}
 
+    {%- render 'meta-pixel' -%}
+
     {{- 'theme.css' | asset_url | stylesheet_tag: preload: true -}}
     {{- 'reference-cards.css' | asset_url | stylesheet_tag -}}
     {{- 'cart-lines.css' | asset_url | stylesheet_tag -}}
