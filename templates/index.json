@@ -788,49 +788,73 @@
         "r1": {
           "type": "review",
           "settings": {
-            "author": "",
-            "city": "",
-            "date": "",
-            "title": "",
+            "author": "Emily D.",
+            "city": "Austin, Texas🇺🇸",
+            "date": "4 days Ago",
+            "title": "Way Better Than Expected",
             "verified": false,
             "rating": 5,
-            "content": ""
+            "content": "<p>Honestly impressed by the quality. It feels way more premium in person and the fit is perfect. I’d definitely buy another color.</p>"
           }
         },
         "r2": {
           "type": "review",
           "settings": {
-            "author": "",
-            "city": "",
-            "date": "",
-            "title": "",
+            "author": "Michael R.",
+            "city": "Chicago, Illinois🇺🇸",
+            "date": "1 week ago",
+            "title": "Warm Without the Bulk",
             "verified": false,
             "rating": 5,
-            "content": ""
+            "content": "<p>Really warm without feeling too bulky. I’ve worn it almost every day since I got it. Great jacket for the price.</p>"
           }
         },
         "r3": {
           "type": "review",
           "settings": {
-            "author": "",
-            "city": "",
-            "date": "",
-            "title": "",
+            "author": "Jessica M.",
+            "city": "Denver, Colorad🇺🇸",
+            "date": "1 day ago",
+            "title": "Perfect Fit",
             "verified": false,
             "rating": 5,
-            "content": ""
+            "content": "<p>I was nervous about ordering a jacket online, especially the sizing, but my usual size fit perfectly. Super comfortable too.</p>"
           }
         },
         "r4": {
           "type": "review",
           "settings": {
-            "author": "",
-            "city": "",
-            "date": "",
-            "title": "",
+            "author": "Brandon T.",
+            "city": "Seattle, Washington🇺🇸",
+            "date": "10 days ago",
+            "title": "Looks Just Like the Photos",
             "verified": false,
             "rating": 5,
-            "content": ""
+            "content": "<p>The jacket looks exactly like the pictures and feels very well made. Took one star off because I personally prefer a slightly looser fit.</p>"
+          }
+        },
+        "review_VWBtrE": {
+          "type": "review",
+          "settings": {
+            "author": "Ashley C.",
+            "city": "Boston, Massachusetts🇺🇸",
+            "date": "2 weeks ago",
+            "title": "Worth Every Dollar",
+            "verified": false,
+            "rating": 5,
+            "content": "<p>I almost didn’t order because of the price, but once I received it I understood. The material and finish feel really high quality.</p>"
+          }
+        },
+        "review_aBi9NX": {
+          "type": "review",
+          "settings": {
+            "author": "Jehnna F.",
+            "city": "Portland, Oregon🇺🇸",
+            "date": "6 days ago",
+            "title": "Already Want Another One",
+            "verified": false,
+            "rating": 5,
+            "content": "<p>Bought one for myself and now I’m thinking about ordering another one. It’s easy to style and feels much more expensive than it is.</p>"
           }
         }
       },
@@ -838,7 +862,9 @@
         "r1",
         "r2",
         "r3",
-        "r4"
+        "r4",
+        "review_VWBtrE",
+        "review_aBi9NX"
       ],
       "name": "Customer reviews",
       "settings": {
@@ -979,6 +1005,36 @@
         "text_color": ""
       }
     },
+    "1791293868678af0a5": {
+      "type": "apps",
+      "blocks": {
+        "loox_reviews_loox_agg_section_dptLfG": {
+          "type": "shopify://apps/loox-reviews/blocks/loox-agg-section/5c3b337f-fd14-4df5-b1d6-80ec13e6e28e",
+          "settings": {
+            "reviews_to_display": "",
+            "default_tab": "automatic",
+            "only_photos": false,
+            "hide_thumbnails": false,
+            "product_handle": "",
+            "aggregated": true,
+            "data-limit": 20,
+            "maxwidth": 1080,
+            "is_sample": true
+          }
+        }
+      },
+      "block_order": [
+        "loox_reviews_loox_agg_section_dptLfG"
+      ],
+      "settings": {
+        "full_width": true,
+        "remove_vertical_spacing": false,
+        "remove_horizontal_spacing": false,
+        "background": "",
+        "background_gradient": "",
+        "text_color": ""
+      }
+    },
     "faq": {
       "type": "faq",
       "blocks": {
@@ -1073,36 +1129,6 @@
         "button_text_color": "#ffffff",
         "accordion_background": "",
         "accordion_text_color": ""
-      }
-    },
-    "1791293868678af0a5": {
-      "type": "apps",
-      "blocks": {
-        "loox_reviews_loox_agg_section_dptLfG": {
-          "type": "shopify://apps/loox-reviews/blocks/loox-agg-section/5c3b337f-fd14-4df5-b1d6-80ec13e6e28e",
-          "settings": {
-            "reviews_to_display": "",
-            "default_tab": "automatic",
-            "only_photos": false,
-            "hide_thumbnails": false,
-            "product_handle": "",
-            "aggregated": true,
-            "data-limit": 20,
-            "maxwidth": 1080,
-            "is_sample": true
-          }
-        }
-      },
-      "block_order": [
-        "loox_reviews_loox_agg_section_dptLfG"
-      ],
-      "settings": {
-        "full_width": true,
-        "remove_vertical_spacing": false,
-        "remove_horizontal_spacing": false,
-        "background": "",
-        "background_gradient": "",
-        "text_color": ""
       }
     }
   },
