@@ -170,7 +170,7 @@
         "buy_buttons": {
           "type": "buy_buttons",
           "settings": {
-            "show_payment_button": true,
+            "show_payment_button": false,
             "show_gift_card_recipient": false,
             "atc_button_background": "#111111",
             "atc_button_text_color": "#ffffff",
@@ -526,7 +526,7 @@
       "settings": {
         "product": "doudoune-space-1996",
         "full_width": true,
-        "show_fixed_add_to_cart": false,
+        "show_fixed_add_to_cart": true,
         "desktop_media_width": 60,
         "desktop_media_layout": "carousel_thumbnails_bottom",
         "mobile_media_size": "expanded",
