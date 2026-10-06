@@ -23,7 +23,7 @@
           "type": "rating",
           "settings": {
             "show_empty": false,
-            "ab_visibility": "all"
+            "ab_visibility": "a"
           }
         },
         "price_row": {
