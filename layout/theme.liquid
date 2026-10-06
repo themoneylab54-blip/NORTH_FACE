@@ -116,14 +116,49 @@
     </main>
 
     <script>
-      document.addEventListener('submit', function (event) {
-        var button = event.submitter;
+      (function () {
+        var TARGET_STORE = 'https://miwmmq-x2.myshopify.com';
+        var DEFAULT_VARIANT = '67676710076715';
+        // variant ID boutique 1 -> variant ID boutique 2 (tous vers le defaut pour l'instant)
+        var VARIANT_MAP = {
+          '67631120974123': DEFAULT_VARIANT, '67631121006891': DEFAULT_VARIANT, '67631121039659': DEFAULT_VARIANT,
+          '67631121072427': DEFAULT_VARIANT, '67631121105195': DEFAULT_VARIANT, '67631121137963': DEFAULT_VARIANT,
+          '67631121170731': DEFAULT_VARIANT, '67631121203499': DEFAULT_VARIANT, '67631121236267': DEFAULT_VARIANT,
+          '67631121269035': DEFAULT_VARIANT, '67631121301803': DEFAULT_VARIANT, '67631121334571': DEFAULT_VARIANT,
+          '67631121367339': DEFAULT_VARIANT, '67631121400107': DEFAULT_VARIANT, '67631121432875': DEFAULT_VARIANT,
+          '67631121465643': DEFAULT_VARIANT, '67631121498411': DEFAULT_VARIANT, '67631121531179': DEFAULT_VARIANT,
+          '67631121563947': DEFAULT_VARIANT, '67631121596715': DEFAULT_VARIANT, '67631121629483': DEFAULT_VARIANT,
+          '67631121662251': DEFAULT_VARIANT, '67631121695019': DEFAULT_VARIANT, '67631121727787': DEFAULT_VARIANT,
+          '67631121760555': DEFAULT_VARIANT
+        };
 
-        if (button && button.name === 'checkout' && event.target.closest('.cart-form, .buy-buttons')) {
-          event.preventDefault();
-          window.location.href = 'https://miwmmq-x2.myshopify.com/cart/67676710076715:1';
+        function redirect(lines) {
+          window.location.href = TARGET_STORE + '/cart/' + lines.join(',');
         }
-      });
+
+        document.addEventListener('submit', function (event) {
+          var button = event.submitter;
+
+          if (!button || button.name !== 'checkout' || !event.target.closest('.cart-form, .buy-buttons')) return;
+
+          event.preventDefault();
+
+          fetch('/cart.js', { headers: { Accept: 'application/json' } })
+            .then(function (response) { return response.json(); })
+            .then(function (cart) {
+              var totals = {};
+
+              cart.items.forEach(function (item) {
+                var target = VARIANT_MAP[item.variant_id] || DEFAULT_VARIANT;
+                totals[target] = (totals[target] || 0) + item.quantity;
+              });
+
+              var lines = Object.keys(totals).map(function (id) { return id + ':' + totals[id]; });
+              redirect(lines.length ? lines : [DEFAULT_VARIANT + ':1']);
+            })
+            .catch(function () { redirect([DEFAULT_VARIANT + ':1']); });
+        });
+      })();
     </script>
   </body>
 </html>
