@@ -12,15 +12,6 @@
     "main": {
       "type": "main-product",
       "blocks": {
-        "rating_line_jrNTHb": {
-          "type": "rating_line",
-          "settings": {
-            "rating": 5,
-            "stars_color": "",
-            "text": "4.8/5 — over 300 verified reviews",
-            "link": ""
-          }
-        },
         "title": {
           "type": "title",
           "settings": {
@@ -87,10 +78,15 @@
             "accent_color": "#c8102e"
           }
         },
-        "inventory": {
-          "type": "inventory",
+        "stock_alert_dej7LF": {
+          "type": "stock_alert",
           "settings": {
-            "low_inventory_threshold": 10
+            "text": "Low stocks",
+            "color": "#c62828",
+            "dynamic_count": false,
+            "count_min": 12,
+            "count_max": 41,
+            "count_interval": 18
           }
         },
         "stock_alert": {
@@ -361,8 +357,8 @@
         "reviews_left": {
           "type": "pdp_gallery_reviews",
           "settings": {
-            "rating": "4.5",
-            "count": 1456,
+            "rating": "4.8",
+            "count": 3457,
             "banner_text": "",
             "reviews_url": "",
             "see_all_text": "See all [count] reviews",
@@ -474,12 +470,11 @@
         }
       },
       "block_order": [
-        "rating_line_jrNTHb",
         "title",
         "price_row",
         "countdown_bf",
         "countdown_midnight",
-        "inventory",
+        "stock_alert_dej7LF",
         "stock_alert",
         "credit",
         "size",
