@@ -947,47 +947,5 @@
         "info": "180 x 180px .png recommended"
       }
     ]
-  },
-  {
-    "name": "A/B test pages produit",
-    "settings": [
-      {
-        "type": "paragraph",
-        "content": "Versions A et B dans la même page produit : chaque bloc a un réglage « A/B test version ». La version A s'affiche pendant la plage horaire, la version B le reste du temps, pour tous les visiteurs. Aperçu : ajoutez ?ab_preview=a ou ?ab_preview=b à l'adresse d'un produit."
-      },
-      {
-        "type": "checkbox",
-        "id": "ab_enabled",
-        "label": "Activer l'A/B test horaire",
-        "default": false
-      },
-      {
-        "type": "text",
-        "id": "ab_start",
-        "label": "Début de la version A",
-        "default": "23:30",
-        "info": "Format HH:MM."
-      },
-      {
-        "type": "text",
-        "id": "ab_end",
-        "label": "Fin de la version A",
-        "default": "01:00",
-        "info": "Format HH:MM. Peut être après minuit."
-      },
-      {
-        "type": "text",
-        "id": "ab_timezone",
-        "label": "Fuseau horaire",
-        "info": "Vide = fuseau de la boutique. Sinon le nom IANA du fuseau de votre compte publicitaire, par ex. Europe/Paris ou America/New_York (heure d'été gérée)."
-      },
-      {
-        "type": "checkbox",
-        "id": "ab_tag_orders",
-        "label": "Enregistrer la version sur les commandes",
-        "default": true,
-        "info": "Ajoute l'attribut « A/B page produit » (A ou B) visible dans chaque commande."
-      }
-    ]
   }
 ]

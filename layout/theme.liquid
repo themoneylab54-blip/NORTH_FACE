@@ -4,8 +4,21 @@
   <head>
     <meta charset="utf-8">
 
-    {%- comment -%}Time-based A/B switch between product templates: must run before anything else loads.{%- endcomment -%}
-    {%- render 'ab-product-switch' -%}
+    {%- comment -%}
+      Old links to the former version A product page (?view=version-a, e.g. in ads) land on a 404: drop the parameter
+      and show the product.
+    {%- endcomment -%}
+    {%- if request.page_type == '404' -%}
+      <script>
+        (function () {
+          var url = new URL(window.location.href);
+          if (url.searchParams.get('view') === 'version-a' && url.pathname.indexOf('/products/') !== -1) {
+            url.searchParams.delete('view');
+            window.location.replace(url.toString());
+          }
+        })();
+      </script>
+    {%- endif -%}
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0, height=device-height, minimum-scale=1.0, maximum-scale=1.0">
     <meta name="theme-color" content="{{ settings.header_background }}">

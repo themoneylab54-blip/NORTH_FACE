@@ -11,8 +11,7 @@ A promo banner for the buy box with a real deadline. Two modes:
   of that window. Hidden outside the window. Every visitor sees the same banner on the same page.
 
 Times are read in the store's timezone (UTC offset rendered by Liquid), or in the IANA timezone set on the block
-(e.g. "Europe/Paris", "America/New_York"), which also follows daylight saving time. In "window" mode an empty block
-timezone falls back to the A/B test timezone (Theme settings), so the banner and the A/B switch share the same clock.
+(e.g. "Europe/Paris", "America/New_York"), which also follows daylight saving time.
 
 When a discount code is set, it is applied automatically (through Shopify's /discount/CODE link) while the banner is
 visible, so the price promised on the page is the price charged at checkout. The code must exist in
@@ -37,9 +36,6 @@ Accepted variables:
   assign pc_accent = block.settings.accent_color | default: '#c8102e'
 
   assign pc_timezone = block.settings.timezone | strip
-  if pc_timezone == blank and block.settings.mode == 'window'
-    assign pc_timezone = settings.ab_timezone | strip
-  endif
 
   assign pc_code = block.settings.discount_code | strip
   assign pc_percent = block.settings.code_percent | default: 0

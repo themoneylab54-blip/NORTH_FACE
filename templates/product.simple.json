@@ -19,31 +19,27 @@
             "rating": 5,
             "stars_color": "#00b67a",
             "text": "Add your real rating here",
-            "link": "",
-            "ab_visibility": "all"
+            "link": ""
           },
           "disabled": true
         },
         "title": {
           "type": "title",
           "settings": {
-            "heading_tag": "h1",
-            "ab_visibility": "all"
+            "heading_tag": "h1"
           }
         },
         "price": {
           "type": "price",
           "settings": {
-            "show_taxes_notice": false,
-            "ab_visibility": "all"
+            "show_taxes_notice": false
           }
         },
         "stock_alert": {
           "type": "stock_alert",
           "settings": {
             "text": "Black Friday prices — only while stock lasts",
-            "color": "#c8102e",
-            "ab_visibility": "all"
+            "color": "#c8102e"
           },
           "disabled": true
         },
@@ -57,8 +53,7 @@
             "vertical_alignment": "center",
             "icon_background": "",
             "icon_color": "#111111",
-            "text": "<p>Free shipping on every jacket</p>",
-            "ab_visibility": "all"
+            "text": "<p>Free shipping on every jacket</p>"
           }
         },
         "ib2": {
@@ -71,8 +66,7 @@
             "vertical_alignment": "center",
             "icon_background": "",
             "icon_color": "#111111",
-            "text": "<p>Ships in 24h · delivered in 3-6 days</p>",
-            "ab_visibility": "all"
+            "text": "<p>Ships in 24h · delivered in 3-6 days</p>"
           }
         },
         "ib3": {
@@ -85,8 +79,7 @@
             "vertical_alignment": "center",
             "icon_background": "",
             "icon_color": "#111111",
-            "text": "<p>30-day free returns and size exchanges</p>",
-            "ab_visibility": "all"
+            "text": "<p>30-day free returns and size exchanges</p>"
           }
         },
         "variant_picker": {
@@ -97,8 +90,7 @@
             "selector_style": "block",
             "swatch_selector_style": "swatch",
             "variant_image_options": "Color, Colour, Couleur, Coloris",
-            "size_chart_page": "",
-            "ab_visibility": "all"
+            "size_chart_page": ""
           }
         },
         "size_guide": {
@@ -116,15 +108,13 @@
             "border_width": 1,
             "border_radius": 2,
             "background": "",
-            "text_color": "",
-            "ab_visibility": "all"
+            "text_color": ""
           }
         },
         "inventory": {
           "type": "inventory",
           "settings": {
-            "low_inventory_threshold": 10,
-            "ab_visibility": "all"
+            "low_inventory_threshold": 10
           }
         },
         "buy_buttons": {
@@ -135,8 +125,7 @@
             "atc_button_background": "#111111",
             "atc_button_text_color": "#FFFFFF",
             "payment_button_background": "",
-            "payment_button_text_color": "",
-            "ab_visibility": "all"
+            "payment_button_text_color": ""
           }
         },
         "delivery": {
@@ -145,8 +134,7 @@
             "icon": "picto-box",
             "min_days": 3,
             "max_days": 6,
-            "text": "Order today, delivered between [date_min] and [date_max]",
-            "ab_visibility": "all"
+            "text": "Order today, delivered between [date_min] and [date_max]"
           }
         },
         "description": {
@@ -154,8 +142,7 @@
           "settings": {
             "icon": "none",
             "icon_width": 20,
-            "collapse_content": false,
-            "ab_visibility": "all"
+            "collapse_content": false
           }
         },
         "ct1": {
@@ -165,8 +152,7 @@
             "icon_width": 20,
             "title": "Fit & sizing",
             "content": "<p>Regular fit with room for a mid-layer underneath. If you are between two sizes, take the larger one for layering or the smaller one for a closer fit.</p>",
-            "page": "",
-            "ab_visibility": "all"
+            "page": ""
           }
         },
         "ct2": {
@@ -176,8 +162,7 @@
             "icon_width": 20,
             "title": "Shipping & returns",
             "content": "<p>Dispatched within 24 hours on working days, delivered in 3-6 days with tracking. Free shipping on every jacket. 30 days to return or exchange any unworn item.</p>",
-            "page": "",
-            "ab_visibility": "all"
+            "page": ""
           }
         },
         "sticky_atc": {
@@ -189,15 +174,13 @@
             "background": "#FFFFFF",
             "text_color": "#111111",
             "button_background": "#111111",
-            "button_text_color": "#FFFFFF",
-            "ab_visibility": "all"
+            "button_text_color": "#FFFFFF"
           }
         },
         "rating": {
           "type": "rating",
           "settings": {
-            "show_empty": false,
-            "ab_visibility": "all"
+            "show_empty": false
           }
         },
         "countdown_bf": {
@@ -222,8 +205,7 @@
             "code_price_label": "Your price:",
             "background": "#111111",
             "text_color": "#ffffff",
-            "accent_color": "#c8102e",
-            "ab_visibility": "all"
+            "accent_color": "#c8102e"
           }
         },
         "countdown_midnight": {
@@ -250,8 +232,7 @@
             "code_price_label": "Your price tonight:",
             "background": "#0b0b0b",
             "text_color": "#ffffff",
-            "accent_color": "#c8102e",
-            "ab_visibility": "all"
+            "accent_color": "#c8102e"
           }
         },
         "payment": {
@@ -259,8 +240,7 @@
           "settings": {
             "icons_source": "custom",
             "icons_list": "visa, master, american_express, paypal, apple_pay, google_pay, shopify_pay, klarna",
-            "alignment": "center",
-            "ab_visibility": "all"
+            "alignment": "center"
           }
         },
         "guarantee": {
@@ -273,8 +253,7 @@
             "title": "Our 30-day promise",
             "content": "<p>Try it at home. If it's not right, exchange it or return it within 30 days for a full refund.</p>",
             "background": "#f4f3f0",
-            "text_color": "#111111",
-            "ab_visibility": "all"
+            "text_color": "#111111"
           }
         },
         "help": {
@@ -287,8 +266,7 @@
             "title": "Need help choosing?",
             "content": "<p>Questions about sizing or warmth? <a href=\"/pages/contact\">Write to our team</a>, we'll help you pick the right jacket.</p>",
             "background": "#f4f3f0",
-            "text_color": "#111111",
-            "ab_visibility": "all"
+            "text_color": "#111111"
           }
         },
         "ct_payment": {
@@ -298,8 +276,7 @@
             "icon_width": 20,
             "title": "Secure payment",
             "content": "<p>Payments go through Shopify's encrypted checkout (SSL). We never see or store your card details. Pay by card or with the express payment options shown at checkout.</p>",
-            "page": "",
-            "ab_visibility": "all"
+            "page": ""
           }
         },
         "reviews_left": {
@@ -403,8 +380,7 @@
             "review_10_size": "",
             "review_10_fit": "",
             "review_10_body": "",
-            "review_10_helpful": 0,
-            "ab_visibility": "all"
+            "review_10_helpful": 0
           }
         }
       },

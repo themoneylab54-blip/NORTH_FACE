@@ -18,15 +18,13 @@
             "rating": 5,
             "stars_color": "",
             "text": "4.8/5 — over 300 verified reviews",
-            "link": "",
-            "ab_visibility": "all"
+            "link": ""
           }
         },
         "title": {
           "type": "title",
           "settings": {
-            "heading_tag": "h1",
-            "ab_visibility": "all"
+            "heading_tag": "h1"
           }
         },
         "price_row": {
@@ -34,8 +32,7 @@
           "settings": {
             "show_badge": true,
             "badge_background": "#c8102e",
-            "badge_text_color": "#ffffff",
-            "ab_visibility": "all"
+            "badge_text_color": "#ffffff"
           }
         },
         "countdown_bf": {
@@ -60,8 +57,7 @@
             "code_price_label": "Your price:",
             "background": "#111111",
             "text_color": "#ffffff",
-            "accent_color": "#c8102e",
-            "ab_visibility": "b"
+            "accent_color": "#c8102e"
           }
         },
         "countdown_midnight": {
@@ -88,15 +84,13 @@
             "code_price_label": "Your price tonight:",
             "background": "#0b0b0b",
             "text_color": "#ffffff",
-            "accent_color": "#c8102e",
-            "ab_visibility": "all"
+            "accent_color": "#c8102e"
           }
         },
         "inventory": {
           "type": "inventory",
           "settings": {
-            "low_inventory_threshold": 10,
-            "ab_visibility": "all"
+            "low_inventory_threshold": 10
           }
         },
         "stock_alert": {
@@ -108,8 +102,7 @@
             "dynamic_count": false,
             "count_min": 14,
             "count_max": 47,
-            "count_interval": 16,
-            "ab_visibility": "all"
+            "count_interval": 16
           }
         },
         "credit": {
@@ -120,8 +113,7 @@
             "text": "Earn [amount] in store credit",
             "icon_color": "#111111",
             "background": "#f4f3f0",
-            "text_color": "#111111",
-            "ab_visibility": "all"
+            "text_color": "#111111"
           }
         },
         "size": {
@@ -133,8 +125,7 @@
             "size_guide_text": "Size guide",
             "other_options": "show",
             "color_chips": "colors",
-            "hide_sold_out_variants": false,
-            "ab_visibility": "all"
+            "hide_sold_out_variants": false
           }
         },
         "personalise": {
@@ -153,8 +144,7 @@
             "name_max_length": 12,
             "number_label": "Number",
             "number_placeholder": "00",
-            "helper_text": "Embroidered exactly as entered.",
-            "ab_visibility": "all"
+            "helper_text": "Embroidered exactly as entered."
           }
         },
         "patch": {
@@ -167,8 +157,7 @@
             "option_2": "Gift box + card",
             "required": false,
             "property_name": "Gift wrapping",
-            "required_message": "Please choose an option before adding to cart.",
-            "ab_visibility": "all"
+            "required_message": "Please choose an option before adding to cart."
           }
         },
         "buy_buttons": {
@@ -179,8 +168,7 @@
             "atc_button_background": "#111111",
             "atc_button_text_color": "#ffffff",
             "payment_button_background": "",
-            "payment_button_text_color": "",
-            "ab_visibility": "all"
+            "payment_button_text_color": ""
           }
         },
         "payment": {
@@ -188,8 +176,7 @@
           "settings": {
             "icons_source": "custom",
             "icons_list": "visa, master, american_express, paypal, apple_pay, google_pay, shopify_pay,",
-            "alignment": "center",
-            "ab_visibility": "all"
+            "alignment": "center"
           }
         },
         "delivery": {
@@ -198,8 +185,7 @@
             "icon": "picto-box",
             "min_days": 3,
             "max_days": 6,
-            "text": "Order now — delivered between [date_min] and [date_max]",
-            "ab_visibility": "all"
+            "text": "Order now — delivered between [date_min] and [date_max]"
           }
         },
         "trust": {
@@ -215,8 +201,7 @@
             "text_2": "30-day returns",
             "icon_3": "picto-lock",
             "icon_color_3": "#111111",
-            "text_3": "Secure checkout",
-            "ab_visibility": "all"
+            "text_3": "Secure checkout"
           }
         },
         "guarantee": {
@@ -229,8 +214,7 @@
             "title": "Our 30-day promise",
             "content": "<p>Try it at home. If it's not right, exchange it or return it within 30 days for a full refund.</p>",
             "background": "#f4f3f0",
-            "text_color": "#111111",
-            "ab_visibility": "all"
+            "text_color": "#111111"
           }
         },
         "help": {
@@ -243,8 +227,7 @@
             "title": "Need help choosing?",
             "content": "<p>Questions about sizing or warmth? <a href=\"/pages/contact\">Write to our team</a>, we'll help you pick the right jacket.</p>",
             "background": "#f4f3f0",
-            "text_color": "#111111",
-            "ab_visibility": "all"
+            "text_color": "#111111"
           }
         },
         "tiers": {
@@ -268,8 +251,7 @@
             "tier4_percent": 0,
             "tier5_quantity": 0,
             "tier5_pay": 0,
-            "tier5_percent": 0,
-            "ab_visibility": "all"
+            "tier5_percent": 0
           }
         },
         "social": {
@@ -283,8 +265,7 @@
             "video_2": "shopify://files/videos/ssstik.io_@pocketclothing.au_1791292196204.mp4",
             "video_url_2": "",
             "video_3": "shopify://files/videos/ssstik.io_@cultureforce_1791292155323.mp4",
-            "video_url_3": "",
-            "ab_visibility": "all"
+            "video_url_3": ""
           }
         },
         "bundle": {
@@ -326,8 +307,7 @@
             "empty_collection_text": "No jackets are available right now.",
             "button_background": "#111111",
             "button_text_color": "#ffffff",
-            "badge_color": "#c8102e",
-            "ab_visibility": "all"
+            "badge_color": "#c8102e"
           }
         },
         "description": {
@@ -335,8 +315,7 @@
           "settings": {
             "icon": "none",
             "icon_width": 20,
-            "collapse_content": true,
-            "ab_visibility": "all"
+            "collapse_content": true
           }
         },
         "ct_details": {
@@ -346,8 +325,7 @@
             "icon_width": 20,
             "title": "Fit & sizing",
             "content": "<p>Regular fit with room for a mid-layer underneath. If you are between two sizes, take the larger one for layering or the smaller one for a closer fit. Measurements for each size are in the size guide.</p>",
-            "page": "",
-            "ab_visibility": "all"
+            "page": ""
           }
         },
         "ct_care": {
@@ -357,8 +335,7 @@
             "icon_width": 20,
             "title": "Care",
             "content": "<p>Close all zips and wash cold on a gentle cycle with a down-specific detergent. Tumble dry on low with two clean tennis balls to restore the loft. Do not dry-clean or iron. Store uncompressed and dry.</p>",
-            "page": "",
-            "ab_visibility": "all"
+            "page": ""
           }
         },
         "ct_shipping": {
@@ -368,8 +345,7 @@
             "icon_width": 20,
             "title": "Shipping & returns",
             "content": "<p>Dispatched within 24 hours on working days, delivered in 3-6 days with tracking. Free shipping on every jacket. 30 days to return or exchange any unworn item.</p>",
-            "page": "",
-            "ab_visibility": "all"
+            "page": ""
           }
         },
         "ct_payment": {
@@ -379,8 +355,7 @@
             "icon_width": 20,
             "title": "Secure payment",
             "content": "<p>Payments go through Shopify's encrypted checkout (SSL). We never see or store your card details. Pay by card or with the express payment options shown at checkout.</p>",
-            "page": "",
-            "ab_visibility": "all"
+            "page": ""
           }
         },
         "reviews_left": {
@@ -484,8 +459,7 @@
             "review_10_size": "",
             "review_10_fit": "",
             "review_10_body": "",
-            "review_10_helpful": 0,
-            "ab_visibility": "all"
+            "review_10_helpful": 0
           }
         },
         "sticky": {
@@ -495,8 +469,7 @@
             "show_delivery": true,
             "min_days": 3,
             "max_days": 6,
-            "mobile_only": false,
-            "ab_visibility": "all"
+            "mobile_only": false
           }
         }
       },
