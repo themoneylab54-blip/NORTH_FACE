@@ -33,7 +33,8 @@ version at the same time, and the page never redirects.
     html[data-ab-version="A"] [data-ab-only="b"] { display: none !important; }
   </style>
 
-  {%- if request.page_type == 'product' -%}
+  {%- comment -%}The home page shows the product page section too, so it follows the same version.{%- endcomment -%}
+  {%- if request.page_type == 'product' or request.page_type == 'index' -%}
     <script>
       (function () {
         var config = {

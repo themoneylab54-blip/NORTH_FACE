@@ -22,6 +22,7 @@ Supported variables
 * product_form_id: the ID of the product form
 * section: the section the block belongs to
 * context: "quick_buy" when rendered in the quick buy drawer of a product card (no size guide, no URL update)
+* update_url: true on the product page, where a variant change updates the URL
 {%- endcomment -%}
 
 {%- liquid
@@ -52,10 +53,10 @@ Supported variables
 
   assign size_label_list = 'general.label.size' | t | replace: ', ', ',' | downcase | split: ','
 
-  # The variant picker only reloads the page for combined products on the real product page. The quick buy is also
-  # rendered as part of the product page, but it opens on other pages (collections, home): it must never touch the URL.
+  # The variant picker only updates the URL (and reloads the page for combined products) where product-info asks for
+  # it: the product page. Not on the home page, and never in the quick buy, which opens on other pages.
   assign pss_update_url = false
-  if request.page_type == 'product' and pss_quick_buy == false
+  if update_url and pss_quick_buy == false
     assign pss_update_url = true
   endif
 

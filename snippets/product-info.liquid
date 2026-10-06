@@ -83,7 +83,7 @@ Supported variables
           {%- endif -%}
 
         {%- when 'title' -%}
-          {%- if request.page_type == 'product' -%}
+          {%- if request.page_type == 'product' or context == 'main_product' -%}
             <h1 class="product-info__title {{ block.settings.heading_tag }}">
               {{- product.title -}}
             </h1>
@@ -620,7 +620,12 @@ Supported variables
             </div>
 
             <button type="submit" form="{{ product_form_id }}" name="add" class="button" style="flex-shrink: 0; {% if block.settings.button_background.alpha != 0 and block.settings.button_background != blank %}--button-background: {{ block.settings.button_background.rgb }};{% endif %} {% if block.settings.button_text_color.alpha != 0 and block.settings.button_text_color != blank %}--button-text-color: {{ block.settings.button_text_color.rgb }};{% endif %}">
-              {{- block.settings.button_text | default: 'product.general.add_to_cart_button' | t | escape -}}
+              {%- comment -%}Only the default goes through "t": a merchant's own label is plain text, not a translation key.{%- endcomment -%}
+              {%- if block.settings.button_text != blank -%}
+                {{- block.settings.button_text | escape -}}
+              {%- else -%}
+                {{- 'product.general.add_to_cart_button' | t | escape -}}
+              {%- endif -%}
             </button>
           </sticky-add-to-cart>
 
@@ -833,7 +838,7 @@ Supported variables
         {%- when 'pdp_price_row' -%}
           {%- render 'pdp-price-row', block: block, product: product, product_form_id: product_form_id, section: section -%}
         {%- when 'pdp_size_selector' -%}
-          {%- render 'pdp-size-selector', block: block, product: product, product_form_id: product_form_id, section: section -%}
+          {%- render 'pdp-size-selector', block: block, product: product, product_form_id: product_form_id, section: section, update_url: update_url -%}
         {%- when 'pdp_social_videos' -%}
           {%- render 'pdp-social-videos', block: block, product: product, product_form_id: product_form_id, section: section -%}
         {%- when 'pdp_sticky_bar' -%}

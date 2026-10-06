@@ -1,3 +1,18 @@
+{%- liquid
+  # On product pages the section shows the product of the page. Elsewhere (the home page) it shows the product picked
+  # in the section settings, and the address bar is never changed on variant change. The setting also decides the
+  # URL behaviour when the variant picker re-renders this section through the product URL, so both renders agree.
+  assign main_product_update_url = true
+  if section.settings.product != blank
+    assign main_product_update_url = false
+  endif
+
+  if product == blank
+    assign product = section.settings.product
+  endif
+-%}
+
+{%- if product != blank -%}
 {%- render 'section-spacing-collapsing' -%}
 
 <style>
@@ -71,7 +86,7 @@
 
       {%- render 'product-info', 
         product: product, 
-        update_url: true,
+        update_url: main_product_update_url,
         product_form_id: product_form_id,
         context: 'main_product'
       -%}
@@ -128,6 +143,11 @@ quick buy information in a template, that will be extracted in JS, but ensure it
 {%- endcomment -%}
 
 {%- render 'product-quick-buy', product: product -%}
+{%- elsif request.design_mode -%}
+  <div class="container">
+    <p class="text-subdued">Select a product in this section's settings (Product).</p>
+  </div>
+{%- endif -%}
 
 {% schema %}
 {
@@ -5540,6 +5560,12 @@ quick buy information in a template, that will be extracted in JS, but ensure it
     }
   ],
   "settings": [
+    {
+      "type": "product",
+      "id": "product",
+      "label": "Product (outside product pages)",
+      "info": "Shown when this section is used outside a product page, e.g. on the home page. Leave empty on product templates: they show the product of the page."
+    },
     {
       "type": "checkbox",
       "id": "full_width",
