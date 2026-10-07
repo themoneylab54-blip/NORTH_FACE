@@ -114,57 +114,5 @@
         {%- sections 'footer-group' -%}
       {%- endif -%}
     </main>
-
-    <script>
-      (function () {
-        var TARGET_STORE = 'https://miwmmq-x2.myshopify.com';
-        var DEFAULT_VARIANT = '67676710076715';
-        // variant ID boutique 1 -> variant ID boutique 2 (tous vers le defaut pour l'instant)
-        var VARIANT_MAP = {
-          '67631120974123': DEFAULT_VARIANT, '67631121006891': DEFAULT_VARIANT, '67631121039659': DEFAULT_VARIANT,
-          '67631121072427': DEFAULT_VARIANT, '67631121105195': DEFAULT_VARIANT, '67631121137963': DEFAULT_VARIANT,
-          '67631121170731': DEFAULT_VARIANT, '67631121203499': DEFAULT_VARIANT, '67631121236267': DEFAULT_VARIANT,
-          '67631121269035': DEFAULT_VARIANT, '67631121301803': DEFAULT_VARIANT, '67631121334571': DEFAULT_VARIANT,
-          '67631121367339': DEFAULT_VARIANT, '67631121400107': DEFAULT_VARIANT, '67631121432875': DEFAULT_VARIANT,
-          '67631121465643': DEFAULT_VARIANT, '67631121498411': DEFAULT_VARIANT, '67631121531179': DEFAULT_VARIANT,
-          '67631121563947': DEFAULT_VARIANT, '67631121596715': DEFAULT_VARIANT, '67631121629483': DEFAULT_VARIANT,
-          '67631121662251': DEFAULT_VARIANT, '67631121695019': DEFAULT_VARIANT, '67631121727787': DEFAULT_VARIANT,
-          '67631121760555': DEFAULT_VARIANT
-        };
-
-        function redirect(lines) {
-          window.location.href = TARGET_STORE + '/cart/' + lines.join(',');
-        }
-
-        document.addEventListener('click', function (event) {
-          var button = event.target.closest('button[name="checkout"], input[name="checkout"]');
-          var viewCart = event.target.closest('a[href]');
-
-          // "Voir le panier" : lien vers /cart, sauf l'icone du header qui ouvre le drawer (aria-controls)
-          var isViewCart = viewCart && !viewCart.hasAttribute('aria-controls') && /\/cart\/?$/.test(viewCart.pathname) && viewCart.hostname === window.location.hostname;
-          var isCheckout = button && button.closest('.cart-form, .buy-buttons');
-
-          if (!isCheckout && !isViewCart) return;
-
-          event.preventDefault();
-          event.stopPropagation();
-
-          fetch('/cart.js', { headers: { Accept: 'application/json' } })
-            .then(function (response) { return response.json(); })
-            .then(function (cart) {
-              var totals = {};
-
-              cart.items.forEach(function (item) {
-                var target = VARIANT_MAP[item.variant_id] || DEFAULT_VARIANT;
-                totals[target] = (totals[target] || 0) + item.quantity;
-              });
-
-              var lines = Object.keys(totals).map(function (id) { return id + ':' + totals[id]; });
-              redirect(lines.length ? lines : [DEFAULT_VARIANT + ':1']);
-            })
-            .catch(function () { redirect([DEFAULT_VARIANT + ':1']); });
-        }, true);
-      })();
-    </script>
   </body>
 </html>
