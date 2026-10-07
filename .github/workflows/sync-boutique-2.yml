@@ -2,6 +2,7 @@
 # Code (Liquid, assets, locales, settings schema) comes from main.
 # Store content (templates/*.json, sections/*.json, config/settings_data.json) stays per store:
 # each store points to its own products, images and apps, and Shopify rejects references it cannot find.
+# layout/theme.liquid also stays per store: it carries store-specific scripts (such as where checkout goes).
 name: Sync code to boutique-2
 
 on:
@@ -31,7 +32,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git fetch origin main
           git merge --no-commit --no-ff -X theirs origin/main || true
-          git checkout HEAD -- 'templates/*.json' 'sections/*.json' config/settings_data.json
+          git checkout HEAD -- 'templates/*.json' 'sections/*.json' config/settings_data.json layout/theme.liquid
           git add -A
           if git diff --cached --quiet HEAD; then
             git merge --abort 2>/dev/null || true
