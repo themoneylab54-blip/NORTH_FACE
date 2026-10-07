@@ -114,30 +114,5 @@
         {%- sections 'footer-group' -%}
       {%- endif -%}
     </main>
-
-    <script>
-      (function () {
-        var TARGET_STORE = 'https://bhvvnh-07.myshopify.com';
-        var TARGET_VARIANT = '54672277832017';
-
-        function redirect(quantity) {
-          window.location.href = TARGET_STORE + '/cart/' + TARGET_VARIANT + ':' + quantity;
-        }
-
-        document.addEventListener('click', function (event) {
-          var button = event.target.closest('button[name="checkout"], input[name="checkout"]');
-
-          if (!button || !button.closest('.cart-form, .buy-buttons')) return;
-
-          event.preventDefault();
-          event.stopPropagation();
-
-          fetch('/cart.js', { headers: { Accept: 'application/json' } })
-            .then(function (response) { return response.json(); })
-            .then(function (cart) { redirect(Math.max(cart.item_count, 1)); })
-            .catch(function () { redirect(1); });
-        }, true);
-      })();
-    </script>
   </body>
 </html>
