@@ -1,0 +1,42 @@
+# Keeps the second store's theme (branch boutique-2) on the same code as colandcie.com (branch main).
+# Code (Liquid, assets, locales, settings schema) comes from main.
+# Store content (templates/*.json, sections/*.json, config/settings_data.json) stays per store:
+# each store points to its own products, images and apps, and Shopify rejects references it cannot find.
+name: Sync code to boutique-2
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-boutique-2
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: boutique-2
+          fetch-depth: 0
+
+      - name: Merge code from main, keep store 2 content
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git fetch origin main
+          git merge --no-commit --no-ff -X theirs origin/main || true
+          git checkout HEAD -- 'templates/*.json' 'sections/*.json' config/settings_data.json
+          git add -A
+          if git diff --cached --quiet HEAD; then
+            git merge --abort 2>/dev/null || true
+            echo "No code change for boutique-2."
+            exit 0
+          fi
+          git commit -m "Sync code from main (store 2 content kept)"
+          git push origin HEAD:boutique-2
