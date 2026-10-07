@@ -256,11 +256,8 @@
             "label": "Worn by our customers",
             "verified_text": "Verified",
             "show_verified": false,
-            "video_1": "shopify://files/videos/ssstik.io_1791292137430.mp4",
             "video_url_1": "",
-            "video_2": "shopify://files/videos/ssstik.io_@pocketclothing.au_1791292196204.mp4",
             "video_url_2": "",
-            "video_3": "shopify://files/videos/ssstik.io_@cultureforce_1791292155323.mp4",
             "video_url_3": ""
           }
         },
@@ -525,7 +522,6 @@
         "p10": {
           "type": "image",
           "settings": {
-            "image": "shopify://shop_images/ugc_01.webp",
             "title": "",
             "heading_tag": "h3",
             "link_url": "",
@@ -547,7 +543,6 @@
         "p11": {
           "type": "image",
           "settings": {
-            "image": "shopify://shop_images/ugc_02.webp",
             "title": "",
             "heading_tag": "h3",
             "link_url": "",
@@ -569,7 +564,6 @@
         "p12": {
           "type": "image",
           "settings": {
-            "image": "shopify://shop_images/ugc_08.webp",
             "title": "",
             "heading_tag": "h3",
             "link_url": "",
@@ -591,7 +585,6 @@
         "p13": {
           "type": "image",
           "settings": {
-            "image": "shopify://shop_images/ugc_06.webp",
             "title": "",
             "heading_tag": "h3",
             "link_url": "",
@@ -613,7 +606,6 @@
         "p14": {
           "type": "image",
           "settings": {
-            "image": "shopify://shop_images/ugc_09.webp",
             "title": "",
             "heading_tag": "h3",
             "link_url": "",
@@ -635,7 +627,6 @@
         "p15": {
           "type": "image",
           "settings": {
-            "image": "shopify://shop_images/ugc_07.webp",
             "title": "",
             "heading_tag": "h3",
             "link_url": "",
@@ -657,7 +648,6 @@
         "p16": {
           "type": "image",
           "settings": {
-            "image": "shopify://shop_images/ugc_10.webp",
             "title": "",
             "heading_tag": "h3",
             "link_url": "",
@@ -679,7 +669,6 @@
         "image_fFtPKC": {
           "type": "image",
           "settings": {
-            "image": "shopify://shop_images/ugc_03.webp",
             "title": "",
             "heading_tag": "h3",
             "link_url": "",
@@ -701,7 +690,6 @@
         "image_hgepp9": {
           "type": "image",
           "settings": {
-            "image": "shopify://shop_images/ugc_04.webp",
             "title": "",
             "heading_tag": "h3",
             "link_url": "",
@@ -751,7 +739,8 @@
         "mobile_item_width": 150,
         "background": "",
         "background_gradient": ""
-      }
+      },
+      "disabled": true
     },
     "reviews": {
       "type": "reviews-carousel",
