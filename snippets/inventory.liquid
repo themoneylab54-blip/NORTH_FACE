@@ -19,7 +19,7 @@ Supported variables
       {%- if variant.inventory_management and variant.inventory_policy == 'deny' and variant.inventory_quantity <= low_threshold and low_threshold > 0 -%}
         <span class="text-with-icon text-error">{%- render 'icon' with 'warning' -%} {{- 'product.inventory.low_stock_with_quantity_count' | t: count: variant.inventory_quantity -}}</span>
       {%- else -%}
-        {%- if variant.inventory_policy == 'continue' and variant.inventory_quantity <= 0 and variant.requires_shipping -%}
+        {%- if variant.inventory_management and variant.inventory_policy == 'continue' and variant.inventory_quantity <= 0 and variant.requires_shipping -%}
           {%- if variant.incoming and variant.next_incoming_date -%}
             {%- capture next_incoming_date -%}{{ variant.next_incoming_date | date: format: 'date' }}{%- endcapture -%}
             <span class="text-with-icon text-warning">{%- render 'icon' with 'warning' -%} {{- 'product.inventory.incoming_stock' | t: next_incoming_date: next_incoming_date -}}</span>
