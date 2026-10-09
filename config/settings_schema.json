@@ -947,5 +947,26 @@
         "info": "180 x 180px .png recommended"
       }
     ]
+  },
+  {
+    "name": "Meta Pixel",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "PageView, ViewContent, AddToCart and InitiateCheckout, sent by the browser pixel and, when the relay URL is set, by the Conversions API with the same event ID (Meta counts each event once). Nothing is sent before the visitor allows marketing cookies where consent is required."
+      },
+      {
+        "type": "text",
+        "id": "meta_pixel_id",
+        "label": "Pixel ID",
+        "info": "Numbers only, from Meta Events Manager. Leave empty to turn the pixel off."
+      },
+      {
+        "type": "text",
+        "id": "meta_capi_url",
+        "label": "Conversions API relay URL",
+        "info": "Address of the Cloudflare Worker that holds the access token (meta-capi folder of the theme repository). Never paste the token itself here: theme code is public."
+      }
+    ]
   }
 ]

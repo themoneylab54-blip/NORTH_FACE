@@ -1,0 +1,221 @@
+{%- comment -%}
+----------------------------------------------------------------------------------------------------------------------
+META (FACEBOOK) PIXEL + CONVERSIONS API
+----------------------------------------------------------------------------------------------------------------------
+
+Theme settings > Meta Pixel: Pixel ID (empty = off) and the Conversions API relay URL (meta-capi/worker.js, a
+Cloudflare Worker that holds the access token). Rendered once, right after content_for_header.
+
+- PageView on every page. ViewContent is sent by sections/main-product.liquid (home page and product pages) through
+  window.metaPixel.track.
+- AddToCart on the theme's "variant:add" event (product form, quick buy, sticky bars, bundle builder). The
+  /cart/add.js response gives the line's total quantity, so the added quantity is the difference with the cart
+  before the add.
+- InitiateCheckout on any checkout button click, listened on window in the capture phase so it runs before any other
+  click handler on the page.
+- Every event goes to the browser pixel and, when the relay URL is set, to the Conversions API with the same event ID,
+  so Meta counts it once.
+- Nothing is sent before the visitor allows marketing cookies where Shopify requires consent (Customer Privacy API).
+  Events tracked before that are kept and sent once consent is given.
+- Skipped in the theme editor. The access token never goes here: theme code is public.
+{%- endcomment -%}
+
+{%- assign meta_pixel_id = settings.meta_pixel_id | strip -%}
+
+{%- if meta_pixel_id != blank and request.design_mode == false -%}
+  <script>
+    (function () {
+      var pixelId = {{ meta_pixel_id | json }};
+      var relayUrl = {{ settings.meta_capi_url | strip | json }};
+      var currency = {{ cart.currency.iso_code | json }};
+      var queue = [];
+      var started = false;
+      var lastCheckoutClick = 0;
+      var cart = {
+        total_price: {{ cart.total_price | json }},
+        item_count: {{ cart.item_count | json }},
+        currency: currency,
+        items: [
+          {%- for item in cart.items -%}
+            { "variant_id": {{ item.variant_id | json }}, "quantity": {{ item.quantity | json }} }{%- unless forloop.last -%},{%- endunless -%}
+          {%- endfor -%}
+        ]
+      };
+
+      function cookie(name) {
+        var match = document.cookie.match('(?:^|; )' + name + '=([^;]*)');
+        return match ? decodeURIComponent(match[1]) : undefined;
+      }
+
+      function clickId() {
+        var stored = cookie('_fbc');
+        var fbclid = new URLSearchParams(window.location.search).get('fbclid');
+
+        return stored || (fbclid ? 'fb.1.' + Date.now() + '.' + fbclid : undefined);
+      }
+
+      function quantitiesOf(someCart) {
+        var quantities = {};
+
+        ((someCart && someCart.items) || []).forEach(function (item) {
+          quantities[item.variant_id] = (quantities[item.variant_id] || 0) + item.quantity;
+        });
+
+        return quantities;
+      }
+
+      function rememberCart(someCart) {
+        if (someCart && someCart.items) {
+          cart = someCart;
+        }
+      }
+
+      {%- comment -%}
+        The pixel script sets the _fbp cookie once loaded: give it a moment before sending to the Conversions API,
+        except for InitiateCheckout, sent at once because the page is about to change.
+      {%- endcomment -%}
+      function sendToRelay(event, attempt) {
+        if (!relayUrl) {
+          return;
+        }
+
+        if (!cookie('_fbp') && event.event_name !== 'InitiateCheckout' && attempt < 5) {
+          setTimeout(function () { sendToRelay(event, attempt + 1); }, 400);
+          return;
+        }
+
+        event.fbp = cookie('_fbp');
+        event.fbc = clickId();
+
+        try {
+          fetch(relayUrl, {
+            method: 'POST',
+            body: JSON.stringify(event),
+            headers: { 'Content-Type': 'text/plain' },
+            credentials: 'omit',
+            keepalive: true
+          }).catch(function () {});
+        } catch (error) {}
+      }
+
+      function send(event) {
+        window.fbq('track', event.event_name, event.custom_data, { eventID: event.event_id });
+        sendToRelay(event, 0);
+      }
+
+      function track(name, params) {
+        var event = {
+          event_name: name,
+          event_id: name + '-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 10),
+          event_time: Math.floor(Date.now() / 1000),
+          event_source_url: window.location.href,
+          custom_data: params || {}
+        };
+
+        if (started) {
+          send(event);
+        } else {
+          queue.push(event);
+        }
+      }
+
+      function start() {
+        if (started) {
+          return;
+        }
+
+        started = true;
+
+        !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+        n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+        n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+        t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+        document,'script','https://connect.facebook.net/en_US/fbevents.js');
+
+        window.fbq('init', pixelId);
+        queue.forEach(send);
+        queue = [];
+      }
+
+      window.metaPixel = { track: track };
+
+      track('PageView');
+
+      document.addEventListener('variant:add', function (event) {
+        var detail = event.detail || {};
+        var items = detail.items || [];
+
+        if (!items.length) {
+          return;
+        }
+
+        var before = quantitiesOf(cart);
+        var after = quantitiesOf(detail.cart);
+        var contents = [];
+        var value = 0;
+
+        items.forEach(function (item) {
+          var id = item.variant_id || item.id;
+          var added = (after[id] || 0) - (before[id] || 0);
+
+          if (!(added > 0)) {
+            added = item.quantity || 1;
+          }
+
+          contents.push({ id: String(id), quantity: added });
+          value += (item.final_price != null ? item.final_price : item.price) * added / 100;
+        });
+
+        rememberCart(detail.cart);
+
+        track('AddToCart', {
+          content_ids: contents.map(function (content) { return content.id; }),
+          contents: contents,
+          content_type: 'product',
+          value: Math.round(value * 100) / 100,
+          currency: (detail.cart && detail.cart.currency) || currency
+        });
+      });
+
+      document.addEventListener('cart:change', function (event) {
+        rememberCart(event.detail && event.detail.cart);
+      });
+
+      window.addEventListener('click', function (event) {
+        var target = event.target;
+        var button = target && target.closest ? target.closest('button[name="checkout"], input[name="checkout"]') : null;
+
+        if (!button || Date.now() - lastCheckoutClick < 2000) {
+          return;
+        }
+
+        lastCheckoutClick = Date.now();
+
+        track('InitiateCheckout', {
+          content_ids: cart.items.map(function (item) { return String(item.variant_id); }),
+          contents: cart.items.map(function (item) { return { id: String(item.variant_id), quantity: item.quantity }; }),
+          content_type: 'product',
+          num_items: cart.item_count,
+          value: Math.round(cart.total_price) / 100,
+          currency: cart.currency || currency
+        });
+      }, true);
+
+      document.addEventListener('visitorConsentCollected', function (event) {
+        if (event.detail && event.detail.marketingAllowed) {
+          start();
+        }
+      });
+
+      if (window.Shopify && typeof window.Shopify.loadFeatures === 'function') {
+        window.Shopify.loadFeatures([{ name: 'consent-tracking-api', version: '0.1' }], function (error) {
+          if (!error && window.Shopify.customerPrivacy && window.Shopify.customerPrivacy.marketingAllowed()) {
+            start();
+          }
+        });
+      } else {
+        start();
+      }
+    })();
+  </script>
+{%- endif -%}
