@@ -65,6 +65,11 @@
         "type": "shopify://apps/loox-reviews/blocks/loox-inject/5c3b337f-fd14-4df5-b1d6-80ec13e6e28e",
         "disabled": false,
         "settings": {}
+      },
+      "4283104001981797428": {
+        "type": "shopify://apps/wetracked-io-connect/blocks/tracking/01a0e78e-0b9c-7d8a-b7fe-af78b794e837",
+        "disabled": false,
+        "settings": {}
       }
     }
   },
