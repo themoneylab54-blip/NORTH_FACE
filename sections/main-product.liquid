@@ -146,6 +146,23 @@ quick buy information in a template, that will be extracted in JS, but ensure it
 {%- endcomment -%}
 
 {%- render 'product-quick-buy', product: product -%}
+
+{%- comment -%}
+  Meta Pixel ViewContent (snippets/meta-pixel.liquid), here rather than in the layout so the home page counts too.
+  Kept outside <product-rerender>: the variant picker only swaps those parts, so this runs once per page view.
+{%- endcomment -%}
+{%- unless request.design_mode -%}
+  {%- assign meta_pixel_variant = product.selected_or_first_available_variant -%}
+  <script>
+    window.metaPixel && window.metaPixel.track('ViewContent', {
+      content_ids: [{{ meta_pixel_variant.id | append: '' | json }}],
+      content_name: {{ product.title | json }},
+      content_type: 'product',
+      value: {{ meta_pixel_variant.price | divided_by: 100.0 | json }},
+      currency: {{ cart.currency.iso_code | json }}
+    });
+  </script>
+{%- endunless -%}
 {%- elsif request.design_mode -%}
   <div class="container">
     <p class="text-subdued">Select a product in this section's settings (Product).</p>
